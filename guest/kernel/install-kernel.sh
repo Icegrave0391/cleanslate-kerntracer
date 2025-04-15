@@ -34,7 +34,7 @@ function check_kernel_config {
 	cat .config | grep "CONFIG_RANDOMIZE_BASE"
 	# cat .config | grep "CONFIG_DMA_CMA"
 	cat .config | grep "CONFIG_SPECULATION_MITIGATIONS"
-	cat .config | grep "CONFIG_RETPOLINE"
+	cat .config | grep "CONFIG_RETPOLINE" || true
 	cat .config | grep "CONFIG_NODES_SHIFT"
 	cat .config | grep "CONFIG_DEBUG_INFO"
 	echo "-----------------------------------"
@@ -46,7 +46,7 @@ function check_kernel_config {
 pushd linux
 	echo "Build: kernel"
 	# make defconfig
-	cp ../kernel-config .config
+	cp ../kernel_config .config
  	check_kernel_config
 	make -j$(nproc)
 popd

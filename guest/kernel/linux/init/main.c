@@ -968,7 +968,7 @@ asmlinkage __visible void __init __no_sanitize_address start_kernel(void)
 	page_alloc_init();
 
 	pr_notice("Kernel command line: %s\n", saved_command_line);
-	printk(KERN_INFO "Native kernel (test native/omnilog).\n");
+	printk(KERN_INFO "Native kernel (test native/func tracer/omnilog?).\n");
 	/* parameters may set static keys */
 	jump_label_init();
 	parse_early_param();
