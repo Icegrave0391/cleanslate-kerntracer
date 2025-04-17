@@ -1,0 +1,26 @@
+set test "embeddedc_suffix"
+set testpath "$srcdir/$subdir"
+set work_dir [pwd]
+
+if {! [installtest_p]} { untested $test; return }
+
+# --- TEST 1 ---
+
+set subtest1 "TEST 1: PR31018: if stmt needing locks before a map op stmt (check at runtime)"
+foreach runtime [get_runtime_list] {
+    if {$runtime eq ""} {
+        set runtime "kernel"
+    }
+    set test_name "$test: $subtest1 ($runtime)"
+    set stp_opts "-g -k"
+    set cmd "stap $stp_opts --runtime=$runtime '$srcdir/$subdir/${test}_1.stp'"
+    set exit_code [run_cmd_2way $cmd out stderr]
+    set exp_out "res: 32
+a=32
+"
+    is "${test_name}: stdout" $out $exp_out
+    is "${test_name}: exit code" $exit_code 0
+    if {$stderr ne ""} {
+        send_log "stderr:\n$stderr"
+    }
+}

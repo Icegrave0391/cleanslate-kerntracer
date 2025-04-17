@@ -1,0 +1,33 @@
+// for pr24659
+
+global value//=2
+global status//=2
+
+probe begin {
+  println("BEGIN")
+  value = 2
+  status = 2
+}
+
+probe kernel.function("vfs_read") {
+  status = 0
+  if (value == 2) next
+  status = 1
+}
+
+probe kernel.function("vfs_read") {
+  printf("vfs_read\n")
+  printf("value %d\n", value)
+  printf("status %d\n", status)
+  if (status != 2) exit()
+}
+
+probe end {
+  printf("end\n")
+  printf("value %d\n", value)
+  printf("status %d\n", status)
+  if (status)
+    println("END FAIL")
+  else
+    println("END PASS")
+}

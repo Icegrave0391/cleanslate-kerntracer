@@ -1,0 +1,64 @@
+#! /usr/bin/env stap
+
+# this many complete test iterations
+@define ITERCNT %( 10 %)
+# this many <<< operations per batch, before checking time
+@define BATCH %( 65536 %)
+# this many microseconds total to run batches for
+@define BATCHTIME %( 50000 %)
+
+@define time
+%(
+    %( runtime == "dyninst" %?
+        gettimeofday_us()
+    %:
+        cpu_clock_us(cpu())
+    %)
+%)
+
+@define feed(agg, nagg)
+%(
+    t1 = @time
+    cnt = 0
+    while (1)
+    {
+        cnt++
+        if (cnt % @BATCH == 0) # ensure we don't call time functions so frequently that they outweigh the payload
+           if (@time > (t1 + @BATCHTIME)) break
+        @agg <<< cnt # This is the operation whose runtime we actually want to measure!
+    }
+    @nagg = @nagg + cnt
+%)
+
+global a, na = 0
+global b, nb = 0
+global c, nc = 0
+global d, nd = 0
+
+probe begin
+{
+    for (i=0; i<@ITERCNT; i++)
+    {
+            @feed(a, na)
+            @feed(b, nb)
+            @feed(c[1], nc)
+            @feed(d[1], nd)
+    }
+    exit()
+}
+
+probe end
+{
+    println("REM na=", na)
+    println("REM @count(a)=", @count(a))
+    println("REM nb=", nb)
+    println("REM @variance(b)=", @variance(b))
+    println("REM nc=", nc)
+    println("REM @count(c[1])=", @count(c[1]))
+    println("REM nd=", nd)
+    println("REM @variance(d[1])=", @variance(d[1]))
+    if ((na > nb) && (nc > nd))
+        println("TEST_PASS")
+    else
+        println("TEST_FAIL")
+}

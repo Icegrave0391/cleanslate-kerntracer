@@ -1,0 +1,50 @@
+set test "optim_stats"
+
+# This test is a literal benchmark that asserts a speedup in various modes of
+# the runtime.  Let's consider two stap scripts.  Script A:
+#
+# global a
+# a <<< 3
+# a <<< 4
+# a <<< 5
+# println(@count(a))
+#
+# And script B:
+#
+# global b
+# b <<< 3
+# b <<< 4
+# b <<< 5
+# println(@variance(b))
+#
+# These two scripts take various run times t(A) and t(B).  This test
+# essentially tries to make sure that t(A) < t(B).  That's is because @count()
+# is computionally cheaper compared to @variance().  Both @count() and
+# @variance cause some incremental run time computation at every element
+# addition time.  The stap runtime should optimize out unneeded computations,
+# so that at the script A run time no @variance() is computed.
+#
+# This similarly works with stats whose elements are arrays, e.g. a[1] <<< 3
+#
+# This test tries to make sure that the above timing assumptions are true.
+
+if {![installtest_p]} {
+    untested $test
+    return
+}
+
+foreach runtime [get_runtime_list] {
+    if {$runtime != ""} {
+        spawn stap --runtime=$runtime -g --suppress-time-limits $srcdir/$subdir/$test.stp
+    } else {
+        spawn stap -g --suppress-time-limits $srcdir/$subdir/$test.stp
+    }
+    expect {
+        -timeout 300
+        {TEST_PASS} { pass "$test $runtime" }
+        {TEST_FAIL} { fail "$test $runtime" }
+        timeout {fail "$test $runtime: unexpected timeout"}
+        eof { }
+    }
+    catch {close}; catch {wait}
+}

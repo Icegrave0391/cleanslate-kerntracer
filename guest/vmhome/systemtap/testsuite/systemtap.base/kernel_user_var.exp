@@ -1,0 +1,28 @@
+set test "kernel_user_var"
+
+if {! [installtest_p]} { untested "$test"; return }
+
+set stap_path $env(SYSTEMTAP_PATH)/stap
+set stpfile "$srcdir/$subdir/$test.stp"
+
+set ok 0
+set notok 0
+spawn $stap_path $stpfile
+expect {
+    -timeout 180
+    -re {->} { incr ok; exp_continue }
+    -re {0x} { incr notok; exp_continue }
+    eof { }
+}
+catch {close}; catch {wait}
+if {$ok != 0 && $notok == 0} {
+    # A user space string should be interpreted
+    pass "$test"
+} elseif {$notok != 0} {
+    # A user space string was not interpreted; only address displayed
+    fail "$test"
+} else {
+    # The probe did not produce output
+    untested "$test"
+}
+

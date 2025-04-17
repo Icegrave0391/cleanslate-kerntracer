@@ -1,0 +1,126 @@
+# debuginfod_probe.exp
+#
+# Checks to see that the debuginfod.process(PATH).** probes
+# are working
+
+set test "debuginfod_probe"
+
+set stap_path $env(SYSTEMTAP_PATH)/stap
+
+catch {exec /usr/bin/which debuginfod} debuginfod
+
+# Check to see if the 'debuginfod_find_metadata' symbol can be found i.e the
+# version of debuginfod supports metadata querying
+set found_metadata_symbol [catch {exec /usr/bin/objdump -t $debuginfod | /usr/bin/grep "debuginfod_find_metadata"}]
+set found_jsonc [catch {exec pkg-config json-c}]
+
+if {"$debuginfod" == "" || $found_metadata_symbol != 0 || $found_jsonc != 0} then {
+    untested "$test"
+} else {
+    # Uncomment for test debugging
+    # log_user 1
+
+    set port [expr {10000 + int(rand()*10000)}]
+    set temp_dir [file join "/tmp/staptest" [pid]]
+    catch {exec mkdir -p $temp_dir}
+    verbose -log "The temp test directory is $temp_dir"
+
+    # Set the cache location to be in the temp test dir
+    set env(XDG_CACHE_HOME) $temp_dir
+    set env(DEBUGINFOD_URLS) ""
+
+    spawn $debuginfod -p $port -R "$srcdir/$subdir/debuginfod_probe.rpm" -d ":memory:"
+    set debuginfod_pid [exp_pid $spawn_id]
+    # give it time to scan the build directory
+    wait_n_secs 5
+
+    set env(DEBUGINFOD_URLS) "http://localhost:$port"
+    verbose -log "started debuginfod on server $env(DEBUGINFOD_URLS)"
+
+    # Test 1a: No globbing
+    set subtest "$test basic"
+    set systemtap_script {
+        probe
+        debuginfod
+        .process("/usr/local/bin/hello")
+        .function("main")
+        { printf("HelloWorld\n") }
+    }
+    spawn sh -c "$stap_path -ve \'$systemtap_script\' -p2 2>&1"
+    wait_n_secs 5
+    set pass 0
+    expect {
+        -timeout 5
+        -re {.*process\(\"f0aa15b8aba4f3c28cac3c2a73801fefa644a9f2\"\).function\(\"main\"\)*} { incr pass }
+        eof { }
+        timeout { fail "$subtest (timeout)" }
+    }
+    catch {close}; catch {wait}
+    if {$pass == 1} then { pass $subtest } else { fail $subtest }
+
+    # Test 1b: Globbing
+    set subtest "$test globbing"
+    set systemtap_script {
+        probe
+        debuginfod
+        .process("/usr/*/*/he???")
+        .function("main")
+        { printf("HelloWorld\n") }
+    }
+    spawn sh -c "$stap_path -ve \'$systemtap_script\' -p2 2>&1"
+    wait_n_secs 5
+    set pass 0
+    expect {
+        -timeout 5
+        -re {.*process\(\"f0aa15b8aba4f3c28cac3c2a73801fefa644a9f2\"\).function\(\"main\"\)*} { incr pass }
+        eof { }
+        timeout { fail "$subtest (timeout)" }
+    }
+    catch {close}; catch {wait}
+    if {$pass == 1} then { pass $subtest } else { fail $subtest }
+
+    # Test 1c: nonexistent path
+    set subtest "$test nonexistent path"
+    set systemtap_script {
+        probe
+        debuginfod
+        .process("/usr/bin/world")
+        .function("main")
+        { printf("HelloWorld\n") }
+    }
+    spawn $stap_path -ve $systemtap_script
+    set pass 0
+    expect {
+        -timeout 10
+        -re {.*semantic error: can't retrieve buildids from debuginfod.*} { incr pass }
+        timeout { fail "$subtest (timeout)" }
+    }
+    catch {close}; catch {wait}
+    if {$pass == 1} then { pass $subtest } else { fail $subtest }
+
+    # Test 1d: package
+    set subtest "$test package"
+    set systemtap_script {
+        probe
+        debuginfod
+        .archive("*probe*")
+        .process("/usr/local/bin/hello")
+        .function("main")
+        { printf("HelloWorld\n") }
+    }
+    spawn sh -c "$stap_path -ve \'$systemtap_script\' -p2 2>&1"
+    wait_n_secs 5
+    set pass 0
+    expect {
+        -timeout 5
+        -re {.*process\(\"f0aa15b8aba4f3c28cac3c2a73801fefa644a9f2\"\).function\(\"main\"\)*} { incr pass }
+        eof { }
+        timeout { fail "$subtest (timeout)" }
+    }
+    catch {close}; catch {wait}
+    if {$pass == 1} then { pass $subtest } else { fail $subtest }
+
+    # Cleanup
+    catch { exec rm -rf "/tmp/staptest" }
+    kill -INT $debuginfod_pid
+}

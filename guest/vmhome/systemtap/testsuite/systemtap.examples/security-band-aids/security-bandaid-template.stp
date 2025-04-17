@@ -1,0 +1,31 @@
+#! /usr/bin/stap -g -m CVE_YYYY_ABCD
+
+/* The following is a template for security bandaids for use
+ * in live patching CVEs with systemtap
+ * See: https://securityblog.redhat.com/2015/06/03/emergency-security-band-aids-with-systemtap/
+ *
+ * The template will define global variables
+ *      cve_notify_p: Nonzero int if the user wants notifications on the loading(begin)/unloading(end) of the patch. O otherwise
+ *      cve_fix_p: Nonzero int if the user wants their CVE to run the fix payload. 0 otherwise
+ *      cve_trace_p: Nonzero int if the user wants their CVE to trace the issue. 0 otherwise
+ *      cve_enabled_p: Nonzero int if the user's patch code should be run. 0 otherwise
+ *          When disabled, there is minimal overhead for the patch and all probes which should be
+ *          toggleable should have `if(cve_enabled_p)` before the probe body.
+ *      cve_tmpdisabled_s: A countdown timer for temporary disabling of probes by setting
+ *          cve_enabled_p to 0 until this number of seconds decreases to <0.
+ *
+ * It is assumed that the user's probes will utilize the above for these purposes
+ * These can be changed within the user's probes at runtime using procfs (/proc/systemtap/CVE_YYYY_ABCD/*)
+ * For example see cve-2016-0728-templatized.stp or cve-2018-6485-templatized.stp
+ *
+ * The user can also track metrics using cve_count_metric(key:string) and cve_record_metric(key:string, value:long)
+ * Where cve_count_metric increments a counter each time called and cve_record_metric can store any long value
+ * These are visable along with some buildin metrics at /proc/systemtap/CVE_YYYY_ABCD/__prometheus
+ *
+ * The patch can also be fully disabled programatically using cve_tmpdisable(duration:long), where
+ * a non-negative duration is the number of seconds to disable the patch, and negative is disabled until reenabled
+ * via procfs
+ */
+
+// User Action Item: Add fix payload here using defined globals
+probe X.Y.Z if(cve_enabled_p) {...}

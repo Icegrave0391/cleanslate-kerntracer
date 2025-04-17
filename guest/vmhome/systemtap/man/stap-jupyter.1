@@ -1,0 +1,99 @@
+.\" -*- nroff -*-
+.TH STAP-JUPYTER-* 1
+.SH NAME
+stap-jupyter-install   \- locally install isystemtap
+
+stap-jupyter-container \- manage an isystemtap container image
+
+.\" macros
+.de SAMPLE
+
+.nr oldin \\n(.i
+.br
+.RS
+.nf
+.nh
+..
+.de ESAMPLE
+.hy
+.fi
+.RE
+.in \\n[oldin]u
+
+..
+
+.SH SYNOPSIS
+\fBstap-jupyter-install\fR
+[\fB--remove\fR]
+[\fB--container-install\fR \fIPREFIX\fR]
+
+\fBstap-jupyter-container\fR
+[\fB--repo\fR \fIREPOSITORY\fR]
+[\fB--image\fR \fIIMAGE\fR]
+[\fB--tag\fR \fITAG\fR]
+[\fB--keyname\fR \fIKEYNAME\fR]
+--{\fBrun\fR, \fBpull\fR, \fBbuild\fR, \fBpublish\fR, \fBremove\fR}
+
+.SH DESCRIPTION
+ISystemtap is an interactive jupyter interface for the incremental writing and running 
+of Systemtap scripts.
+
+The \fIstap-jupyter-install\fR program can be used to locally install the ISystemtap
+jupyter kernel, language-server and jupyter-lab extension in ~/.systemtap/jupyter.
+Once installed, the kernel can be used with \fIjupyter-lab\fR.
+
+Alternatively the \fIstap-jupyter-container\fR program can be used to run ISystemtap
+within a container, preventing the need for any local jupyter kernel installation.
+
+.SH INSTALL OPTIONS
+The following options are supported by stap-jupyter-install. Any other option prints a short help
+message.
+.IP "\fB--remove\fR"
+Uninstall the local ISystemtap files.
+.IP "\fB--container-install\fR \fIPREFIX\fR"
+\fB[Intended For Maintainers Only]\fR This is used to specify the \fIPREFIX\fR of the install
+directory for \fIstap\fR. It is called within the container build process, and should not
+be used otherwise. 
+.SH CONTAINER OPTIONS
+The following options are supported by stap-jupyter-container. Any other option prints a short help
+message.
+.IP "\fB--repo\fR \fIREPOSITORY\fR"
+Specify which repository to use, defaults to "quay.io".
+.IP "\fB--image\fR \fIIMAGE\fR"
+Specify the image name. Defaults to "systemtap/isystemtap"
+.IP "\fB--tag\fR \fITAG\fR"
+Specify the image tag. Defaults to "latest"
+.IP "\fB--keyname\fR \fIKEYNAME\fR"
+In order for the container to run \fIstap\fR it needs to \fIssh\fR to the host. It requires
+an ssh key pair, and is specified by \fIKEYNAME\fR, which is by default "id_rsa".
+
+.SH CONTAINER COMMANDS
+The following commands are recognized by stap-jupyter-container. One of the following
+is required.
+.IP "\fB--run\fR"
+ Run the image. Pulls if not done already.
+.IP "\fB--pull\fR"
+ Pulls the image.
+.IP "\fB--build\fR"
+ Builds a local copy of the image. The repo will be "localhost". See \fIpodman\fR images.
+.IP "\fB--remove\fR"
+ Removes the image.
+.IP "\fB--publish\fR"
+ \fB[Intended For Maintainers Only]\fR This is used to publish the built image. It 
+requires write permissions to 
+.nh
+https://quay.io/systemtap/isystemtap.
+.hy
+
+.SH SEE ALSO
+.nh
+.nf
+.IR stap (1),
+.IR podman (1)
+.IR ssh (1)
+
+.SH BUGS
+Use the Bugzilla link of the project web page or our mailing list.
+.nh
+.BR http://sourceware.org/systemtap/ , <systemtap@sourceware.org> .
+.hy

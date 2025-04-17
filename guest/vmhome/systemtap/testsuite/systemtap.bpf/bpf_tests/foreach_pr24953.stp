@@ -1,0 +1,39 @@
+global arr1
+global arr2
+global arr3
+
+probe begin {
+    printf("BEGIN\n")
+
+    arr1["a"] = 1;
+    arr2[10] = 200;
+    arr1["b"] = 2;
+    arr2[100] = 2000;
+    arr1["b"] = 3;
+    arr2[10] = 20000;
+    arr1["a"] = 4;
+
+    arr3[1] = 1
+    arr3[2] = 2
+    arr3[3] = 3
+
+    exit()
+}
+
+probe end {
+    flag = 1
+
+    foreach (val1 = key1 in arr1)
+        flag = flag && (val1 == arr1[key1])
+
+    foreach (val2 = key2 in arr2)
+        flag = flag && (val2 == arr2[key2])
+
+    foreach (val3 = key3 in arr3)
+        flag = flag && (val3 == arr3[key3])
+
+    if (flag)
+        printf("END PASS\n")
+    else
+        printf("END FAIL\n")
+}

@@ -1,0 +1,12 @@
+# NB: The ipykernel version is frozen since later versions cause the buttons and other
+# clickable/typeable inputs to stop working. Exactly why is unclear, but since isystemtap
+# is a child of the ipykernel anyways and older version won't hurt unless we also upgrade
+# want a newer kernel feature. So its not a big issue
+ipykernel==6.15.2    # The base ipython kernel, which the isystemtap kernel inherits from 
+bqplot              # A matplotlib like library, but based on ipywidgets
+ipyevents           # Event widget, used for certain user actions (ex. keyboard input)
+jupyter-ui-poll     # Used for polling of user events, while cells are running
+ipywidgets==8.0.4   # The widgets which are generated in the output of the cells. NB: we freeze the version since 8.0.5 introduced a bug, this can be unfrozen when this is fixed
+jupyter_kernel_test # A dependency of the testsuite
+jupyterlab          # The frontend
+jupyterlab-lsp      # The language-server client extension

@@ -1,0 +1,24 @@
+
+set ::result_string {-4 3 2 1
+1 2 3 -4}
+
+foreach dwarf [list -g -gdwarf-2 -gdwarf-3 -gdwarf-4 -gdwarf-5] {
+    set test "bitfield2 $dwarf"
+    set binary "./a.out$dwarf"
+    set res [target_compile ${srcdir}/${subdir}/bitfield2.c $binary executable \
+                 "additional_flags=$dwarf"]
+    if {$res ne ""} {
+        verbose "target_compile failed: $res" 2
+        fail "$test compilation"
+    } else {
+        pass "$test compilation"
+    }
+
+    foreach runtime [get_runtime_list] {
+        if {$runtime != ""} {
+            stap_run3 "$test $runtime" --runtime=$runtime -g $srcdir/$subdir/bitfield2.stp -c $binary
+        } else {
+            stap_run3 $test -g $srcdir/$subdir/bitfield2.stp -c $binary
+        }
+    }
+}

@@ -1,0 +1,7 @@
+probe process.data(0x$^ADDR_a).rw {
+    println("Hit");
+}
+
+probe timer.s(1) {
+    exit();
+}

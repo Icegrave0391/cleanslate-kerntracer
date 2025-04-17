@@ -1,0 +1,16 @@
+
+global a, b, c, d
+  
+probe process.function("main").label("f3") {
+  a = $f->d
+  b = $f->a
+  c = $g->b
+  d = $g->d
+}
+
+probe process.function("main").label("f4") {
+  $f->d = d;
+  $f->a = c;
+  $g->b = b;
+  $g->d = a;
+}

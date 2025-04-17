@@ -1,0 +1,50 @@
+set test pr30407
+
+proc test_cleanup {} {
+    catch {exec rm -f $test}
+}
+
+if {! [installtest_p] || ! [uretprobes_p]} {
+  test_cleanup
+  untested "$test -p5"
+  return
+}
+
+for {set i 0} {$i < [arch_compile_flags]} {incr i} {
+    for {set d 4} {$d <=5} {incr d} {
+        foreach j { \  PIE } {
+            set test_flags "compiler=gcc [arch_compile_flag $i]"
+            set test_flags "$test_flags additional_flags=-g additional_flags=-gdwarf-$d"
+            if { $j == "PIE" } {
+                set test_flags "$test_flags additional_flags=-fPIE"
+                set test_flags "$test_flags additional_flags=-pie"
+            }
+            set res [target_compile $srcdir/$subdir/$test.c $test \
+                         executable $test_flags]
+            if {$res == "" && [file exists $test]} then {
+              pass "$test compile ($test_flags)"
+            } else {
+              fail "$test compile ($test_flags)"
+            }
+
+            spawn stap --ldd $srcdir/$subdir/$test.stp -c ./$test
+            set ok 0
+            expect {
+                    -timeout 60
+                    -re {[\ ]*0x[0-9a-f]+[^\r\n]*systemtap.base/pr30407.c:[0-9][^\r\n]*\r\n} {
+                      incr ok; exp_continue
+                    }
+                    -re {[\ ]*0x[0-9a-f]+[^\r\n]*\r\n} { exp_continue }
+                    timeout { fail "$test (timeout)" }
+                    eof { }
+            }
+            catch { close }; catch { wait }
+            if {$ok == 1} then {
+                pass "$test -p5 ($test_flags - $ok)"
+            } else {
+                fail "$test -p5 ($test_flags - $ok)"
+            }
+        }
+    }
+}
+test_cleanup

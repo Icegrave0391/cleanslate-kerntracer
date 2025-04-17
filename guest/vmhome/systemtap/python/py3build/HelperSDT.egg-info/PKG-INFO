@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: HelperSDT
+Version: 0.1.0
+Summary: Helper SDT python module
+Home-page: http://sourceware.org/systemtap
+Author: Systemtap Development Team
+Author-email: systemtap@sourceware.org
+License: GPLv2+
+Platform: UNKNOWN
+
+A python module that gets loaded when systemtap wants to set breakpoints in a python file.
+

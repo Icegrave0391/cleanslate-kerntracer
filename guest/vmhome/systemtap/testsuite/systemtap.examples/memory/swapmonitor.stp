@@ -1,0 +1,20 @@
+#! /usr/bin/env stap
+
+global swap_result
+probe kernel.function("swap_read_folio")!, kernel.function("swap_readpage") {
+  swap_result[tz_ctime(gettimeofday_s()),ppfunc(),execname(),pid()] <<< 1
+}
+probe kernel.function("swap_write_folio")!, kernel.function("swap_writepage") {
+  swap_result[tz_ctime(gettimeofday_s()),ppfunc(),execname(),pid()] <<< 1
+}
+
+probe begin {
+  printf("%-30s %-15s %-25s %-10s %-10s \n","TIME","FUNC","COMM","PID", "COUNT")
+}
+
+probe timer.s(10) {
+  foreach ([t+,f,n,p] in swap_result) {
+    printf("%-30s %-15s %-25s %-10d %-10d \n",t,f,n,p,@count(swap_result[t,f,n,p]))
+  }
+  delete(swap_result)
+}

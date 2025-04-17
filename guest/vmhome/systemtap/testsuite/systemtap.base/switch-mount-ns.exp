@@ -1,0 +1,328 @@
+set test "switch-mount-ns"
+set testpath "$srcdir/$subdir"
+set work_dir [pwd]
+
+if {! [installtest_p]} { untested $test; return }
+if {! [uretprobes_p]} { untested $test; return }
+
+# --- TEST 1 ---
+
+set subtest1 "TEST 1: --target-namespace + uprobes in containers (no -x PID)"
+if {![min_kernel_vers_p 5.8.0]} {
+    untested "switch-mount-ns (kernel version is too low; 5.8+ required)"
+} else {
+    set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+        "additional_flags=-O additional_flags=-g additional_flags=-O0"]
+    if {$res ne ""} {
+        verbose "target_compile failed: $res" 2
+        fail "$test: $subtest1: unable to compile ${test}_1.c"
+    } else {
+        if {! [process_template_file "$srcdir/$subdir/${test}_1.stp" \
+                                     "./${test}_1.stp" "./a.out" nm_err]} {
+            fail "$test: $subtest1: $nm_err"
+        } else {
+            set test_name "$test: $subtest1"
+
+            set rc [catch {exec sh -c "cd '$work_dir' && rm -f *.pid"} res]
+            if {$rc != 0} {
+                fail "$test: $subtest1: failed to clean up files under '$work_dir': $res"
+                return;
+            }
+            spawn -noecho bash -c "$srcdir/$subdir/${test}_1.sh '$work_dir/a.out' '${test}-1' > '$work_dir/${test}-1-bg-shell-out.log' 2>&1"
+            set bg_sh_pid [exp_pid $spawn_id]
+            set bg_pid $bg_sh_pid
+
+            set ns_pid ""
+            set ns_pid_file "$work_dir/ns.pid"
+            for {set i 0} {$i < 1000} {incr i} {
+                if {[file exists $ns_pid_file]} {
+                    set f [open "$ns_pid_file" r]
+                    set ns_pid [read $f]
+                    close $f
+                    break
+                }
+                # in sec
+                sleep 0.01
+            }
+            if {![info exists ns_pid] || $ns_pid eq ""} {
+                fail "$test: $subtest1: ns.pid was never found under $work_dir: [exec ls $work_dir]"
+                return
+            }
+
+            if {[file exists "$work_dir/target.pid"]} {
+                set f [open "$work_dir/target.pid" r]
+                set bg_pid [read $f]
+                close $f
+            }
+            set stp_opts "--target-namespace=\$^NS_PID -d \$^WORK_DIR/tmp/newtarget/a.out"
+            regsub -all -- {\$\^WORK_DIR\y} $stp_opts $work_dir stp_opts
+            regsub -all -- {\$\^NS_PID\y} $stp_opts $ns_pid stp_opts
+            set cmd "stap $stp_opts './${test}_1.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            catch {kill -INT -$bg_sh_pid 2}
+            catch {kill -KILL $bg_sh_pid}
+            set exp_out "Hit
+target pid: 0
+"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            set no_stderr_pat "Failed to open file '/proc/\\d+/ns/mnt': No such file or directory"
+            unlike "${test_name}: stderr should not match" $stderr $no_stderr_pat "-lineanchor"
+        }
+    }
+}
+
+# --- TEST 2 ---
+
+set subtest2 "TEST 2: --target-namespace + uprobes in containers (with -x PID)"
+if {![min_kernel_vers_p 5.8.0]} {
+    untested "switch-mount-ns (kernel version is too low; 5.8+ required)"
+} else {
+    set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+        "additional_flags=-O additional_flags=-g additional_flags=-O0"]
+    if {$res ne ""} {
+        verbose "target_compile failed: $res" 2
+        fail "$test: $subtest2: unable to compile ${test}_1.c"
+    } else {
+        if {! [process_template_file "$srcdir/$subdir/${test}_1.stp" \
+                                     "./${test}_1.stp" "./a.out" nm_err]} {
+            fail "$test: $subtest2: $nm_err"
+        } else {
+            set test_name "$test: $subtest2"
+
+            set rc [catch {exec sh -c "cd '$work_dir' && rm -f *.pid"} res]
+            if {$rc != 0} {
+                fail "$test: $subtest2: failed to clean up files under '$work_dir': $res"
+                return;
+            }
+            spawn -noecho bash -c "$srcdir/$subdir/${test}_1.sh '$work_dir/a.out' '${test}-2' > '$work_dir/${test}-2-bg-shell-out.log' 2>&1"
+            set bg_sh_pid [exp_pid $spawn_id]
+            set bg_pid $bg_sh_pid
+
+            set ns_pid ""
+            set ns_pid_file "$work_dir/ns.pid"
+            for {set i 0} {$i < 1000} {incr i} {
+                if {[file exists $ns_pid_file]} {
+                    set f [open "$ns_pid_file" r]
+                    set ns_pid [read $f]
+                    close $f
+                    break
+                }
+                # in sec
+                sleep 0.01
+            }
+            if {![info exists ns_pid] || $ns_pid eq ""} {
+                fail "$test: $subtest2: ns.pid was never found under $work_dir: [exec ls $work_dir]"
+                return
+            }
+
+            if {[file exists "$work_dir/target.pid"]} {
+                set f [open "$work_dir/target.pid" r]
+                set bg_pid [read $f]
+                close $f
+            }
+            set stp_opts "--target-namespace=\$^NS_PID -d \$^WORK_DIR/tmp/newtarget/a.out -x \$^PID"
+            regsub -all -- {\$\^WORK_DIR\y} $stp_opts $work_dir stp_opts
+            regsub -all -- {\$\^NS_PID\y} $stp_opts $ns_pid stp_opts
+            regsub -all -- {\$\^PID\y} $stp_opts $bg_pid stp_opts
+            set cmd "stap $stp_opts './${test}_1.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            catch {kill -INT -$bg_sh_pid 2}
+            catch {kill -KILL $bg_sh_pid}
+            set out_pat "\\AHit
+target pid: \[1-9\]\\d*
+\\Z"
+            like "${test_name}: stdout" $out $out_pat "-lineanchor"
+            is "${test_name}: exit code" $exit_code 0
+            set no_stderr_pat "Failed to open file '/proc/\\d+/ns/mnt': No such file or directory"
+            unlike "${test_name}: stderr should not match" $stderr $no_stderr_pat "-lineanchor"
+        }
+    }
+}
+
+# --- TEST 3 ---
+
+set subtest3 "TEST 3: NO --target-namespace for uprobes in containers (no -x PID)"
+
+# No hits
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest3: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_1.stp" \
+                                 "./${test}_1.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest3: $nm_err"
+    } else {
+        set test_name "$test: $subtest3"
+
+        set rc [catch {exec sh -c "cd '$work_dir' && rm -f *.pid"} res]
+        if {$rc != 0} {
+            fail "$test: $subtest3: failed to clean up files under '$work_dir': $res"
+            return;
+        }
+        spawn -noecho bash -c "$srcdir/$subdir/${test}_1.sh '$work_dir/a.out' '${test}-3' > '$work_dir/${test}-3-bg-shell-out.log' 2>&1"
+        set bg_sh_pid [exp_pid $spawn_id]
+        set bg_pid $bg_sh_pid
+
+        set ns_pid ""
+        set ns_pid_file "$work_dir/ns.pid"
+        for {set i 0} {$i < 1000} {incr i} {
+            if {[file exists $ns_pid_file]} {
+                set f [open "$ns_pid_file" r]
+                set ns_pid [read $f]
+                close $f
+                break
+            }
+            # in sec
+            sleep 0.01
+        }
+        if {![info exists ns_pid] || $ns_pid eq ""} {
+            fail "$test: $subtest3: ns.pid was never found under $work_dir: [exec ls $work_dir]"
+            return
+        }
+
+        if {[file exists "$work_dir/target.pid"]} {
+            set f [open "$work_dir/target.pid" r]
+            set bg_pid [read $f]
+            close $f
+        }
+        set stp_opts "-d \$^WORK_DIR/tmp/newtarget/a.out -x \$^PID"
+        regsub -all -- {\$\^WORK_DIR\y} $stp_opts $work_dir stp_opts
+        regsub -all -- {\$\^PID\y} $stp_opts $bg_pid stp_opts
+        set cmd "stap $stp_opts './${test}_1.stp'"
+        set exit_code [run_cmd_2way_as_root $cmd out stderr]
+        catch {kill -INT -$bg_sh_pid 2}
+        catch {kill -KILL $bg_sh_pid}
+        set exp_out ""
+        is "${test_name}: stdout" $out $exp_out
+        is "${test_name}: exit code" $exit_code 0
+        set no_stderr_pat "Failed to open file '/proc/\\d+/ns/mnt': No such file or directory"
+        unlike "${test_name}: stderr should not match" $stderr $no_stderr_pat "-lineanchor"
+    }
+}
+
+# --- TEST 4 ---
+
+set subtest4 "TEST 4: mismatched ns in --target-namespace for uprobes in containers (no -x PID)"
+
+# No hits
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest4: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_1.stp" \
+                                 "./${test}_1.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest4: $nm_err"
+    } else {
+        set test_name "$test: $subtest4"
+
+        set rc [catch {exec sh -c "cd '$work_dir' && rm -f *.pid"} res]
+        if {$rc != 0} {
+            fail "$test: $subtest4: failed to clean up files under '$work_dir': $res"
+            return;
+        }
+        spawn -noecho bash -c "$srcdir/$subdir/${test}_1.sh '$work_dir/a.out' '${test}-4' > '$work_dir/${test}-4-bg-shell-out.log' 2>&1"
+        set bg_sh_pid [exp_pid $spawn_id]
+        set bg_pid $bg_sh_pid
+
+        set ns_pid ""
+        set ns_pid_file "$work_dir/ns.pid"
+        for {set i 0} {$i < 1000} {incr i} {
+            if {[file exists $ns_pid_file]} {
+                set f [open "$ns_pid_file" r]
+                set ns_pid [read $f]
+                close $f
+                break
+            }
+            # in sec
+            sleep 0.01
+        }
+        if {![info exists ns_pid] || $ns_pid eq ""} {
+            fail "$test: $subtest4: ns.pid was never found under $work_dir: [exec ls $work_dir]"
+            return
+        }
+
+        if {[file exists "$work_dir/target.pid"]} {
+            set f [open "$work_dir/target.pid" r]
+            set bg_pid [read $f]
+            close $f
+        }
+        set stp_opts "--target-namespace 1 -d \$^WORK_DIR/tmp/newtarget/a.out"
+        regsub -all -- {\$\^WORK_DIR\y} $stp_opts $work_dir stp_opts
+        set cmd "stap $stp_opts './${test}_1.stp'"
+        set exit_code [run_cmd_2way_as_root $cmd out stderr]
+        catch {kill -INT -$bg_sh_pid 2}
+        catch {kill -KILL $bg_sh_pid}
+        set exp_out ""
+        is "${test_name}: stdout" $out $exp_out
+        is "${test_name}: exit code" $exit_code 0
+        set no_stderr_pat "Failed to open file '/proc/\\d+/ns/mnt': No such file or directory"
+        unlike "${test_name}: stderr should not match" $stderr $no_stderr_pat "-lineanchor"
+    }
+}
+
+# --- TEST 5 ---
+
+set subtest5 "TEST 5: ns pid not found: --target-namespace + uprobes in containers (no -x PID)"
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest5: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_1.stp" \
+                                 "./${test}_1.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest5: $nm_err"
+    } else {
+        set test_name "$test: $subtest5"
+
+        set rc [catch {exec sh -c "cd '$work_dir' && rm -f *.pid"} res]
+        if {$rc != 0} {
+            fail "$test: $subtest5: failed to clean up files under '$work_dir': $res"
+            return;
+        }
+        spawn -noecho bash -c "$srcdir/$subdir/${test}_1.sh '$work_dir/a.out' '${test}-5' > '$work_dir/${test}-5-bg-shell-out.log' 2>&1"
+        set bg_sh_pid [exp_pid $spawn_id]
+        set bg_pid $bg_sh_pid
+
+        set ns_pid ""
+        set ns_pid_file "$work_dir/ns.pid"
+        for {set i 0} {$i < 1000} {incr i} {
+            if {[file exists $ns_pid_file]} {
+                set f [open "$ns_pid_file" r]
+                set ns_pid [read $f]
+                close $f
+                break
+            }
+            # in sec
+            sleep 0.01
+        }
+        if {![info exists ns_pid] || $ns_pid eq ""} {
+            fail "$test: $subtest5: ns.pid was never found under $work_dir: [exec ls $work_dir]"
+            return
+        }
+
+        if {[file exists "$work_dir/target.pid"]} {
+            set f [open "$work_dir/target.pid" r]
+            set bg_pid [read $f]
+            close $f
+        }
+        set stp_opts "--target-namespace=123456 -d \$^WORK_DIR/tmp/newtarget/a.out"
+        regsub -all -- {\$\^WORK_DIR\y} $stp_opts $work_dir stp_opts
+        set cmd "stap $stp_opts './${test}_1.stp'"
+        set exit_code [run_cmd_2way $cmd out stderr]
+        catch {kill -INT -$bg_sh_pid 2}
+        catch {kill -KILL $bg_sh_pid}
+        set exp_out ""
+        is "${test_name}: stdout" $out $exp_out
+        isnt "${test_name}: exit code" $exit_code 0
+        set stderr_pat "^Failed to open file '/proc/123456/ns/mnt': No such file or directory
+WARNING: \[^\\n\]*?\\ystaprun exited with status: 1
+"
+        like "${test_name}: stderr" $stderr $stderr_pat "-lineanchor"
+    }
+}

@@ -1,0 +1,5 @@
+
+probe module("amd*").function("*") {
+  printf("hello");
+  exit();
+}

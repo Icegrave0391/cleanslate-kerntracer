@@ -1,0 +1,13 @@
+
+
+/* print copious amounts of content to test message framing / sequencing, PR28449 */
+
+global seq
+probe timer.profile {
+  seq ++
+  for (i=0; i<seq*seq; i++)
+    printf ("%d ", seq)
+  printf("\n")
+  
+  if (seq > 384) exit() // cry uncle
+}

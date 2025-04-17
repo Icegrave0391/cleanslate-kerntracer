@@ -1,0 +1,18 @@
+%{
+#define STAP_MODULE_INIT_HOOK  my_init
+
+long my_global_var = 0;
+
+static int my_init(void) {
+    my_global_var += 2;
+    return 0;
+}
+%}
+
+function get_val:long() %{
+    STAP_RETURN(my_global_var);
+%}
+
+probe oneshot {
+    println("res: ", get_val());
+}

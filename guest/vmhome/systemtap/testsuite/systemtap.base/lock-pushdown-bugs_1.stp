@@ -1,0 +1,18 @@
+@define assert_lock(v) %( if (%{ c->locked %} != @v) { error(sprintf("locked mismatch, expected %d, actual %d", @v, %{ c->locked %})) } %)
+
+global stats;
+
+probe process.function("main") {
+    my_pid = pid();
+    v = @var("argc");
+    @assert_lock(0);
+    if (v > 3) {
+        delete stats;
+    }
+    @assert_lock(0);
+    stats[my_pid] <<< v;
+    @assert_lock(1);
+    stats[my_pid] <<< v;
+    @assert_lock(2);
+    println("ok");
+}

@@ -1,0 +1,9 @@
+probe process("./test_unused").function("foo") {
+  $a = 9;
+  $b = 42;
+}
+
+probe process("./test_unused").function("bar") {
+  $a = 18;
+  $b = 21;
+}

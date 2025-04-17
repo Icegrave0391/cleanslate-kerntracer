@@ -1,0 +1,8 @@
+title: Trace VFS writes to files
+name: traceio3.stp
+keywords: io
+subsystem: io
+exit: user-controlled
+description: Print a list of files being written to at the kernel VFS layer.  Optionally, accept a regular expression to match file names against.
+test_check: stap -p4 traceio3.stp /dev
+test_installcheck: stap traceio3.stp /dev -T 5

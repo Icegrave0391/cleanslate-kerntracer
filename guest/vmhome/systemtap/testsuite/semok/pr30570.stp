@@ -1,0 +1,41 @@
+#! stap -p2
+
+# PR30570: ei should be resolvable in all of the following
+
+# the try block is elided
+probe oneshot {
+    try { }
+    catch (e1)
+    { print(e1) }
+}
+
+# error var is elided
+probe oneshot {
+    try { print("foo") }
+    catch (e2)
+    { }
+}
+
+# error var and the try block are elided
+probe oneshot {
+    try { }
+    catch (e3)
+    { }
+}
+
+# error var and the try block are elided which means
+# it's not an issue to use e4 as a long here
+global e4 = 10
+probe oneshot {
+    try { }
+    catch (e4)
+    { }
+}
+
+# e5 can be a global string
+global e5 = "foo"
+probe oneshot {
+    try { }
+    catch (e5)
+    { print(e5) }
+}

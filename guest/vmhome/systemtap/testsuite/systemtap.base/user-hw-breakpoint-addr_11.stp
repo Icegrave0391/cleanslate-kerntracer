@@ -1,0 +1,8 @@
+probe process.data(0x$^ADDR_a).length(8).write {
+    println("~~~");
+    print_ubacktrace_fileline();
+}
+
+probe timer.s(1) {
+    exit();
+}

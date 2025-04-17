@@ -1,0 +1,17 @@
+#! /usr/bin/env stap
+
+// Provide a trace of uniqueish files being written to as per the
+// linux kernel VFS layer.  "uniqueish" means best-effort removal
+// of duplicates.
+
+// Optionally, provide a regex on the command line for matching file
+// names of interest.
+
+global recently_written%  // wraparound array
+
+probe vfs.write, vfs.writev {
+  %( $# > 0 %? if (pathname !~ @1) next; %) 
+  if (pathname in recently_written) next;
+  recently_written[pathname] = 1;
+  println(pathname)
+}

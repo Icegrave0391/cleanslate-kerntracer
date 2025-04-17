@@ -1,0 +1,57 @@
+set test bz29676
+
+# log_user 1
+# exp_internal 1
+
+set test_dir [pwd]
+set src $srcdir/$subdir/$test.c
+set exe $test
+set dbg $test.dbg
+
+set result [target_compile $src $exe executable "compiler=gcc additional_flags=-g"]
+if { $result != "" } {
+    fail "${test}: unable to compile ${test}.c"
+}
+
+# Seperate the debuginfo from the elf into its own file
+# This contains the debuginfo for the symbols foo1 and foobar
+# (NOT foo2) since this was added directly to the symbol table via inline asm
+catch {exec objcopy --only-keep-debug $exe $dbg}
+
+# Remove foo1 from the executable's symbol table and remove the debuginfo
+# The symbol table contains foo2 and foobar
+catch {exec objcopy --strip-symbol=foo1 $exe}
+catch {exec objcopy --strip-debug $exe}
+
+# The args are the expected completions for function("foo*")
+proc correct_stap_output { args } {
+    global test_dir
+    global exe
+
+    set result "^"
+    foreach f $args {
+        append $result "process\\\(\"$test_dir/$exe\"\\\).function\\\(\"" $f "\"\\\)\r\n"
+    }
+    append $result "$"
+    return $result
+}
+
+proc test_list { test input output_re } {
+    spawn stap -l $input
+    expect {
+	-timeout 60
+        -re $output_re { pass $test }
+        timeout { fail $test }
+        eof { fail $test }
+    }
+    catch { close }; catch { wait }
+}
+
+# Before dbg made is availible only the elf symbol table data can be used (i.e foo2 and foobar)
+test_list $test"_no_dbg" "process(\"$exe\").function(\"foo*\")" [correct_stap_output "foo2" "foobar"]
+
+# add a link to the debugging info into the stripped executable
+catch {exec objcopy --add-gnu-debuglink=$dbg $exe}
+
+# After the link foo1 should be available from dbg and foobar should get a richer output (i.e foobar's debuginfo is taken from dbg and not exe)
+test_list $test"_yes_dbg" "process(\"$exe\").function(\"foo*\")" [correct_stap_output "foo1@$src:5" "foo2" "foobar@$src:1"]

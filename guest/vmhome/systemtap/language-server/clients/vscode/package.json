@@ -1,0 +1,53 @@
+{
+    "name": "systemtap-language-server",
+    "description": "Systemtap Language Server",
+    "author": "Red Hat",
+    "repository": {
+        "type": "git",
+        "url": "https://sourceware.org/git/systemtap.git"
+    },
+    "version": "1.0.0",
+    "publisher": "redhat",
+    "bugs": "https://sourceware.org/bugzilla/describecomponents.cgi?product=systemtap",
+    "engines": {
+        "vscode": "^1.62.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "activationEvents": [
+        "onLanguage:systemtap"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "systemtap",
+                "aliases": [
+                    "Systemtap",
+                    "systemtap"
+                ],
+                "extensions": [
+                    ".stp"
+                ]
+            }
+        ]
+    },
+    "main": "out/client",
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -b",
+        "watch": "tsc -b -w"
+    },
+    "devDependencies": {
+        "@types/node": "^16.11.6",
+        "@types/vscode": "^1.62.0",
+        "@typescript-eslint/eslint-plugin": "^5.3.0",
+        "@typescript-eslint/parser": "^5.3.0",
+        "eslint": "^8.2.0",
+        "typescript": "^4.4.4"
+    },
+    "dependencies": {
+        "package.json": "^2.0.1",
+        "vscode-languageclient": "^7.0.0"
+    }
+}

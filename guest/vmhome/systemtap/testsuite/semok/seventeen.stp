@@ -1,0 +1,11 @@
+#! stap -p2
+
+global foo
+probe kernel.function("pipe_write")
+{
+   a = @choose_defined($nr_segs,$iocb)
+   foo [a] = 1
+   # $nr_segs is not an lvalue here (foo is), so this should compile
+   # even in non-guru mode
+   foo [@choose_defined($nr_segs,$iocb)] ++
+}

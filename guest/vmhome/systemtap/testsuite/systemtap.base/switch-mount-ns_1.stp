@@ -1,0 +1,9 @@
+probe process("$^PWD/tmp/newtarget/a.out").function("foo") {
+    println("Hit");
+    println("target pid: ", target());
+    exit();
+}
+
+probe timer.s(1) {
+    exit();
+}

@@ -1,0 +1,55 @@
+# Test the language server.
+set test "language_server"
+global env
+set PYTHON3 $env(PYTHON3)
+
+# Both python and jsonc are required
+if {! [file exists "$PYTHON3"]} then { untested $test; return }
+if { [catch {exec pkg-config json-c }] } then { untested $test; return }
+if {[strverscmp $GCC_Version 8] < 0} {
+    verbose -log "skipping $test.exp: GCC too old ($GCC_Version vs. 8)"
+    untested $test
+    return
+}
+
+set test_root "$srcdir/$subdir"
+set test_script "$test_root/stap_language_server_tester.py"
+
+# This is used for testing string completion
+set file_dir "$test_root/foo/bar"
+set exe_name "baz"
+set file_path "$file_dir/$exe_name.c"
+
+set result [target_compile $file_path $file_dir/$exe_name executable "compiler=gcc additional_flags=-g"]
+if { $result != "" } {
+    fail "${test}: unable to compile $exe_name.c"
+}
+
+set env(TEST_PATH) "$test_root/"
+set env(TEST_C_FILE) $file_path
+# Prevent the creation of __pycache__
+set env(PYTHONDONTWRITEBYTECODE) 1 
+
+set v "-v"
+if { $verbose == 0 } {
+    set v "-vvv"
+}
+
+# The testing suite can be run independently for development
+# See: stap_language_server_tester.py --help
+
+# By default TCL considers any output to stderr to be an error and causes rc to be 1
+# A simple work around is to redirect stderr to stdout and this removes that behaviour
+set rc [catch {exec $PYTHON3 $test_script "--stap-path=$env(SYSTEMTAP_PATH)/stap" $v 2>@stdout } out]
+if { $rc } {
+    verbose -log "$test test failure: $out";
+    fail $test;
+} else {
+    pass $test;
+}
+
+# Cleanup
+set env(TEST_PATH) ""
+set env(TEST_C_FILE) ""
+set env(PYTHONDONTWRITEBYTECODE) 0
+catch { exec rm -f $file_dir/$exe_name}

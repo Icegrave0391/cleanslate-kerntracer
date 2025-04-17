@@ -1,0 +1,18 @@
+#! /bin/sh
+
+stap -p4 -g $@ - <<'END'
+
+%{
+#include <generated/utsrelease.h>
+%}
+
+function get_release () %{
+strlcpy(STAP_RETVALUE, UTS_RELEASE, MAXSTRINGLEN);
+%}
+
+probe begin
+{
+	log("hello from systemtap, kernel version " . get_release())
+}
+
+END

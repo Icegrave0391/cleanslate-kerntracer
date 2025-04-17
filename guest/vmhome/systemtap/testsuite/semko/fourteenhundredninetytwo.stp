@@ -1,0 +1,7 @@
+#! /bin/sh
+
+# imply probe context for @cast() on newer stap
+stap -p2 -e '
+    probe process("/bin/sh").function("main") { f() }
+    function f() { println(@cast(0, "task_struct")$) }
+'

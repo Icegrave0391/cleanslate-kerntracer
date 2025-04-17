@@ -1,0 +1,23 @@
+
+/* Generate roughly 4MB of output and then quit.
+ * Be nice to the transport layer => divide the
+ * load into chunks across a reasonable time interval
+ */
+
+probe timer.ms(100)
+{
+  for (j = 0; j < 4000; j++)
+    printf("1234567890\n")
+}
+
+/* Reliably terminate the testcase after 10 seconds
+ * runtime.  This way the .exp file can simply rely
+ * on this constant run time and amount of data
+ * generated.
+ */
+
+probe timer.s(10)
+{
+    exit()
+}
+

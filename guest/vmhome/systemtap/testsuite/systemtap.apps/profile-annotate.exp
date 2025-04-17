@@ -1,0 +1,114 @@
+set outp []
+
+# Used to get file length for testing when -w is not specified.
+# The debuginfod file and annotated source file should be of equal length.
+# file is the filename to check the length of 
+proc file_len {filename} {
+	set fd [open $filename r]
+	set i 0
+	while { [gets $fd line] > -1 } { incr i }
+	close $fd
+	return $i
+}
+
+
+set test "stap-profile-annotate"
+set c_arg "/usr/bin/stress --cpu 4 -t 10"
+
+if {![installtest_p]} { untested $test; return }
+
+if { ! [ file exists "/usr/bin/stress" ] } {
+	untested "$test: /usr/bin/stress not present. Skipping...";
+	return
+}
+
+if { ! [info exists env(DEBUGINFOD_URLS)] } {
+    untested "$test: DEBUGINFOD_URLS un set"
+    return
+}
+
+
+# Command to find a lib to profile on the system
+# There may be multiple, so pick the last one, hoping it's the one
+# /usr/bin/stress is linked against.  OTOH since stap-profile-annotate
+# invokes stap with -c stress --ldd, the right one will be found anyway.
+set lib [lindex [glob /lib*/libc.so.*] end]
+
+set test "source-annotate -c, -w=null, debuginfod functionality"
+# Flag to check if -c is found
+set c 0
+# Lists for checking if debuginfod files exists and 
+# annotate files are annotated appropriately
+set annotated_paths []
+set dbg_paths       []
+set buildids        []
+
+spawn stap-profile-annotate -vvv -d $lib -c $c_arg -T 50
+expect {
+	-timeout 180
+	-re "'-c', '$c_arg'"                             { incr c ; exp_continue }
+
+# Collect debuginfod file locations 
+	-re "Stored debuginfod-find source file as ((.*)\#\#(\S+\..))" { append dbg_paths "$expect_out(1,string) "; exp_continue }
+
+# Collect profile-'buildid' locations
+	-re {hits in (profile-(.*?)/.*\..+ )over}            { append annotated_paths $expect_out(1,string);
+							   append buildids "$expect_out(2,string) "; exp_continue }
+	eof {append outp $expect_out(buffer);}
+	timeout { fail "$test: Unexpected timeout" }
+}
+
+# If c is not found
+if { !$c } {
+	fail "$test: -c option not found in stap_args";
+} else { pass $test }
+
+# Remove duplicates from both path lists
+set failme 0
+foreach b $buildids {
+	set cur_dbg []
+	set cur_ann []
+	foreach d $dbg_paths {
+		if { [ regexp "$b" $d ] } { append cur_dbg "$d "}
+	}
+	foreach a $annotated_paths {
+		if { [ regexp "$b" $a ] } { append cur_ann "$a " }
+	}
+	# This for loop assumes that both $annotated_paths and dbg_paths
+	# are in an order such that annotated_paths[0] is the annotated
+	# version of dbg_paths[0]
+	for { set i 0 } { $i < [ llength $cur_dbg ] } { incr i } {
+		set dbg [lindex $cur_dbg $i]
+		set ann [lindex $cur_ann $i]
+		set dbg_len [ file_len $dbg ]
+		set ann_len [ file_len $ann ]
+            if {$dbg_len != $ann_len} { set failme 1 }
+	}
+}
+
+if { $failme > 0 } { fail "$test length mismatch" } else { pass $test }
+
+
+
+# Test to see if -w 0 only prints annotated source lines into files
+set test "source-annotate -w=0"
+set annotated_paths []
+spawn stap-profile-annotate -w 0 -T 30 -d $lib -vvv
+expect {
+	-timeout 180
+# Collect profile-'buildid' locations
+	-re {hits in (profile-(.*?)/.*\..+ )over} { append annotated_paths $expect_out(1,string); exp_continue}
+	timeout { fail "$test: Unexpected timeout" }
+}
+
+set failme 0
+foreach a $annotated_paths {
+    set fd [open $a r]
+    while { [gets $fd line] > -1 } {
+        if { ![regexp {[0-9]{7} } $line] } {
+            set failme 1
+        }
+    }
+}
+
+if { $failme > 0 } then { fail "$test: Line present in $a without hit count" } else { pass $test }

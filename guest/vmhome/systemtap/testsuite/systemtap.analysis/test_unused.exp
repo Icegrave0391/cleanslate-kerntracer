@@ -1,0 +1,23 @@
+set test "test_unused"
+set testpath "$srcdir/$subdir"
+
+# Only run on make on machines that have dyninst support
+# FIXME
+
+set res [target_compile ${testpath}/${test}.c ${test} executable "additional_flags=-O2 additional_flags=-g"]
+if { $res != "" } {
+    verbose "target_compile failed: $res" 2
+    fail "${test}: unable to compile ${test}.c"
+}
+
+set ok 0
+
+spawn stap -vgp4 $srcdir/$subdir/$test.stp
+expect {
+    -re "WARNING: write at 0x\[0-9a-fA-F\]+ will have no effect" {incr ok ; exp_continue}
+}
+
+if { $ok == 3 } { pass "$test" } { fail "$test" }
+
+# Cleanup
+if { $verbose == 0 } { catch { exec rm -f $test } }
