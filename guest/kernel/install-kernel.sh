@@ -37,6 +37,8 @@ function check_kernel_config {
 	cat .config | grep "CONFIG_RETPOLINE" || true
 	cat .config | grep "CONFIG_NODES_SHIFT"
 	cat .config | grep "CONFIG_DEBUG_INFO"
+	cat .config | grep "CONFIG_LIVEPATCH" || true
+	cat .config | grep "CONFIG_FUNCTION_TRACER" || true
 	echo "-----------------------------------"
 	echo ""
 	sleep 2

@@ -4,10 +4,9 @@ pushd ../ && source .env && popd
 # load the vm image (if not currently loaded)
 ./load-vmdisk.sh 
 
-log_info "Copying kernel build source to VMdisk /lib/modules/$GUEST_LINUX_VER/build"
-
 # guest Linux version
 GUEST_LINUX_VER=$KERNELVERSION
+log_info "Copying kernel build source to VMdisk /lib/modules/$GUEST_LINUX_VER/build"
 
 # unlink the build directory (if exists)
 sudo unlink $VMDISKMOUNT/lib/modules/$GUEST_LINUX_VER/build || true
