@@ -1,6 +1,5 @@
 #!/bin/bash -e
 
-set -x
 # source environment variables
 pushd ../ && source .env && popd
 
