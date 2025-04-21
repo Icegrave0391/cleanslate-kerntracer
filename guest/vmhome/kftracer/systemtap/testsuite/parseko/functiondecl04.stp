@@ -1,7 +1,0 @@
-#! stap -p1
-
-# bad function declaration - no "()" after name
-function decl
-{
-	return 0
-}

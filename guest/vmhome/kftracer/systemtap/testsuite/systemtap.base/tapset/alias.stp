@@ -1,6 +1,0 @@
-probe test_alias = end {
-  alias_local = 1
-}
-probe begin {
-  println("included alias")
-}

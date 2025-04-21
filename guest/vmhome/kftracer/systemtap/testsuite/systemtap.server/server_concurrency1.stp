@@ -1,6 +1,0 @@
-
-probe module("acpi*").function("*") {
-  printf("hello");
-  exit();
-}
-

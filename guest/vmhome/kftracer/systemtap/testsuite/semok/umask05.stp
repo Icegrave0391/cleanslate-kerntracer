@@ -1,5 +1,0 @@
-#! stap -p2
-
-probe procfs("foo5").umask(0222).write {
-	printf("The user wrote, %s", $value)
-}

@@ -1,3 +1,0 @@
-#! stap -p2
-
-probe begin { if ("foo" == NULL) log ("boo") } # check NULL as integral global

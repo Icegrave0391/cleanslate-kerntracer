@@ -1,2 +1,0 @@
-probe tapset_test.foo { }
-

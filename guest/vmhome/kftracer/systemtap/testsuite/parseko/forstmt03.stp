@@ -1,9 +1,0 @@
-#! stap -p1
-
-# no ';' following for condition
-
-function decl()
-{
-    for (i = 0; i < 5)
-        j = i
-}

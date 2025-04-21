@@ -1,5 +1,0 @@
-#! stap -p2
-
-probe procfs("foo1").umask(0000).read {
-	$value = "100\n"
-}

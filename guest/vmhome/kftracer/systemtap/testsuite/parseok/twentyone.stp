@@ -1,6 +1,0 @@
-#! stap -gp1
-
-probe one
-{
-  println(%{ 1 %})
-}

@@ -1,7 +1,0 @@
-probe input.char {
-	print(char)
-}
-
-probe input.line {
-	print(line)
-}

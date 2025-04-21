@@ -1,3 +1,0 @@
-#! stap -u -wp2
-
-probe module("xfs").statement("*@*:*") {}

@@ -1,3 +1,0 @@
-#! stap -p1
-
-probe begin { println(0 + @var("foo", "bar" "baz")) }

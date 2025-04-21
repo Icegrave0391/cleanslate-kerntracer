@@ -1,4 +1,0 @@
-#! stap -p1
-
-# PR 5376 case 3
-probe foo ? = begin { }

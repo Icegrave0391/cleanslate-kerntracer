@@ -1,7 +1,0 @@
-probe process.data(0x$^ADDR_a).write {
-    println("Hit");
-}
-
-probe timer.s(1) {
-    exit();
-}

@@ -1,3 +1,0 @@
-#! stap -gp2
-
-probe kernel.statement(0).absolute { print ($any_variable) }

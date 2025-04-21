@@ -1,4 +1,0 @@
-#! stap -u -p2
-
-probe foo.bar = foo.* { }
-probe foo.* { }

@@ -1,4 +1,0 @@
-probe process.function("main")
-{
-  print_ubacktrace_fileline()
-}

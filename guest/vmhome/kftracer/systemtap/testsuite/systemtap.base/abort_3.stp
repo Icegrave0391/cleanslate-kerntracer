@@ -1,5 +1,0 @@
-probe oneshot {
-    println("enter probe");
-    abort();
-    println("leave probe");
-}

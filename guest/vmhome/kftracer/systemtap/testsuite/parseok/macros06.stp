@@ -1,5 +1,0 @@
-#! stap -p1
-
-@define bar(b) %( @b %)
-@define foo(a) %( @bar(@a) %)
-probe @foo(begin) { print(42) }

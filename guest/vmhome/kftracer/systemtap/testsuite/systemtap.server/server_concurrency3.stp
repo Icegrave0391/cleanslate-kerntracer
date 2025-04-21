@@ -1,5 +1,0 @@
-
-probe module("dm-*").function("*") {
-  printf("hello");
-  exit();
-}

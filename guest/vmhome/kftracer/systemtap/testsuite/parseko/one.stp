@@ -1,2 +1,0 @@
-#! stap -p1
-"not a probe"

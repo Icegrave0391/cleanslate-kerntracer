@@ -41,3 +41,11 @@ stty intr ^c
 
 sleep 0.5
 ./copy-from-vm.sh
+
+# grant vmhome ownership
+if test -d "vmhome"; then
+	ORIGINAL_USER="${SUDO_USER:-$USER}"
+	echo "restore vmhome permission back to $ORIGINAL_USER:$ORIGINAL_USER"
+	sudo chown -R $ORIGINAL_USER:$ORIGINAL_USER vmhome/
+fi
+

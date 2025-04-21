@@ -1,3 +1,0 @@
-#! stap -u -p2
-
-probe netfilter.hook { }

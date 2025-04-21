@@ -1,7 +1,0 @@
-#! stap -p2
-
-global baz
-probe begin {
-  baz[1] = 4;
-  baz["1"] = 5;   # inconsistent index types
-}

@@ -1,3 +1,0 @@
-#! stap -p1
-
-@define foo

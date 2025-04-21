@@ -1,3 +1,0 @@
-#! stap -u -p2
-
-probe netfilter.hook("NF_INET_NONEXISTENT_HOOK") { }

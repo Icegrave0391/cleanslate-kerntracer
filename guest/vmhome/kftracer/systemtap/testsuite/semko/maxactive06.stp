@@ -1,7 +1,0 @@
-#! stap -p2
-
-# maxactive with "begin" probe
-
-probe begin.maxactive(3)
-{
-}

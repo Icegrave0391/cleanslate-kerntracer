@@ -1,2 +1,0 @@
-probe process.function("main").label("l1") { printf("func label end\n") }
-probe process.statement("*@process_by_cmd.c") { printf("state end\n") }

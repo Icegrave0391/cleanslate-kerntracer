@@ -1,3 +1,0 @@
-#! stap -u -p2
-
-probe kernel.function("*@kernel/kprobes.c").call {} // blocklisted

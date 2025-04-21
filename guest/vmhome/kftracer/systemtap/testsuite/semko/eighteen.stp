@@ -1,5 +1,0 @@
-#! stap -p2
-
-probe kernel.function("schedule") {
-  log ($no_such_variable_anywhere)
-}

@@ -1,7 +1,0 @@
-#! stap -p2
-
-# maxactive not on a return probe
-
-probe kernel.function("*").maxactive(3)
-{
-}

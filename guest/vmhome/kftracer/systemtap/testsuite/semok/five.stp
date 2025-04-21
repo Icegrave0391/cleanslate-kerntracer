@@ -1,8 +1,0 @@
-#! stap -p2
-
-global array
-probe begin
-{
-  array[1] = array[2] = 3;
-  statvar <<< value <<< 4;
-}

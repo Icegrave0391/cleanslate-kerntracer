@@ -8,3 +8,5 @@ ObjectsInSyscallRaw
 .cache
 .sudo_as_admin_successful
 .viminfo
+.ipython
+.local

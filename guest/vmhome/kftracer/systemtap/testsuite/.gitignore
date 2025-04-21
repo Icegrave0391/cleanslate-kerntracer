@@ -1,9 +1,0 @@
-.systemtap-*
-site.exp
-systemtap.log
-systemtap.sum
-dbg.log
-server.log
-*.so
-*_exe
-*.exe.[0-9]

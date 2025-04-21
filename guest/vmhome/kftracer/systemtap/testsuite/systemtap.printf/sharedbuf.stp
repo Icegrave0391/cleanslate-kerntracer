@@ -1,3 +1,0 @@
-probe begin {
-	printf("Host: begin\n")
-}

@@ -1,6 +1,0 @@
-#! stap -p1
-
-# bad arch - not a string
-%( arch == foo %?
-   probe begin { }
-%)

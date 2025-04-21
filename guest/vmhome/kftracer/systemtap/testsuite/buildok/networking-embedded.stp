@@ -1,5 +1,0 @@
-#! stap -p4
-
-probe begin {
-	printf("%s\n", get_netdev_name(0))
-}

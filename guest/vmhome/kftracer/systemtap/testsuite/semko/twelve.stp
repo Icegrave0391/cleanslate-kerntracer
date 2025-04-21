@@ -1,6 +1,0 @@
-#! stap -p2
-
-probe end {
-  for (a=0; "hello";) {println("hello")}
-  while ("goodbye") {println("world")}
-}

@@ -1,6 +1,0 @@
-#!/usr/bin/stap
-probe syscall.* {
-	printf("hi\n");
-	exit();
-}
-

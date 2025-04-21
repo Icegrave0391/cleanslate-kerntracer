@@ -1,5 +1,0 @@
-#! stap -p1
-
-# wildcard with space
-
-probe a * b { }

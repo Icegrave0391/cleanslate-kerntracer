@@ -1,3 +1,0 @@
-#! /bin/sh
-
-stap -p4 --example helloworld.stp

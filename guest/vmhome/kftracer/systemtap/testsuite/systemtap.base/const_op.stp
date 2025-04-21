@@ -1,4 +1,0 @@
-probe oneshot
-{
-    println("x", @const("STP_SKIP_BADVARS"), "y")
-}

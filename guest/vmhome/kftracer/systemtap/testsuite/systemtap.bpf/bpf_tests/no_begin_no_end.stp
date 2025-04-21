@@ -1,4 +1,0 @@
-probe kernel.function("vfs_read") {
-	printf("BEGIN\nEND PASS\n")
-	exit()
-}

@@ -1,6 +1,0 @@
-probe oneshot
-{
-  printf("BEGIN")
-  printf("%d", target())
-  printf("END\n")
-}

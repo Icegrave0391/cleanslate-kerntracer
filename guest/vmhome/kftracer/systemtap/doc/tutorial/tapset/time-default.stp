@@ -1,2 +1,0 @@
-function __time_value () { return gettimeofday_us () }
-

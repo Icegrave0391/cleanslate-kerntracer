@@ -1,5 +1,0 @@
-probe begin 
-{
-	printf("Hello%%World");	
-	exit()
-}

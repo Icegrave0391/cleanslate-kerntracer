@@ -1,6 +1,0 @@
-#! stap -p1
-
-probe begin {
-    // need more than one value to join
-    printd(", ", 1)
-}

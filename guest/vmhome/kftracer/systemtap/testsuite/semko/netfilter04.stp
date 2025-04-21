@@ -1,3 +1,0 @@
-#! stap -p2
-
-probe netfilter.hook("NF_INET_PRE_ROUTING") { printf("%d\n", $verdict) }

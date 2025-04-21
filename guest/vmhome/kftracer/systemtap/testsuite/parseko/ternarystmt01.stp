@@ -1,8 +1,0 @@
-#! stap -p1
-
-# missing ':' in ternary statement
-
-function decl()
-{
-    a = (a == 1) ? 0
-}

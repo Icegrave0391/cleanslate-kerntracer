@@ -1,7 +1,0 @@
-#! stap -p2
-
-global b
-probe begin {
-  a <<< 2;
-  b[4] <<< 4;
-}
