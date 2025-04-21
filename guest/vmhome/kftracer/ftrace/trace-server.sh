@@ -1,9 +1,15 @@
 #!/bin/bash
 
-# 1. Grab your nginx PIDs
-PIDS=$(pgrep -x nginx | tr '\n' ',' | sed 's/,$//')
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <server-program-name> <output-file.dat>"
+    exit
+fi
 
 BUFSIZE_KB=16384
+
+# 1. Grab your nginx PIDs
+PROC_NAME=$1
+PIDS=$(pgrep -x $PROC_NAME | tr '\n' ',' | sed 's/,$//')
 
 # 2. Record a combined trace:
 sudo trace-cmd record \
@@ -13,6 +19,6 @@ sudo trace-cmd record \
   -e syscalls:sys_exit_* \
   -b $BUFSIZE_KB \
   -O function_fork \
-  -o nginx-syscall-fns.dat
+  -o $2
 
 # …wait until you’ve generated enough workload, then press Ctrl‑C to finish…
