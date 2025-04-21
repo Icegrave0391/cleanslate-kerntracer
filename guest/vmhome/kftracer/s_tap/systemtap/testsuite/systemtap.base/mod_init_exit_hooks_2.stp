@@ -1,0 +1,31 @@
+%{
+#define STAP_MODULE_INIT_HOOK  my_init
+#define STAP_MODULE_EXIT_HOOK  my_fini
+
+long *my_global_ptr = NULL;
+
+static int my_init(void) {
+    my_global_ptr = _stp_vzalloc(sizeof(long));
+    if (my_global_ptr == NULL) {
+        return ENOMEM;
+    }
+    *my_global_ptr = 17;
+    return 0;
+}
+
+static void my_fini(void) {
+    _stp_vfree(my_global_ptr);
+}
+%}
+
+function get_val:long() %{
+    if (my_global_ptr == NULL) {
+        STAP_ERROR ("cannot resolve id in namespace");
+    } else {
+        STAP_RETURN(*my_global_ptr);
+    }
+%}
+
+probe oneshot {
+    println("res: ", get_val());
+}

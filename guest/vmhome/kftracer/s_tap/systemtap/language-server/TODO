@@ -1,0 +1,5 @@
+completion (M-C-i for emacs) functionality desired:
+
+- process("/bin/ls").function("ma   <M-C-i>  should expand to main etc.
+  - Works on jupyter, emacs, vscode, not vim-lsp (small bug on client side) 
+- Add a timeout on completions which take longer than k ms (Ex. completing kernel.function("mem))

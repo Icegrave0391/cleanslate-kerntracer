@@ -1,0 +1,25 @@
+{
+    "name": "jupyterlab-stap-highlight",
+    "version": "1.0.0",
+    "description": "Jupyterlab extension to highlight Systemtap syntax",
+    "author": "Systemtap Development Team",
+    "main": "lib/plugin.js",
+    "keywords": [
+        "jupyter",
+        "jupyterlab",
+        "jupyterlab-extension"
+    ],
+    "license": "GPLv2+",
+    "repository": {
+        "url": "https://sourceware.org/git/systemtap.git",
+        "type": "git"
+    },
+    "jupyterlab": {
+        "extension": true
+    },
+    "scripts": {},
+    "dependencies": {
+        "@jupyterlab/codemirror": "*",
+        "ls": "^0.2.1"
+    }
+}

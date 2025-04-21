@@ -1,0 +1,15 @@
+probe timer.ms(100)
+{
+    log("hey!")
+}
+
+probe timer.s(2)
+{
+    switch_file()
+}
+
+probe timer.s(4)
+{
+    exit()
+}
+

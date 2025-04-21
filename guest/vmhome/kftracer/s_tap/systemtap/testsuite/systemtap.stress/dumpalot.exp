@@ -1,0 +1,21 @@
+
+set test "dumpalot"
+
+proc string_occurrences {needleString haystackString} {
+    # https://stackoverflow.com/a/34803141/661150
+    regsub -all $needleString $haystackString {} stripped
+    expr {([string length $haystackString] - [string length $stripped]) / [string length $needleString]}
+}
+
+
+foreach buflen { 1 2 4 8 16 32 64 } {
+    catch {eval exec stap -g --suppress-time-limits --suppress-handler-errors -s $buflen -T 20 $srcdir/$subdir/$test.stp} foo
+    verbose -log "$test buflen $buflen output length [string length $foo]"
+    foreach msg { ERROR WARNING } {
+        verbose -log "$test buflen $buflen $msg [string_occurrences $msg $foo]"
+    }
+    # don't bother analyze the output, simply observe
+    # lower buffer length parameters will incur kernel- and/or userspace-side errors
+    # but it should still produce some output, run & shut down cleanly
+    pass "$test buf $buflen"
+}

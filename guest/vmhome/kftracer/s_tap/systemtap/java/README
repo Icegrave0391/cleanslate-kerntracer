@@ -1,0 +1,16 @@
+How to set up Byteman support in Systemtap
+==========================================
+
+Systemtap now contains support for probing Java methods using the
+Byteman tool from JBoss as a backend. In order to make use of it, two
+things are required.
+
+(1) Environment variable BYTEMAN_HOME must point to a valid Byteman installation.
+
+Byteman can be obtained at http://www.jboss.org/byteman; alternately,
+it can be installed through your distribution's package manager.
+Either way, double-check that this enviroment variable is configured
+correctly.
+
+(2) libHelperSDT.so and HelperSDT.jar must be accessible to the local
+JDK that you are planning to probe.

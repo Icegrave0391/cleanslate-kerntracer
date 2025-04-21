@@ -1,0 +1,23 @@
+# Path setup
+# SCRIPT_PATH=${prefix}/etc/systemtap/script.d
+# CONFIG_PATH=${prefix}/etc/systemtap/conf.d
+# CACHE_PATH=${prefix}/var/cache/systemtap
+# STAT_PATH=${prefix}/var/run/systemtap
+# TEMP_PATH=/tmp
+# LOG_FILE=${prefix}/var/log/systemtap.log
+
+# Fail unless all scripts succeeded to run
+# PASSALL=yes
+
+# Always follows script dependencies
+# RECURSIVE=no
+
+# Automatically recompile scripts if caches are old or do not exist.
+# AUTOCOMPILE=yes
+
+# Start these scripts by default. If omitted, all scripts are started.
+# DEFAULT_START=
+
+# Log boot-time staprun stderr to /run/systemtap/$script.log
+# LOG_BOOT_ERR=no
+

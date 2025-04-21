@@ -1,0 +1,65 @@
+set test "kernel-hw-breakpoint-addr-err"
+set testpath "$srcdir/$subdir"
+
+if {! [installtest_p]} { untested $test; return }
+if {! [uretprobes_p]} { untested $test; return }
+
+# --- TEST 1 ---
+
+set subtest1 "TEST 1: kernel.data(ADDR).rw 2nd probe failed to register"
+
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest1: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_1.stp" \
+                                 "./${test}_1.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest1: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest1 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_1.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out ""
+            is "${test_name}: stdout" $out $exp_out
+            isnt "${test_name}: exit code" $exit_code 0
+            set stderr_pat "^ERROR: Probe kernel\\.data\\(\"blah_no_such_symbol\"\\)\\.length\\(1\\)\\.rw registration failed: invalid symbol 'blah_no_such_symbol'"
+            like "${test_name}: stderr" $stderr $stderr_pat "-lineanchor"
+        }
+    }
+}
+
+# --- TEST 2 ---
+
+set subtest2 "TEST 2: kernel.data(ADDR).rw 1st probe failed to register"
+
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest2: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_2.stp" \
+                                 "./${test}_2.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest2: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest2 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_2.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out ""
+            is "${test_name}: stdout" $out $exp_out
+            isnt "${test_name}: exit code" $exit_code 0
+            set stderr_pat "^ERROR: Probe kernel\\.data\\(\"blah_no_such_symbol\"\\)\\.length\\(1\\)\\.write registration failed: invalid symbol 'blah_no_such_symbol'"
+            like "${test_name}: stderr" $stderr $stderr_pat "-lineanchor"
+        }
+    }
+}

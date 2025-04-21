@@ -1,0 +1,5 @@
+#! stap -u -p2
+
+probe foo = bar {}
+probe bar = foo {}
+probe foo {}

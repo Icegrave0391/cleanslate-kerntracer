@@ -1,0 +1,7 @@
+#! /bin/sh
+
+exec stap -v -p2 -e 'probe oneshot {log("nothing") }
+                     probe process.statement("main@*:1")? { log("yo") }' -c stap
+
+# The optional misaddressed statement probe should let stap still
+# succeed with the oneshot probe.

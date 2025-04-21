@@ -1,0 +1,97 @@
+# Test cases for procfs probes with bpf runtime
+
+set test "PROCFS_BPF"
+
+if {![installtest_p]} { untested $test; return }
+
+proc proc_read_value {test path} {
+    set value "<unknown>"
+    if [catch {exec timeout 1 cat $path} value] {
+	      fail "$test read $path $value"
+    } else {
+	      pass "$test read $path $value"
+    }
+    return $value
+}
+
+proc proc_write_value {test path value} {
+    if [catch {exec timeout 1 sh -c "echo $value > $path"} msg] {
+        fail "$test write $path $msg"
+    } else {
+        pass "$test write $path $value"
+    }
+}
+
+proc proc_read_write {} {
+    global test
+    
+    # effective userid
+    set user [exec id -un]
+    set path_read "/var/tmp/systemtap-$user/$test/command"
+    set path_write "/var/tmp/systemtap-$user/$test/other"
+
+    # read the initial value, which should be '100'
+    set value [proc_read_value $test $path_read]
+    if { $value == "100" } {
+        pass "$test initial value"
+    } else {
+        fail "$test initial value: $value"
+    }
+
+    # write a new value of '200'
+    proc_write_value $test $path_write "200"
+
+    # make sure it got set to '200'
+    set value [proc_read_value $test $path_read]
+    if { $value == "200" } {
+        pass "$test value: 200"
+    } else {
+        fail "$test value: $value"
+    }
+
+    # read it again to make sure nothing changed
+    set value [proc_read_value "$test again" $path_read]
+    if { $value == "200" } {
+      pass "$test value: 200 again"
+    } else {
+        fail "$test value: $value again"
+    }
+
+    # write a new value of 'hello'
+    proc_write_value $test $path_write "hello"
+
+    # make sure it got set to 'hello'
+    set value [proc_read_value $test $path_read]
+    if { $value == "hello" } {
+        pass "$test value: hello"
+    } else {
+        fail "$test value: $value"
+    }
+
+    # write a new value of 'goodbye'
+    proc_write_value $test $path_write "goodbye"
+
+    # make sure it got set to 'goodbye'
+    set value [proc_read_value $test $path_read]
+    if { $value == "goodbye" } {
+        pass "$test value: goodbye"
+    } else {
+        fail "$test value: $value"
+    }
+
+    return 0;
+}
+
+# The script starts with a value of "100".  If the user writes into
+# /proc/systemtap/MODNAME/command, that value is returned by the next
+# read.
+
+set systemtap_script {
+}
+
+
+# test procfs probes
+set output_string "\\mfinal value = goodbye\\M\r\n"
+stap_run $test proc_read_write $output_string --bpf $srcdir/$subdir/procfs_bpf.stp -m $test
+
+exec /bin/rm -f ${test}.bo

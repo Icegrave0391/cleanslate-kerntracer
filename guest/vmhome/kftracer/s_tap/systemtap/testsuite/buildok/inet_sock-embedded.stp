@@ -1,0 +1,12 @@
+#! stap -p4
+
+probe begin {
+	print (inet_get_local_port (0))
+	print (inet_get_ip_source (0))
+	print (inet_get_dest_port (0))
+	print (inet_get_ip_dest (0))
+%(systemtap_v < "2.0" %?
+	print (daddr_to_string(0))
+%)
+}
+

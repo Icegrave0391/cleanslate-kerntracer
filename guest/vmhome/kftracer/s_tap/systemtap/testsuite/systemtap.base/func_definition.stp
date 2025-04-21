@@ -1,0 +1,68 @@
+/*
+ * func_definition.stp
+ *
+ * Check function definitions
+ */
+probe begin {
+    println("systemtap starting probe")
+}
+
+
+function f1(arg:long)
+{
+    if (arg == 2015)
+        println("systemtap test success")
+    else
+        printf("systemtap test failure - arg of f1:%d != 2015\n", arg)
+}
+
+function f2(arg)
+{
+    if (arg == 2015)
+        println("systemtap test success")
+    else
+        printf("systemtap test failure - arg of f2:%d != 2015\n", arg)
+}
+
+function f3:long()
+{
+    return 2015
+}
+
+function f4()
+{
+    return 2015
+}
+
+function f5()
+{
+    println("systemtap test success")
+}
+
+function function_names_over_128_characters_exceed_MAX_NAME_LEN_in_linux_objtool_which_is_invoked_by_kbuild_and_are_therefore_shortened()
+{
+    return 2021
+}
+
+probe end {
+    println("systemtap ending probe")
+
+    f1(2015)
+
+    f2(2015)
+
+    if (f3() == 2015)
+        println("systemtap test success")
+    else
+        printf("systemtap test failure - return_value of f3:%d != 2015\n", f3())
+
+    if (f4() == 2015)
+        println("systemtap test success")
+    else
+        printf("systemtap test failure - return_value of f4:%d != 2015\n", f4())
+
+    f5()
+
+    if (function_names_over_128_characters_exceed_MAX_NAME_LEN_in_linux_objtool_which_is_invoked_by_kbuild_and_are_therefore_shortened() == 2021)
+        println("systemtap test success")
+}

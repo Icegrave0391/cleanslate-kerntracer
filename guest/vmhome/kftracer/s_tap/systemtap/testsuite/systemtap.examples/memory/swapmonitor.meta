@@ -1,0 +1,6 @@
+title: Summarize swap operations
+name: swapmonitor.stp
+keywords: memory swap
+description: The swapmonitor.stp script is an example to monitor "swap in/out" in RHEL. This stap monitor the call of "swap_readpage" and "swap_writepage", and then printf the timeframe, func, execname, pid and the count with 10 seconds interval.
+test_check: stap -p4 swapmonitor.stp
+test_installcheck: stap swapmonitor.stp -T 5

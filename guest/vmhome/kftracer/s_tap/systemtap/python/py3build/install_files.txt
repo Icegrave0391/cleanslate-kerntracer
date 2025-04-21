@@ -1,0 +1,9 @@
+/usr/local/lib/python3.10/dist-packages/HelperSDT/__main__.py
+/usr/local/lib/python3.10/dist-packages/HelperSDT/__init__.py
+/usr/local/lib/python3.10/dist-packages/HelperSDT/__pycache__/__main__.cpython-310.pyc
+/usr/local/lib/python3.10/dist-packages/HelperSDT/__pycache__/__init__.cpython-310.pyc
+/usr/local/lib/python3.10/dist-packages/HelperSDT/_HelperSDT.cpython-310-x86_64-linux-gnu.so
+/usr/local/lib/python3.10/dist-packages/HelperSDT-0.1.0-py3.10.egg-info/PKG-INFO
+/usr/local/lib/python3.10/dist-packages/HelperSDT-0.1.0-py3.10.egg-info/top_level.txt
+/usr/local/lib/python3.10/dist-packages/HelperSDT-0.1.0-py3.10.egg-info/dependency_links.txt
+/usr/local/lib/python3.10/dist-packages/HelperSDT-0.1.0-py3.10.egg-info/SOURCES.txt

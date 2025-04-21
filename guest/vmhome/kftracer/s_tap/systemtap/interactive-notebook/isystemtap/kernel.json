@@ -1,0 +1,5 @@
+{
+    "argv": ["python", "-m", "isystemtap", "-f", "{connection_file}"],
+    "language": "systemtap",
+    "display_name": "ISystemtap"
+}

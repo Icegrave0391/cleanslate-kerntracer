@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Systemtaplanguageserver
+Bundle-SymbolicName: com.redhat.systemtaplanguageserver;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.core.contenttype,
+ org.eclipse.ui,
+ org.eclipse.lsp4e,
+ org.eclipse.ui.genericeditor;bundle-version="1.2.300"
+Bundle-Vendor: REDHAT
+Automatic-Module-Name: com.redhat.systemtaplanguageserver
+Bundle-RequiredExecutionEnvironment: JavaSE-17

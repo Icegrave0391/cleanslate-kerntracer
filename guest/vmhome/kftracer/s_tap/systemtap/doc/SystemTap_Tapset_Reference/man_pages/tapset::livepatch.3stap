@@ -1,0 +1,42 @@
+.\" -*- nroff -*-
+.TH TAPSET::LIVEPATCH 3stap "November 2024" "SystemTap Tapset Reference"
+.SH NAME
+tapset::livepatch \- systemtap livepatch tapset
+ 
+.SH DESCRIPTION
+.TP
+.P
+.TP
+.B cve_count_metric 
+Increment the count of key
+.IP
+See 
+.IR function::cve_count_metric (3stap)
+ for details.
+.P
+.TP
+.B cve_record_metric 
+Set the value of key
+.IP
+See 
+.IR function::cve_record_metric (3stap)
+ for details.
+.P
+.TP
+.B cve_tmpdisable 
+Disable the cve livepatch
+.IP
+See 
+.IR function::cve_tmpdisable (3stap)
+ for details.
+
+.SH SEE ALSO
+.BR
+.IR \%function::cve_count_metric (3stap),
+.BR
+.IR \%function::cve_record_metric (3stap),
+.BR
+.IR \%function::cve_tmpdisable (3stap),
+.BR
+.IR \%stap (1),
+.IR \%stapprobes (3stap)
