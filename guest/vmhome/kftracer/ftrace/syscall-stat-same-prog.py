@@ -33,7 +33,9 @@ for sc in syscalls:
         continue
     sets = []
     for fname in os.listdir(sc_dir):
-        if fname.startswith(f"{program}-") and fname.endswith('.txt'):
+        if (fname.startswith(f"{program}-") and 
+            not fname.startswith(f"{program}-all") and
+            fname.endswith('.txt')):
             path = os.path.join(sc_dir, fname)
             with open(path) as sf:
                 funcs = set(line.strip() for line in sf if line.strip())
@@ -53,7 +55,7 @@ for sc, runs in all_funcs.items():
         for fn in sorted(diff):
             present = [fname for fname, s in runs if fn in s]
             missing = [fname for fname, s in runs if fn not in s]
-            print(f"  {fn}: present in {present}, missing in {missing}")
+            print(f"  {fn}: present ({len(present)}/{len(names)} times) in {present}, missing in {missing}")
         print()
     else:
         print(f"No differences in {sc} across {len(runs)} runs")
