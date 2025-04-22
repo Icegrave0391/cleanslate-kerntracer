@@ -20,6 +20,7 @@ __enqueue_entity
 __fdget
 __fget_light
 __fib_validate_source
+__flush_smp_call_function_queue
 __handle_irq_event_percpu
 __hrtimer_get_next_event
 __hrtimer_init
@@ -53,6 +54,7 @@ __napi_poll
 __napi_schedule
 __netif_receive_skb_core
 __netif_receive_skb_list_core
+__netif_schedule
 __next_timer_interrupt
 __note_gp_changes
 __pskb_trim_head
@@ -80,6 +82,7 @@ __sock_wfree
 __softirqentry_text_start
 __sys_setsockopt
 __sysvec_apic_timer_interrupt
+__sysvec_call_function
 __sysvec_irq_work
 __tcp_ack_snd_check
 __tcp_get_metrics
@@ -163,6 +166,7 @@ default_send_IPI_single_phys
 default_wake_function
 del_timer
 del_timer_sync
+delayed_work_timer_fn
 detach_if_pending
 dev_gro_receive
 dev_hard_start_xmit
@@ -172,6 +176,7 @@ dma_map_page_attrs
 dma_sync_single_for_cpu
 dma_unmap_page_attrs
 do_softirq
+do_sync_core
 do_tcp_setsockopt
 dst_release
 e1000_alloc_rx_buffers
@@ -208,6 +213,7 @@ free_unref_page
 free_unref_page_commit
 free_unref_page_prepare.part.0
 generic_exec_single
+generic_smp_call_function_single_interrupt
 get_nohz_timer_target
 get_page_from_freelist
 get_partial_node.part.0

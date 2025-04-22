@@ -28,6 +28,8 @@ __fdget
 __fget_light
 __fib_validate_source
 __flush_smp_call_function_queue
+__folio_put
+__free_pages
 __handle_irq_event_percpu
 __hrtimer_get_next_event
 __hrtimer_init
@@ -67,7 +69,9 @@ __netif_receive_skb_list_core
 __netif_schedule
 __next_timer_interrupt
 __note_gp_changes
+__page_cache_release
 __pskb_trim_head
+__put_cred
 __qdisc_run
 __queue_delayed_work
 __queue_work
@@ -165,6 +169,7 @@ available_idle_cpu
 bio_endio
 bio_free
 bio_put
+blake2s_compress
 blake2s_update
 blk_account_io_completion
 blk_flush_complete_seq
@@ -184,6 +189,7 @@ bvec_free
 calc_global_load
 calc_global_load_tick
 calc_wheel_index
+call_rcu
 call_timer_fn
 can_migrate_task.part.0
 cgroup_base_stat_cputime_account_end.isra.0
@@ -274,8 +280,12 @@ finish_task_switch
 finish_wait
 fixup_red_left
 fput
+free_page_and_swap_cache
+free_pages
+free_pages.part.0
 free_pcp_prepare
 free_pcppages_bulk
+free_swap_cache
 free_unref_page
 free_unref_page_commit
 free_unref_page_prepare.part.0
@@ -523,6 +533,7 @@ rcu_sched_clock_irq
 rcu_segcblist_accelerate
 rcu_segcblist_add_len
 rcu_segcblist_advance
+rcu_segcblist_enqueue
 rcu_segcblist_extract_done_cbs
 rcu_segcblist_insert_done_cbs
 rcu_segcblist_n_segment_cbs
@@ -776,6 +787,7 @@ tick_sched_handle.isra.0
 tick_sched_timer
 timekeeping_advance
 timekeeping_update
+tlb_remove_table_rcu
 trigger_load_balance
 try_module_get
 try_to_del_timer_sync

@@ -50,7 +50,7 @@ After this, all results will be generated at `kftracer/ftrace/syscall_profiles/.
 
 - Per-syscall functions will be generated at: `syscall_profiles/<sys_id>:<sys_name>/<prog-name>-<file-id>.txt`.
 - Common functions will be merged at: `syscall_profiles/common/<prog-name>.txt`.
-- All executed syscalls (by the program) will be merged at: ``syscall_profiles/executed_syscalls/<prog-name>.txt`.
+- All executed syscalls (by the program) will be merged at: `syscall_profiles/executed_syscalls/<prog-name>.txt`.
 
 **4. Persistence**
 

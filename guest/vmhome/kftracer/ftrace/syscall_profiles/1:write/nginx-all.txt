@@ -147,6 +147,8 @@ __sysvec_call_function
 __sysvec_call_function_single
 __sysvec_irq_work
 __task_rq_lock
+__tasklet_schedule
+__tasklet_schedule_common
 __tcp_ack_snd_check
 __tcp_get_metrics
 __tcp_push_pending_frames
@@ -170,6 +172,7 @@ __wake_up
 __wake_up_bit
 __wake_up_common
 __wake_up_common_lock
+__wake_up_locked_key
 __wake_up_sync_key
 __x64_sys_write
 __zone_watermark_ok
@@ -280,6 +283,7 @@ create_empty_buffers
 create_page_buffers
 crng_fast_key_erasure
 crng_make_state
+crng_reseed_interval.part.0
 crypto_shash_update
 csum_partial
 csum_partial_copy_nocheck
@@ -585,6 +589,7 @@ kthread_blkcg
 kthread_is_per_cpu
 ktime_get
 ktime_get_coarse_real_ts64
+ktime_get_seconds
 ktime_get_update_offsets_now
 ktime_get_with_offset
 kvm_steal_clock
@@ -863,6 +868,9 @@ switch_ldt
 switch_mm_irqs_off
 syscall_exit_work
 task_tick_fair
+tasklet_action
+tasklet_action_common.isra.0
+tasklet_clear_sched
 tcp4_gro_receive
 tcp_ack
 tcp_ack_tstamp
@@ -926,11 +934,13 @@ tcp_small_queue_check.isra.0
 tcp_sndbuf_expand
 tcp_synack_rtt_meas
 tcp_sync_mss
+tcp_tasklet_func
 tcp_time_wait
 tcp_timewait_state_process
 tcp_trim_head
 tcp_try_fastopen
 tcp_tso_segs
+tcp_tsq_handler
 tcp_twsk_destructor
 tcp_update_metrics
 tcp_update_pacing_rate
@@ -963,6 +973,8 @@ tick_sched_handle.isra.0
 tick_sched_timer
 timekeeping_advance
 timekeeping_update
+timerfd_tmrproc
+timerfd_triggered
 timestamp_truncate
 trigger_load_balance
 try_module_get
@@ -1024,6 +1036,7 @@ wake_q_add
 wake_up_bit
 wake_up_process
 wake_up_q
+wake_up_var
 wakeup_kswapd
 wakeup_preempt_entity.isra.0
 wakeup_softirqd

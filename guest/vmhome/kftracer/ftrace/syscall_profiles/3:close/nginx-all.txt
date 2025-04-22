@@ -329,6 +329,7 @@ napi_schedule_prep
 napi_skb_cache_get
 napi_skb_cache_put
 native_send_call_func_single_ipi
+native_smp_send_reschedule
 neigh_resolve_output
 net_rx_action
 netdev_core_pick_tx

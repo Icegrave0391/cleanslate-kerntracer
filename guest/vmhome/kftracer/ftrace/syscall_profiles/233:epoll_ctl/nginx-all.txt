@@ -88,6 +88,8 @@ __softirqentry_text_start
 __sysvec_apic_timer_interrupt
 __sysvec_call_function_single
 __sysvec_irq_work
+__tasklet_schedule
+__tasklet_schedule_common
 __tcp_ack_snd_check
 __tcp_get_metrics
 __tcp_push_pending_frames
@@ -567,6 +569,9 @@ switch_ldt
 switch_mm_irqs_off
 syscall_exit_work
 task_tick_fair
+tasklet_action
+tasklet_action_common.isra.0
+tasklet_clear_sched
 tcp4_gro_receive
 tcp_ack
 tcp_ack_tstamp
@@ -632,11 +637,13 @@ tcp_sndbuf_expand
 tcp_stream_memory_free
 tcp_synack_rtt_meas
 tcp_sync_mss
+tcp_tasklet_func
 tcp_time_wait
 tcp_timewait_state_process
 tcp_trim_head
 tcp_try_fastopen
 tcp_tso_segs
+tcp_tsq_handler
 tcp_twsk_destructor
 tcp_update_metrics
 tcp_update_pacing_rate
@@ -708,6 +715,7 @@ wake_all_kswapds
 wake_bit_function
 wake_up_bit
 wake_up_process
+wake_up_var
 wakeup_kswapd
 wakeup_preempt_entity.isra.0
 wakeup_softirqd

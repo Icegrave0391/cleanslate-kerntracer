@@ -212,6 +212,7 @@ dma_sync_single_for_cpu
 dma_unmap_page_attrs
 do_dentry_open
 do_filp_open
+do_sync_core
 do_sys_open
 do_sys_openat2
 down_read

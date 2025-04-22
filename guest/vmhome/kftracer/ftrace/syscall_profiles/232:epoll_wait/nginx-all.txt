@@ -17,6 +17,8 @@ __cgroup_account_cputime_field
 __common_interrupt
 __cond_resched
 __copy_skb_header
+__d_free
+__d_free_external
 __default_send_IPI_dest_field
 __dev_queue_xmit
 __enqueue_entity
@@ -24,6 +26,7 @@ __fdget
 __fget_light
 __fib_validate_source
 __flush_smp_call_function_queue
+__free_pages
 __handle_irq_event_percpu
 __hrtimer_get_next_event
 __hrtimer_init
@@ -48,6 +51,7 @@ __kmem_cache_free
 __ksize
 __kthread_should_park
 __local_bh_enable_ip
+__mmdrop
 __mod_zone_page_state
 __module_get
 __msecs_to_jiffies
@@ -197,6 +201,7 @@ del_timer
 del_timer_sync
 delayed_work_timer_fn
 dequeue_task_fair
+destroy_context_ldt
 detach_buf_split
 detach_entity_load_avg
 detach_if_pending
@@ -244,6 +249,8 @@ find_suitable_fallback
 finish_task_switch
 fixup_red_left
 flush_end_io
+free_pages
+free_pages.part.0
 free_pcp_prepare
 free_pcppages_bulk
 free_unref_page
@@ -408,6 +415,7 @@ native_send_call_func_single_ipi
 native_smp_send_reschedule
 need_active_balance
 neigh_resolve_output
+net_disable_timestamp
 net_rx_action
 net_tx_action
 netdev_core_pick_tx
@@ -434,6 +442,7 @@ page_frag_free
 perf_event_task_tick
 pfifo_fast_dequeue
 pfifo_fast_enqueue
+pgd_free
 pgdat_balanced
 pick_next_entity
 pick_next_task_fair
@@ -715,6 +724,9 @@ try_to_del_timer_sync
 try_to_wake_up
 ttwu_do_activate.isra.0
 ttwu_do_wakeup.isra.0
+udp_destruct_common
+udp_destruct_sock
+udp_rmem_release
 unlock_buffer
 update_blocked_averages
 update_cfs_group

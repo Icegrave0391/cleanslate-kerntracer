@@ -278,6 +278,7 @@ do_sendfile
 do_softirq
 do_splice_direct
 do_splice_to
+do_sync_core
 do_tcp_sendpages
 down_read
 dst_release

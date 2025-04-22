@@ -169,6 +169,7 @@ cipso_v4_delopt
 cipso_v4_req_delattr
 clear_buddies
 clockevents_program_event
+complete
 consume_skb
 cpuacct_account_field
 cpuacct_charge
@@ -223,6 +224,7 @@ fib_select_path
 fib_table_lookup
 fib_validate_source
 file_free_rcu
+find_busiest_group
 find_exception
 finish_task_switch
 fixup_red_left
@@ -239,6 +241,7 @@ get_partial_node.part.0
 get_random_u16
 get_random_u32
 get_work_pool
+group_balance_cpu
 handle_edge_irq
 handle_fasteoi_irq
 handle_irq_event
@@ -356,6 +359,7 @@ ktime_get_update_offsets_now
 ktime_get_with_offset
 kvm_steal_clock
 lapic_next_deadline
+load_balance
 load_new_mm_cr3
 lock_sock_nested
 lock_timer_base
@@ -394,6 +398,7 @@ nf_hook_slow
 nohz_balance_exit_idle
 note_gp_changes
 note_interrupt
+ns_to_timespec64
 nsecs_to_jiffies
 ntp_get_next_leap
 ntp_tick_length
@@ -629,6 +634,7 @@ tcp_rcv_established
 tcp_rcv_space_adjust
 tcp_rcv_state_process
 tcp_rearm_rto.part.0
+tcp_recv_timestamp
 tcp_recvmsg
 tcp_recvmsg_locked
 tcp_release_cb
@@ -652,6 +658,7 @@ tcp_tsq_handler
 tcp_twsk_destructor
 tcp_update_metrics
 tcp_update_pacing_rate
+tcp_update_recv_tstamps
 tcp_update_skb_after_send
 tcp_urg
 tcp_v4_conn_request
@@ -692,6 +699,7 @@ update_cfs_rq_h_load
 update_curr
 update_dl_rq_load_avg
 update_fast_timekeeper
+update_group_capacity
 update_io_ticks
 update_min_vruntime
 update_process_times
@@ -718,6 +726,7 @@ vring_unmap_one_split_indirect.part.0
 wake_all_kswapds
 wake_up_process
 wake_up_var
+wakeme_after_rcu
 wakeup_kswapd
 wakeup_preempt_entity.isra.0
 wakeup_softirqd

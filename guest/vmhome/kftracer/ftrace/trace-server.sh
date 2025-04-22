@@ -13,6 +13,8 @@ PIDS=$(pgrep -x $PROC_NAME | tr '\n' ',' | sed 's/,$//')
 
 # 2. Record a combined trace:
 echo "Start tracing syscalls for <$PROC_NAME> (PIDS: $PIDS)"
+rm report-cpu*.txt
+
 sudo trace-cmd record \
   -p function_graph \
   -P $PIDS \

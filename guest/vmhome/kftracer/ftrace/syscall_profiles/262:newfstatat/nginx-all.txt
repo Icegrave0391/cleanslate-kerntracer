@@ -284,6 +284,7 @@ discard_slab
 dma_map_page_attrs
 dma_sync_single_for_cpu
 dma_unmap_page_attrs
+do_sync_core
 down_read
 dput
 dst_release
@@ -622,6 +623,7 @@ raw_spin_rq_lock_nested
 raw_spin_rq_lock_nested.constprop.0
 raw_spin_rq_unlock
 rcu_accelerate_cbs
+rcu_accelerate_cbs_unlocked
 rcu_advance_cbs
 rcu_cblist_dequeue
 rcu_core
@@ -948,6 +950,7 @@ wakeup_softirqd
 walk_component
 workingset_activation
 workingset_update_node
+writeout_period
 xfd_validate_state
 xfrm_lookup_route
 xfrm_lookup_with_ifid
