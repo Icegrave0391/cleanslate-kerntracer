@@ -69,6 +69,7 @@ __rcu_read_unlock
 __remove_hrtimer
 __rq_qos_done
 __rq_qos_done_bio
+__send_ipi_mask
 __sk_destruct
 __sk_dst_check
 __sk_free
@@ -130,6 +131,7 @@ account_system_time
 acct_account_cputime
 add_disk_randomness
 add_interrupt_randomness
+add_timer_on
 add_timer_randomness
 add_wait_queue
 alloc_pages
@@ -185,6 +187,7 @@ cubictcp_acked
 cubictcp_cong_avoid
 cubictcp_init
 cubictcp_state
+default_send_IPI_single
 default_send_IPI_single_phys
 default_wake_function
 del_timer
@@ -260,6 +263,7 @@ hrtimer_interrupt
 hrtimer_run_queues
 hrtimer_try_to_cancel
 hrtimer_update_next_event
+hrtimer_wakeup
 i_callback
 idle_cpu
 inet_bind2_bucket_destroy
@@ -301,6 +305,8 @@ inode_free_by_rcu
 insert_work
 internal_add_timer
 invoke_rcu_core
+io_serial_in
+io_serial_out
 ioapic_ack_level
 ip_append_data.part.0
 ip_build_and_send_pkt
@@ -360,6 +366,7 @@ ktime_get_coarse_real_ts64
 ktime_get_seconds
 ktime_get_update_offsets_now
 ktime_get_with_offset
+kvm_send_ipi_mask
 kvm_steal_clock
 lapic_next_deadline
 load_new_mm_cr3
@@ -402,6 +409,7 @@ nf_hook_slow
 nohz_balance_exit_idle
 note_gp_changes
 note_interrupt
+nsecs_to_jiffies
 ntp_get_next_leap
 ntp_tick_length
 packet_rcv
@@ -515,6 +523,7 @@ selinux_skb_peerlbl_sid
 selinux_sock_rcv_skb_compat
 selinux_socket_sock_rcv_skb
 send_call_function_single_ipi
+serial8250_backup_timeout
 set_next_entity
 set_task_cpu
 set_task_rq_fair

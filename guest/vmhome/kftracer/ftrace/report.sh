@@ -3,12 +3,12 @@
 CPUS=$(nproc --all)
 
 if [ $# -ne 2 ]; then
-    echo "Usage: $0 <trace-file.dat> <program-name>"
+    echo "Usage: $0 <program-name> <raw-trace.dat>"
     exit
 fi
 
-DAT_FILE=$1
-PROG=$2
+DAT_FILE=$2
+PROG=$1
 
 # extract input .dat file name
 echo "reporting $DAT_FILE..."

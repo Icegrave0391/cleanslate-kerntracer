@@ -110,6 +110,7 @@ __rq_qos_done
 __rq_qos_done_bio
 __rq_qos_throttle
 __rq_qos_track
+__send_ipi_mask
 __sk_destruct
 __sk_dst_check
 __sk_free
@@ -268,6 +269,7 @@ d_lru_add
 d_set_d_op
 d_splice_alias
 default_send_IPI_self
+default_send_IPI_single
 default_send_IPI_single_phys
 default_wake_function
 del_timer
@@ -361,9 +363,12 @@ finish_task_switch
 finish_wait
 fixup_red_left
 flush_tlb_func
+folio_activate
 folio_add_lru
 folio_alloc
 folio_batch_add_and_move
+folio_batch_move_lru
+folio_mapping
 folio_mark_accessed
 folio_unlock
 free_pcp_prepare
@@ -371,6 +376,7 @@ free_pcppages_bulk
 free_slab
 free_unref_page
 free_unref_page_commit
+free_unref_page_list
 free_unref_page_prepare.part.0
 generic_exec_single
 generic_fillattr
@@ -520,6 +526,7 @@ ktime_get_coarse_real_ts64
 ktime_get_seconds
 ktime_get_update_offsets_now
 ktime_get_with_offset
+kvm_send_ipi_mask
 kvm_steal_clock
 lapic_next_deadline
 legitimize_links
@@ -530,6 +537,7 @@ load_balance
 load_new_mm_cr3
 lock_timer_base
 lookup_fast
+lru_add_fn
 mark_page_accessed
 mempolicy_slab_node
 mempool_alloc
@@ -646,6 +654,7 @@ rcu_segcblist_ready_cbs
 rcu_start_this_gp
 rebalance_domains
 recalc_bh_state
+release_pages
 remove_entity_load_avg
 resched_curr
 restore_nameidata

@@ -74,6 +74,7 @@ __rcu_read_unlock
 __remove_hrtimer
 __rq_qos_done
 __rq_qos_done_bio
+__send_ipi_mask
 __sk_destruct
 __sk_dst_check
 __sk_free
@@ -195,6 +196,7 @@ cubictcp_cong_avoid
 cubictcp_init
 cubictcp_state
 deactivate_task
+default_send_IPI_single
 default_send_IPI_single_phys
 default_wake_function
 del_timer
@@ -386,6 +388,7 @@ ktime_get_seconds
 ktime_get_ts64
 ktime_get_update_offsets_now
 ktime_get_with_offset
+kvm_send_ipi_mask
 kvm_steal_clock
 lapic_next_deadline
 load_balance

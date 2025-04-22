@@ -63,10 +63,12 @@ __napi_poll
 __napi_schedule
 __netif_receive_skb_core
 __netif_receive_skb_list_core
+__netif_schedule
 __next_timer_interrupt
 __note_gp_changes
 __pskb_trim_head
 __qdisc_run
+__queue_delayed_work
 __queue_work
 __raise_softirq_irqoff
 __rcu_read_lock
@@ -74,6 +76,7 @@ __rcu_read_unlock
 __remove_hrtimer
 __rq_qos_done
 __rq_qos_done_bio
+__send_ipi_mask
 __sk_destruct
 __sk_dst_check
 __sk_free
@@ -155,6 +158,8 @@ bio_put
 blake2s_compress
 blake2s_update
 blk_account_io_completion
+blk_flush_complete_seq
+blk_mq_add_to_requeue_list
 blk_mq_complete_request
 blk_mq_complete_request_remote
 blk_mq_free_request
@@ -195,6 +200,7 @@ cubictcp_cong_avoid
 cubictcp_init
 cubictcp_state
 default_send_IPI_self
+default_send_IPI_single
 default_send_IPI_single_phys
 default_wake_function
 del_timer
@@ -206,6 +212,7 @@ dev_gro_receive
 dev_hard_start_xmit
 dev_qdisc_enqueue
 dev_queue_xmit_nit
+dev_watchdog
 discard_slab
 dma_map_page_attrs
 dma_sync_single_for_cpu
@@ -256,6 +263,7 @@ find_exception
 find_suitable_fallback
 finish_task_switch
 fixup_red_left
+flush_end_io
 flush_tlb_func
 free_pcp_prepare
 free_pcppages_bulk
@@ -275,6 +283,7 @@ get_page_from_freelist
 get_partial_node.part.0
 get_random_u16
 get_random_u32
+get_task_policy.part.0
 get_unused_fd_flags
 get_work_pool
 getname
@@ -379,6 +388,7 @@ irqd_cfg
 is_swiotlb_active
 is_vmalloc_addr
 jiffies_to_usecs
+kblockd_mod_delayed_work_on
 kfree
 kfree_skb_partial
 kfree_skb_reason
@@ -400,6 +410,7 @@ ktime_get_coarse_real_ts64
 ktime_get_seconds
 ktime_get_update_offsets_now
 ktime_get_with_offset
+kvm_send_ipi_mask
 kvm_steal_clock
 lapic_next_deadline
 legitimize_links
@@ -421,6 +432,7 @@ mix_pool_bytes
 mntget
 mntput
 mntput_no_expire
+mod_delayed_work_on
 mod_node_page_state
 mod_timer
 mod_timer_pending
@@ -517,6 +529,7 @@ remove_entity_load_avg
 resched_curr
 restore_nameidata
 rmqueue_bulk
+round_jiffies
 run_filter
 run_posix_cpu_timers
 run_rebalance_domains
@@ -738,6 +751,7 @@ timekeeping_update
 trigger_load_balance
 try_module_get
 try_to_del_timer_sync
+try_to_grab_pending
 try_to_unlazy
 try_to_wake_up
 ttwu_do_activate.isra.0

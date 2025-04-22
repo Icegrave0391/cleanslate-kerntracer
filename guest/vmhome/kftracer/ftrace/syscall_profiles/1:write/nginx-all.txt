@@ -16,6 +16,7 @@ __blk_flush_plug
 __blk_mq_alloc_requests
 __blk_mq_free_request
 __blk_mq_get_tag
+__blk_mq_sched_restart
 __blk_mq_try_issue_directly
 __blk_rq_map_sg
 __block_commit_write.isra.0
@@ -125,6 +126,7 @@ __rq_qos_done
 __rq_qos_done_bio
 __rq_qos_throttle
 __rq_qos_track
+__send_ipi_mask
 __sk_destruct
 __sk_dst_check
 __sk_free
@@ -232,19 +234,24 @@ blk_add_timer
 blk_attempt_plug_merge
 blk_cgroup_bio_start
 blk_finish_plug
+blk_flush_complete_seq
+blk_mq_add_to_requeue_list
 blk_mq_attempt_bio_merge
 blk_mq_complete_request
 blk_mq_complete_request_remote
 blk_mq_free_request
 blk_mq_get_tag
+blk_mq_hctx_has_pending
 blk_mq_put_tag
 blk_mq_rq_ctx_init.isra.0
+blk_mq_run_hw_queue
 blk_mq_sched_bio_merge
 blk_mq_start_request
 blk_mq_submit_bio
 blk_mq_try_issue_directly
 blk_mq_unique_tag
 blk_queue_exit
+blk_rq_init
 blk_start_plug
 blk_update_request
 blkcg_iolatency_done_bio
@@ -294,6 +301,7 @@ cubictcp_state
 current_time
 deactivate_task
 default_send_IPI_self
+default_send_IPI_single
 default_send_IPI_single_phys
 default_wake_function
 del_timer
@@ -407,6 +415,7 @@ find_suitable_fallback
 finish_task_switch
 finish_wait
 fixup_red_left
+flush_end_io
 flush_tlb_func
 folio_activate
 folio_activate_fn
@@ -440,6 +449,7 @@ generic_write_end
 get_nohz_timer_target
 get_page_from_freelist
 get_partial_node.part.0
+get_pfnblock_flags_mask
 get_random_u16
 get_random_u32
 get_task_policy.part.0
@@ -567,6 +577,7 @@ jbd2_log_start_commit
 jbd2_write_access_granted
 jiffies_to_usecs
 journal_tag_bytes
+kblockd_mod_delayed_work_on
 kfree
 kfree_rcu_shrink_count
 kfree_skb_partial
@@ -592,6 +603,7 @@ ktime_get_coarse_real_ts64
 ktime_get_seconds
 ktime_get_update_offsets_now
 ktime_get_with_offset
+kvm_send_ipi_mask
 kvm_steal_clock
 lapic_next_deadline
 list_lru_add
@@ -616,11 +628,13 @@ migrate_disable
 migrate_enable
 migrate_task_rq_fair
 mlock_page_drain_local
+mod_delayed_work_on
 mod_node_page_state
 mod_timer
 mod_timer_pending
 module_put
 move_folios_to_lru
+mq_flush_data_end_io
 mutex_lock
 mutex_spin_on_owner
 mutex_unlock
@@ -700,6 +714,7 @@ raw_spin_rq_lock_nested
 raw_spin_rq_lock_nested.constprop.0
 raw_spin_rq_unlock
 rcu_accelerate_cbs
+rcu_accelerate_cbs_unlocked
 rcu_advance_cbs
 rcu_cblist_dequeue
 rcu_core
@@ -720,6 +735,7 @@ rcu_segcblist_n_segment_cbs
 rcu_segcblist_pend_cbs
 rcu_segcblist_ready_cbs
 rcu_start_this_gp
+rcu_work_rcufn
 rebalance_domains
 recalc_bh_state
 release_pages
@@ -799,6 +815,8 @@ send_call_function_single_ipi
 serial8250_backup_timeout
 set_next_entity
 set_next_task_idle
+set_pageblock_migratetype
+set_pfnblock_flags_mask
 set_task_cpu
 set_task_rq_fair
 setup_object_debug
@@ -849,6 +867,7 @@ sock_free_inode
 sock_gen_put
 sock_wfree
 start_this_handle
+steal_suitable_fallback
 stop_this_handle
 submit_bh
 submit_bh_wbc.isra.0
@@ -981,6 +1000,7 @@ try_module_get
 try_to_del_timer_sync
 try_to_free_buffers
 try_to_free_pages
+try_to_grab_pending
 try_to_unmap_flush
 try_to_wake_up
 ttwu_do_activate.isra.0

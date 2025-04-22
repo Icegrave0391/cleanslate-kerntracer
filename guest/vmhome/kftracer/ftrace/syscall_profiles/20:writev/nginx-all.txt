@@ -69,6 +69,7 @@ __rcu_read_unlock
 __remove_hrtimer
 __rq_qos_done
 __rq_qos_done_bio
+__send_ipi_mask
 __sk_destruct
 __sk_dst_check
 __sk_free
@@ -131,6 +132,7 @@ account_system_time
 acct_account_cputime
 add_disk_randomness
 add_interrupt_randomness
+add_timer_on
 add_timer_randomness
 alloc_pages
 apic_ack_edge
@@ -170,6 +172,7 @@ cipso_v4_delopt
 cipso_v4_req_delattr
 clear_buddies
 clockevents_program_event
+clocksource_watchdog
 consume_skb
 cpuacct_account_field
 cpuacct_charge
@@ -184,6 +187,7 @@ cubictcp_cong_avoid
 cubictcp_cwnd_event
 cubictcp_init
 cubictcp_state
+default_send_IPI_single
 default_send_IPI_single_phys
 default_wake_function
 del_timer
@@ -366,6 +370,7 @@ ktime_get_coarse_real_ts64
 ktime_get_seconds
 ktime_get_update_offsets_now
 ktime_get_with_offset
+kvm_send_ipi_mask
 kvm_steal_clock
 lapic_next_deadline
 load_new_mm_cr3
@@ -442,6 +447,7 @@ raw_spin_rq_lock_nested
 raw_spin_rq_lock_nested.constprop.0
 raw_spin_rq_unlock
 rcu_accelerate_cbs
+rcu_accelerate_cbs_unlocked
 rcu_advance_cbs
 rcu_cblist_dequeue
 rcu_core
