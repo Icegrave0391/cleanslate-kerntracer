@@ -41,7 +41,7 @@ for sc in syscalls:
     if sets:
         all_funcs[sc] = sets
 
-# compute diffs and report
+# compute diffs and write union outputs
 for sc, runs in all_funcs.items():
     # gather union and intersection
     names = [fname for fname, _ in runs]
@@ -58,3 +58,11 @@ for sc, runs in all_funcs.items():
     else:
         print(f"No differences in {sc} across {len(runs)} runs")
         print()
+        
+    # write merged (union) functions to <program>-all.txt
+    sc_dir = os.path.join(base_dir, sc)
+    out_all = os.path.join(sc_dir, f"{program}-all.txt")
+    with open(out_all, 'w') as of:
+        for fn in sorted(union):
+            of.write(fn + '\n')
+    print(f"Wrote merged union functions to {out_all}")
