@@ -1,2 +1,4 @@
 *.dat
-
+*.swp
+/report*.txt
+__pycache__

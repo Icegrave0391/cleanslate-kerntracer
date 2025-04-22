@@ -11,6 +11,12 @@ def usage():
     print("Output: Output files (per-syscall functions) will be generated at syscall_profiles/sys_id:sys_name/<program>-<file-id>")
     sys.exit(1)
 
+# align ftrace's __sys_enter_xxx and real syscall name
+def sys_name_align(sys_name: str):
+    if sys_name == "sendfile64":
+        return "sendfile"
+    return sys_name
+
 # ── GLOBALS ─────────────────────────────────────────
 # map {syscall_name → set(function names)}
 syscalls = {}
@@ -24,10 +30,12 @@ def parse_file(program, filename):
     in_syscall = False
     current_sys_name = None
     current_sys_id = None          # nr of the syscall we’re inside
+    local_funcs = set()           # stash of syscall functions
 
     with open(filename) as f:
         # line and line_number
         for line_number, line in enumerate(f):
+            
             # 0) FILTER: skip any line that is not a syscall trace
             line = line.rstrip()
             if not line:
@@ -56,26 +64,39 @@ def parse_file(program, filename):
             # 3) SYSCALL BOUNDARIES
             if ev_tok.startswith('sys_enter_'):
                 name = ev_tok[len('sys_enter_'):]
+                name = sys_name_align(name)
                 try:
                     nr = syscall_table(name)
                 except ValueError:
                     print(f"line_{line_number} Unknown syscall: {name}")
                     sys.exit(1)
+                # noise: should not double-enter syscalls
+                if in_syscall:
+                    print(f"line_{line_number} syscall already entered: {current_sys_name} ({current_sys_id})")
+                    print("Discard this noise syscall.")
+                # begin new stash
                 in_syscall = True
                 current_sys_id = nr
                 current_sys_name = name
-                syscalls.setdefault(f"{current_sys_id}:{current_sys_name}", set())
+                local_funcs = set()
                 
             if ev_tok.startswith('sys_exit_'):
                 # we could verify it's the same name, but just reset
                 sys_name = ev_tok[len('sys_exit_'):]
+                sys_name = sys_name_align(sys_name)
                 if current_sys_name is None or current_sys_id is None:
                     print(f"[{filename}] line_{line_number} Found sys_exit_{sys_name} without previous sys_enter_")
                 elif sys_name != current_sys_name:
-                    raise ValueError(f"line_{line_number} syscall mismatch: {current_sys_name} != {sys_name}")
+                    print(f"line_{line_number} syscall mismatch: {current_sys_name} != {sys_name}")
+                    print("Discard the noise syscall pair...")
+                else:
+                    # commit
+                    __key = f"{current_sys_id}:{current_sys_name}"
+                    syscalls.setdefault(__key, set()).update(local_funcs)
                 in_syscall = False
                 current_sys_id = None
                 current_sys_name = None
+                local_funcs = set()
                 continue
 
             # 4) FUNCTION ENTRIES
@@ -87,7 +108,7 @@ def parse_file(program, filename):
                 # strip arguments/parentheses
                 name = func.split('(')[0].strip()
                 if in_syscall and current_sys_id and current_sys_name:
-                    syscalls[f"{current_sys_id}:{current_sys_name}"].add(name)
+                    local_funcs.add(name)
                 else:
                     common_funcs.add(name)
 

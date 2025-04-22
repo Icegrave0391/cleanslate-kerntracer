@@ -5,13 +5,14 @@ if [ $# -ne 2 ]; then
     exit
 fi
 
-BUFSIZE_KB=16384
+BUFSIZE_KB=65536      # 64MB per-core buffer size
 
 # 1. Grab your nginx PIDs
 PROC_NAME=$1
 PIDS=$(pgrep -x $PROC_NAME | tr '\n' ',' | sed 's/,$//')
 
 # 2. Record a combined trace:
+echo "Start tracing syscalls for <$PROC_NAME> (PIDS: $PIDS)"
 sudo trace-cmd record \
   -p function_graph \
   -P $PIDS \
