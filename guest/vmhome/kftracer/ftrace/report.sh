@@ -18,7 +18,7 @@ sudo trace-cmd report \
 
 # differentiate report into different threads
 rm report-cpu*.txt
-python3 ./report-to-pid.py $PROG
+python3 ./__report-to-pid.py $PROG
 
 # delete raw report.txt file
 rm report.txt

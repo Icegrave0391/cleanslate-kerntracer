@@ -3,7 +3,7 @@ import sys
 import os
 import glob
 
-from syscall_table import syscall_table
+from __syscall_table import syscall_table
 
 def usage():
     print(f"Usage: {sys.argv[0]} <program> <file_id>")
