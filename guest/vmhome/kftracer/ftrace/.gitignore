@@ -2,3 +2,4 @@
 *.swp
 /report*.txt
 __pycache__
+*objdump

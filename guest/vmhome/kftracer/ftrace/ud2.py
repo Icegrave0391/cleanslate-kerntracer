@@ -109,11 +109,36 @@ def main():
     base_dir = 'syscall_profiles'
     exec_file = os.path.join(base_dir, 'executed_syscalls', f'{prog}.txt')
     kall_path = 'kallsyms'
-    if not os.path.isfile(exec_file) or not os.path.isfile(kall_path):
+    kobjdump_path = 'kobjdump'
+    if not os.path.isfile(exec_file) or not os.path.isfile(kall_path) or not os.path.isfile(kobjdump_path):
         print('Error: missing input files.', file=sys.stderr)
         sys.exit(1)
 
-    # Load symbols until __start_rodata, track __static_call_text_end
+    # 1) Parse kobjdump: identify fentry-capable and non-fentry symbols
+    fentry_set = set()
+    all_kobj = set()
+    cur = None; has_fe = False
+    for ln in open(kobjdump_path):
+        line = ln.rstrip()
+        if not line:
+            if cur is not None:
+                all_kobj.add(cur)
+                if has_fe:
+                    fentry_set.add(cur)
+            cur, has_fe = None, False
+            continue
+        if '<' in line and line.endswith('>:'):
+            cur = line.split('<',1)[1].split('>',1)[0]
+            has_fe = False
+        elif cur and '__fentry__' in line:
+            has_fe = True
+    if cur is not None:
+        all_kobj.add(cur)
+        if has_fe:
+            fentry_set.add(cur)
+    non_fentry_set = all_kobj - fentry_set
+
+    # 2) Load kallsymbols until __start_rodata, track __static_call_text_end
     text_end = None
     static_end = None
     syms = []  # (addr,name)
