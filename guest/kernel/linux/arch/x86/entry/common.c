@@ -37,6 +37,10 @@
 
 #ifdef CONFIG_X86_64
 
+// deeplog
+int DEEPLOG_IS_CF_LOGGING;
+EXPORT_SYMBOL(DEEPLOG_IS_CF_LOGGING);
+
 // #define ENABLE_OMNILOG
 int DEEPLOG_IS_PT_TRACING;
 EXPORT_SYMBOL(DEEPLOG_IS_PT_TRACING);
@@ -141,6 +145,10 @@ static __always_inline bool do_syscall_x64(struct pt_regs *regs, int nr)
 	 * numbers for comparisons.
 	 */
 	unsigned int unr = nr;
+	// for deeplog
+	register unsigned int r1 asm("ecx") = 0;
+	// register unsigned long edi asm("rbx") = (unsigned long)unr;
+	register unsigned int eax asm("eax") = unr;
 
 #ifdef ENABLE_OMNILOG
 	if (likely(unr < NR_syscalls)) {
@@ -150,10 +158,24 @@ static __always_inline bool do_syscall_x64(struct pt_regs *regs, int nr)
 	}
 #endif
 
+	// normal deeplog vmfunc function
+	if (likely(unr < NR_syscalls) && DEEPLOG_IS_CF_LOGGING == 1) {
+		if (is_tracked_proc()) {
+			asm("xor %eax, %eax");
+			asm("movl %0,%1;"
+			:
+			: "r" (unr), "r" (r1));
+			// asm("add $0x1, %ecx");
+			asm("vmfunc");
+			asm("nop");
+			asm("nop");
+			asm("nop");
+		}
+	}
+
 	if (likely(unr < NR_syscalls)) {
-	
-// PT trace all (start)
-#if (0)
+		// profile: always PT trace all (start)
+#if (0) // disabled
 		if (is_tracked_proc()) {
 			do_start_stop_pt(1, unr);
 		}
@@ -162,8 +184,27 @@ static __always_inline bool do_syscall_x64(struct pt_regs *regs, int nr)
 		unr = array_index_nospec(unr, NR_syscalls);
 		regs->ax = sys_call_table[unr](regs);
 
-// PT trace all (stop)
-#if (0)
+		// normal deeplog vmfunc function
+		// vmcall + vmfunc (back)
+		if (DEEPLOG_IS_CF_LOGGING == 1) {
+			if (is_tracked_proc()) {
+			  asm("movl %0,%1;"
+				:
+				: "r" (0x82350), "r" (eax));
+			  asm volatile ("vmcall");
+			  asm("nop");
+			  asm("nop");
+			  asm("nop");
+			  asm("movl %0,%1;"
+				:
+				: "r" (511), "r" (r1));
+			  asm("xor %rax, %rax");
+			  asm("vmfunc");
+			}
+		  }
+
+		// profile: always PT trace all (stop)
+#if (0) // disabled
 		if (is_tracked_proc()) {
 			do_start_stop_pt(0, unr);
 		}
