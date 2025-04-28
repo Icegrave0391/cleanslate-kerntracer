@@ -24,6 +24,8 @@ with open(exec_file) as f:
         if tok:
             syscalls.append(tok)
 
+syscalls.append('common')
+
 # for each syscall, collect per-run function sets
 all_funcs = {}   # key -> list of sets
 for sc in syscalls:

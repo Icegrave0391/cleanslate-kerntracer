@@ -17,6 +17,7 @@ Outputs to out_UD2/<program>/:
 """
 import sys
 import os
+import re
 from collections import defaultdict
 
 PAGE_SIZE = 0x1000
@@ -37,7 +38,19 @@ DEFAULT_FUNCS = [
     'audit_copy_inode','audit_tree_lookup','audit_tree_match','security_inode_getsecid',
     'get_vfs_caps_from_disk','selinux_inode_getsecid'
 ]
-IGNORE_FUNCS = set(DEFAULT_FUNCS)
+CRITICAL_FUNCS = [
+    'do_sync_core','do_idle','arch_cpu_idle_enter','arch_cpu_idle_dead','arch_cpu_idle',
+    'stop_this_cpu','select_idle_routine',
+]
+IGNORE_FUNCS = set(DEFAULT_FUNCS + CRITICAL_FUNCS)
+
+def __do_filter_functions(k_func_syms):
+    """
+    Filter symbols by given substring patterns using regular expressions.
+    Currently filters symbols matching pattern "idle".
+    """
+    patterns = [re.compile("idle")]
+    return [sym for sym in k_func_syms if any(p.search(sym) for p in patterns)]
 
 def usage():
     print(f"Usage: {sys.argv[0]} <program>", file=sys.stderr)
@@ -93,14 +106,25 @@ def generateSyscallFunction(num):
     sys.exit(1)
 
 
-def addDefaultFunctions(funcs, num):
+def addIgnoreFunctions(funcs, num, syms):
+    syms_funcs = set(fn for _, fn in syms)
+    filter_funcs = __do_filter_functions(syms_funcs)
     entry = generateSyscallFunction(num)
-    for fn in DEFAULT_FUNCS + [entry]:
+    
+    ignores = list(IGNORE_FUNCS) + [entry] + filter_funcs
+    for fn in ignores:
         if fn not in funcs:
             funcs.append(fn)
     return funcs
 
-
+def addNonFentryFunctions(funcs, non_fentry_set, syms):
+    syms_funcs = set(fn for _, fn in syms)
+    intersection = non_fentry_set & syms_funcs
+    for fn in intersection:
+        if fn not in funcs:
+            funcs.append(fn)
+    return funcs
+    
 def main():
     if len(sys.argv) != 2:
         usage()
@@ -116,27 +140,33 @@ def main():
 
     # 1) Parse kobjdump: identify fentry-capable and non-fentry symbols
     fentry_set = set()
-    all_kobj = set()
-    cur = None; has_fe = False
-    for ln in open(kobjdump_path):
-        line = ln.rstrip()
-        if not line:
-            if cur is not None:
-                all_kobj.add(cur)
-                if has_fe:
-                    fentry_set.add(cur)
-            cur, has_fe = None, False
-            continue
-        if '<' in line and line.endswith('>:'):
-            cur = line.split('<',1)[1].split('>',1)[0]
-            has_fe = False
-        elif cur and '__fentry__' in line:
-            has_fe = True
-    if cur is not None:
-        all_kobj.add(cur)
-        if has_fe:
-            fentry_set.add(cur)
-    non_fentry_set = all_kobj - fentry_set
+    non_fentry_set = set()
+    current = None
+    has_fentry = False
+    header_re = re.compile(r'^[0-9a-f]+ <([^>]+)>:$')
+    with open(kobjdump_path, 'r') as kd:
+        print(f'Parsing {kobjdump_path}...')
+        for ln in kd:
+            line = ln.rstrip()
+            m = header_re.match(line)
+            if m:
+                # flush previous function
+                if current is not None:
+                    if has_fentry:
+                        fentry_set.add(current)
+                    else:
+                        non_fentry_set.add(current)
+                current = m.group(1)
+                has_fentry = False
+            else:
+                if current and '__fentry__' in line:
+                    has_fentry = True
+        # flush last function
+        if current is not None:
+            if has_fentry:
+                fentry_set.add(current)
+            else:
+                non_fentry_set.add(current)
 
     # 2) Load kallsymbols until __start_rodata, track __static_call_text_end
     text_end = None
@@ -199,12 +229,16 @@ def main():
         if not os.path.isfile(func_file):
             continue
 
+        # get profiled functions
         prof_all = [l.strip() for l in open(func_file) if l.strip()]
-        prof_all = addDefaultFunctions(prof_all, sid)
-
-        # kfuncs output
+        
+        # then update profiled functions (ignore non-fentry ones)
+        prof_all = addIgnoreFunctions(prof_all, sid, syms)
+        prof_all = addNonFentryFunctions(prof_all, non_fentry_set, syms)
+        
+        # generate kfuncs output first
         kfuncs_out[sid] = '|'.join(sorted(prof_all))
-
+        
         # Map profiled funcs onto pages
         pages = defaultdict(lambda: Page(0))
         for fn in prof_all:
@@ -228,6 +262,9 @@ def main():
             if base_addr not in symbol_pages:
                 continue
             pg = pages.get(base_addr, Page(base_addr))
+            # if pg.base == 0xffffffff8102b000:
+            #     import IPython; IPython.embed()
+            #     break
             if not pg.segments:
                 wp.append(hex(base_addr))
             else:
