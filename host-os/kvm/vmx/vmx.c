@@ -5460,6 +5460,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
 		if (instp != 0xfe2c1 && 
 			instp != 0xfd07e && 
 			instp != 0x1b9269b && 
+			instp != 0xffffffff8199b433 && // dev_watchdog
 			is_deeplog_context_init())
 		{	
 			eptp_list = vcpu_eptp_list_fetch(vcpu);
