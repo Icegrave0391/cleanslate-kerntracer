@@ -49,7 +49,11 @@ def __do_filter_functions(k_func_syms):
     Filter symbols by given substring patterns using regular expressions.
     Currently filters symbols matching pattern "idle".
     """
-    patterns = [re.compile("idle")]
+    patterns = [
+        re.compile("idle"),
+        re.compile("irq"),
+        re.compile("lock"),
+        ]
     return [sym for sym in k_func_syms if any(p.search(sym) for p in patterns)]
 
 def usage():
@@ -269,6 +273,9 @@ def main():
                 wp.append(hex(base_addr))
             else:
                 for s, e in pg.finalize():
+                    # not a even range? (UD2 occupies 2 bytes)
+                    if (e - s) % 2 != 0:
+                        print(f"[Warn] (syscall={sid}) Odd UD2 range: {hex(s)}-{hex(e)}", file=sys.stderr)
                     ud.extend([hex(s), hex(e)])
 
         whole_pages[sid] = ','.join(wp)
