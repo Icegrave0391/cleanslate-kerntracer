@@ -912,7 +912,7 @@ unsigned long white_function_pages[] =  {
     0xffffffff81c91000,
     0xffffffff81c92000,
     0xffffffff81c93000,
-    0xffffffff81c94000,
+    0xffffffff81c94000, // sched_text_
     0xffffffff81c95000,
     0xffffffff81c96000,
     0xffffffff81c97000,
@@ -920,8 +920,10 @@ unsigned long white_function_pages[] =  {
     0xffffffff81c99000,
     0xffffffff81c9a000,
     0xffffffff81c9b000,
-    0xffffffff81e00000,
-    0xffffffff81e01000,
+    0xffffffff81c9c000, // __lock_text
+    0xffffffff81c9d000, 
+    0xffffffff81e00000, // __entry_text
+    0xffffffff81e01000, // __irqentry_text
     0xffffffff81e02000,
     0xffffffff82000000,
     0xffffffff82001000,
