@@ -157,14 +157,19 @@ def template_extract():
 
 
 if __name__ == "__main__":
-    if (len(sys.argv) != 2):
-        print("Usage: python3 template_gen.py <target_profiled_process_name>")
+    if (len(sys.argv) < 2):
+        print("Usage: python3 template_gen.py <target_profiled_process_name> <(optional) kvm>")
         exit(1)
     
     targ_proc = sys.argv[1]
     
-    DEFAULT_WHOLE_PG_FILE = DEFAULT_TEMPLATE_DIR/str(targ_proc)/"whole_page_code.txt"
-    DEFAULT_SUB_PG_FILE = DEFAULT_TEMPLATE_DIR/str(targ_proc)/"ud2_sections.txt"
+    if (len(sys.argv) == 3 and sys.argv[2] == "kvm"):
+        print(f"[Info target process {targ_proc}]: using kvm template")
+        DEFAULT_WHOLE_PG_FILE = DEFAULT_TEMPLATE_DIR/str(targ_proc)/"kvm_data"/"whole_page_code.txt"
+        DEFAULT_SUB_PG_FILE = DEFAULT_TEMPLATE_DIR/str(targ_proc)/"kvm_data"/"ud2_sections.txt"
+    else:
+        DEFAULT_WHOLE_PG_FILE = DEFAULT_TEMPLATE_DIR/str(targ_proc)/"whole_page_code.txt"
+        DEFAULT_SUB_PG_FILE = DEFAULT_TEMPLATE_DIR/str(targ_proc)/"ud2_sections.txt"
 
     if not DEFAULT_WHOLE_PG_FILE.exists():
         print(f"[Error target process {targ_proc}]: {DEFAULT_WHOLE_PG_FILE} does not exist")
@@ -178,5 +183,6 @@ if __name__ == "__main__":
 
     # succ
     print(f"[Succ target process {targ_proc}] KVM CF-profiling template done.")
+    print(f"Profile dir: {DEFAULT_WHOLE_PG_FILE.parent}")
     print(f"Template is generated to {DEFAULT_DST_FILE}")
     print(f"Now please rebuild kvm by executing: repo-path/host-os/rebuild-kvm.sh")

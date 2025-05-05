@@ -5575,7 +5575,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
 		(
 		is_deeplog_memory_pinned && 
 		((cr2_or_gpa >= 0x100000 && cr2_or_gpa<= 0xbffdcfff) || 
-		(cr2_or_gpa >= 0x100000000 && cr2_or_gpa<= 0x233ffffff))
+		(cr2_or_gpa >= 0x100000000 && cr2_or_gpa<= 0x23fffffff))
 		),
 		"pg_fault on cr2_or_gpa=%lx\n", 
 		(unsigned long)cr2_or_gpa);

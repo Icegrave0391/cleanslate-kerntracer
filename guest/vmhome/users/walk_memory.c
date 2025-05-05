@@ -43,6 +43,17 @@ static inline void walk_guest_memory_done(void)
     kvm_hypercall3(KVM_DEEPLOG_WALK_MEMORY, 0, 0, 0);
 }
 
+// [    0.000000] BIOS-provided physical RAM map:
+// [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+// [    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+// [    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+// [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000bffdcfff] usable
+// [    0.000000] BIOS-e820: [mem 0x00000000bffdd000-0x00000000bfffffff] reserved
+// [    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
+// [    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+// [    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000023fffffff] usable
+// [    0.000000] NX (Execute Disable) protection: active
+
 void walk_memory(void *dummy)
 {
   unsigned long p;
@@ -50,6 +61,14 @@ void walk_memory(void *dummy)
   unsigned long total_ram_pages = get_num_physpages();
   unsigned long total_ram = total_ram_pages * page_size;
   printk(KERN_INFO "Total RAM: %lu bytes\n", total_ram);
+
+  for (p = 0; p < 0x9fbff; p += 0x1000) {
+    // Calculate the address
+    void *address = phys_to_virt((p));
+    // Accessing the first byte of the page
+    if (address)
+      printk(KERN_INFO "First byte (address: 0%lx): 0x%x\n", (unsigned long)address, ((volatile char *)address)[0]);
+  }
 
   for (p = 0x100000; p < 0xbffdcfff; p += 0x1000) {
     // Calculate the address
@@ -59,8 +78,7 @@ void walk_memory(void *dummy)
       printk(KERN_INFO "First byte (address: 0%lx): 0x%x\n", (unsigned long)address, ((volatile char *)address)[0]);
   }
   
-  // 100000000-233ffffff
-  for (p = 0x100000000; p < 0x233ffffff; p += 0x1000) {
+  for (p = 0x100000000; p < 0x23fffffff; p += 0x1000) {
     // Calculate the address
     void *address = phys_to_virt((p));
     // Accessing the first byte of the page
