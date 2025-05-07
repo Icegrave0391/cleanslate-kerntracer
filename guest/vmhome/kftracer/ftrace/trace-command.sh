@@ -10,8 +10,8 @@ shift
 
 CMD=("$@")
 
-# 每核 64 MB buffer
-BUFSIZE_KB=65536
+# 128 MB buffer
+BUFSIZE_KB=262144
 
 echo "Start tracing command: ${CMD[*]}"
 echo "Output will be saved to $OUTPUT"

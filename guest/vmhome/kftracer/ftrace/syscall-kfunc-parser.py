@@ -15,6 +15,16 @@ def usage():
 def sys_name_align(sys_name: str):
     if sys_name == "sendfile64":
         return "sendfile"
+    if sys_name == "newstat":
+        return "stat"
+    if sys_name == "newfstat":
+        return "fstat"
+    if sys_name == "newlstat":
+        return "lstat"
+    if sys_name == "newuname":
+        return "uname"
+    if sys_name == "umount":
+        return "umount2"
     return sys_name
 
 # ── GLOBALS ─────────────────────────────────────────
@@ -60,6 +70,8 @@ def parse_file(program, filename):
                 print(f"skip line: '{line}'")
                 continue
             ev_tok = rest.split(None, 1)[0].rstrip(':')  # e.g. "sys_enter_open"
+            # if ev_tok == "function":
+            #     import IPython; IPython.embed()          
             
             # 3) SYSCALL BOUNDARIES
             if ev_tok.startswith('sys_enter_'):
@@ -101,13 +113,21 @@ def parse_file(program, filename):
                 continue
 
             # 4) FUNCTION ENTRIES
-            if ev_tok == 'funcgraph_entry':
-                # everything after the '|' is the function call
-                if '|' not in line:
-                    continue
-                func = line.split('|', 1)[1].strip()
-                # strip arguments/parentheses
-                name = func.split('(')[0].strip()
+            if ev_tok == 'funcgraph_entry' or ev_tok == 'function':
+                
+                if ev_tok == 'funcgraph_entry':
+                    # everything after the '|' is the function call
+                    if '|' not in line:
+                        continue
+                    func = line.split('|', 1)[1].strip()
+                    # strip arguments/parentheses
+                    name = func.split('(')[0].strip()
+                else:
+                    if ':' not in line:
+                        continue
+                    func = line.split(':')[-1].strip()
+                    name = func 
+                    
                 if in_syscall and current_sys_id is not None and current_sys_name is not None:
                     local_funcs.add(name)
                 else:
