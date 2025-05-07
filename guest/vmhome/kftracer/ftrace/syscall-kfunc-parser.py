@@ -84,6 +84,7 @@ def parse_file(program, filename):
                 # we could verify it's the same name, but just reset
                 sys_name = ev_tok[len('sys_exit_'):]
                 sys_name = sys_name_align(sys_name)
+                
                 if current_sys_name is None or current_sys_id is None:
                     print(f"[{filename}] line_{line_number} Found sys_exit_{sys_name} without previous sys_enter_")
                 elif sys_name != current_sys_name:
@@ -107,7 +108,7 @@ def parse_file(program, filename):
                 func = line.split('|', 1)[1].strip()
                 # strip arguments/parentheses
                 name = func.split('(')[0].strip()
-                if in_syscall and current_sys_id and current_sys_name:
+                if in_syscall and current_sys_id is not None and current_sys_name is not None:
                     local_funcs.add(name)
                 else:
                     common_funcs.add(name)

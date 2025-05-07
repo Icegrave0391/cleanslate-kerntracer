@@ -53,6 +53,8 @@ def __do_filter_functions(k_func_syms):
         re.compile("idle"),
         re.compile("irq"),
         re.compile("lock"),
+        re.compile("rcu"),
+        re.compile("kcompactd"),
         ]
     return [sym for sym in k_func_syms if any(p.search(sym) for p in patterns)]
 
@@ -274,12 +276,17 @@ def main():
             else:
                 for s, e in pg.finalize():
                     # not a even range? (UD2 occupies 2 bytes)
-                    if (e - s) % 2 != 0:
-                        print(f"[Warn] (syscall={sid}) Odd UD2 range: {hex(s)}-{hex(e)}", file=sys.stderr)
+                    # if (e - s) % 2 != 0:
+                    #     print(f"[Warn] (syscall={sid}) Odd UD2 range: {hex(s)}-{hex(e)}", file=sys.stderr)
                     ud.extend([hex(s), hex(e)])
 
         whole_pages[sid] = ','.join(wp)
         ud2_sects[sid]  = ','.join(ud)
+
+    # write __fentry__ set
+    with open("fentry-set-raw.txt", "w") as f:
+        for fn in fentry_set:
+            f.write(f"{fn}\n")
 
     # Write outputs
     out_dir = os.path.join('out_UD2', prog)

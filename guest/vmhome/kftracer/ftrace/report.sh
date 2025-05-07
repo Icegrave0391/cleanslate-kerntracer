@@ -21,4 +21,4 @@ rm report-cpu*.txt
 python3 ./__report-to-pid.py $PROG
 
 # delete raw report.txt file
-rm report.txt
+# rm report.txt
