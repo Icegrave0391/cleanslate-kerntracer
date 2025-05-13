@@ -6,7 +6,7 @@ def should_filter_function(name):
                        "timekeeping_update", "update_fast_timekeeper", "ntp_get_next_leap", "ntp_tick_length",
                        "account_system_time", "account_system_index_time", "__acct_update_integrals",
                        "__accumulate_pelt_segments", "__update_load_avg_cfs_rq", "__update_load_avg_se",
-                       "calc_global_load", "cpuacct_charge", "cpuacct_account_field",
+                       "calc_global_load", "cpuacct_charge", "cpuacct_account_field", "__queue_work",
                         "cgroup_rstat_updated", "update_curr", "update_cfs_group", "task_work_add"]
     patterns = [
             re.compile("idle"),
