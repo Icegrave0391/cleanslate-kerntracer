@@ -1,0 +1,24 @@
+This is a collection of tests for systemtap.
+
+Running the Testsuite
+*********************
+
+There are two ways to run the testsuite and pass additional parameters to
+DejaGnu.  The first is to do `make check' in the main build directory and,
+if desired, selecting parts of the testsuite with `RUNTESTFLAGS':
+
+      % make check RUNTESTFLAGS='argv.exp -v --debug'
+
+"make check" runs unprivileged tests only against an uninstalled build tree,
+and can be run without special privileges.
+
+"make installcheck" runs all tests against an installed tree.  It requires
+root and/or sudo/stapdev privileges.
+
+      # make installcheck RUNTESTFLAGS=
+
+Runs whole the testsuite.
+
+      # make installcheck RUNTESTFLAGS='argv.exp add.exp'
+
+Runs only two test cases.

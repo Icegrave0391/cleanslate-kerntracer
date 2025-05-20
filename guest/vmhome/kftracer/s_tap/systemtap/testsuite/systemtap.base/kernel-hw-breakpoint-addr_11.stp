@@ -1,0 +1,10 @@
+probe kernel.data(0x$^ADDR_a).length(8).write {
+    if (pid() == target()) {
+        println("~~~");
+        print_ubacktrace_fileline();
+    }
+}
+
+probe timer.s(5) {
+    exit();
+}

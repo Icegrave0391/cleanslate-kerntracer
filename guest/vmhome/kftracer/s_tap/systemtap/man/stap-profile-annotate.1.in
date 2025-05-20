@@ -1,0 +1,201 @@
+.TH STAP-PROFILE-ANNOTATE 1
+.SH NAME
+stap-profile-annotate \- Annotate source files of running programs.
+
+.\" macros
+.\" do not nest SAMPLEs
+.de SAMPLE
+.br
+
+.nr oldin \\n(.i
+.nf
+.nh
+..
+.de ESAMPLE
+.hy
+.fi
+.in \\n[oldin]u
+
+..
+
+.SH SYNOPSIS
+
+.br
+.B strace-profile-annotate [ \fIOPTIONS\fR ] \-d \fIBINARY\fR ...
+.br
+.B strace-profile-annotate [ \fIOPTIONS\fR ] \-x \fIPID\fR 
+.br
+.B strace-profile-annotate [ \fIOPTIONS\fR ] \-c \fICMD\fR
+
+.SH DESCRIPTION
+
+The stap-profile-annotate command profiles selected user-space
+processes, based on selected profiling events over a selected period
+of time, then produces an annotated source code listings from all the
+hits on their executables & shared libraries.  The annotation
+identifes number of profiling event hits on the source files'
+individual lines.
+
+The selection of user-space processes and shared libraries may be
+system-wide (in which case use the \fB-d\fP option to enumerate all
+potentially interesting binaries), or may be focused on single
+pre-existing process (\fB-x\fP) or a newly run process hierarchy
+(\fB-c\fP).  SystemTap automatically adds dependent shared libraries
+for any binary explicitly given by the user.
+
+The selection of profiling event may be the default kernel profiling
+timer (a few hundred Hz), or any desired set of systemtap probe
+points (\fB-e\fP).
+
+The selected time for the profiling session can be the lifetime of the
+targeted process, or a specified timeout (\fB-T\fP), or may be
+interrupted by the user at any time.
+
+The stap-profile-annotate program uses debuginfod to fetch debuginfo
+and source files, and therefore requires a configured
+\fBdebuginfod-find\fP program.  If profiling locally built programs
+that are not available in central debuginfod servers, consider
+running a local private server temporarily, possibly federated to
+upstream debuginfod servers.
+.SAMPLE
+   % export DEBUGINFOD_URLS=https://UPSTREAM.SERVER/
+   % debuginfod -p 8002 -d :memory: -F /BUILD/TREE1 /BUILD/TREE2 &
+   
+   # export DEBUGINFOD_URLS=http://localhost:8002/
+   # stap-profile-annotate [...]
+.ESAMPLE
+
+The resulting annotated source files may be written into
+subdirectories based on the buildid of the binaries, or printed to
+standard output (\fB-p\fP).
+
+A profiling session can end before the process it's targeting
+finishes. In this case, sending SIGINT to stap-profile-annotate
+will yield the script's desired output if sent after
+"Stopped stap data collector" is in stdout. You must still
+manually kill the targeted process after sending 
+stap-profile-annotate SIGINT.
+
+When stap is run it adds user-space libraries into the kernel
+module by default. However, when profiling a module which is not a
+user-space shared library the -d option must be used to add that
+module's information into the SystemTap kernel module.
+
+stap-profile-annotate relies heavily on the use of debuginfod. Debuginfod
+allows the script to fetch debuginfo and translate virtual memory
+offsets into source line numbers. It is also used to fetch the
+actual source files to annotate. For these reasons, ensure your
+debuginfod client is properly configured for use.
+
+.SH OPTIONS
+.PP
+
+.TP
+.B \fB\-h\fR
+Show help message.
+
+.TP
+.B \fB\-x\fR, \fB\-\-pid\fR \fIPID\fR
+Pre-existing process PID for SystemTap to target.  Its symbol information
+is automatically included.
+
+.TP
+.B \fB\-c\fR, \fB\-\-cmd\fR \fICMD\fR
+Command for SystemTap to run and then target.  Its symbol information
+is automatically included.
+
+.TP
+.B \fB\-d\fR \fIBINARY\fR
+Add symbol information for another binary (executable or shared library)
+and its referenced libraries.  This option may be repeated.
+
+.TP
+.B \fB\-e\fR \fIEVENTS\fR, \fB\-\-events \fIEVENTS\fR
+Use the given SystemTap probe points (comma-separated), instead of the
+default \fItimer.profile\fP to catch profiling hits.  Consider
+\fIperf.hw.branch_misses\fP.
+
+.TP
+.B \fB\-T\fR, \fB\-\-timeout \fITIMEOUT\fR
+stap-profile-annotate will exit after TIMEOUT seconds.  \fBNote:\fR if
+\fB\-x\fR or \fB\-c\fR, any targeted processes will not be killed
+after this timeout.  Targeted processes either need their own
+timeouts specified or to be killed manually.
+
+.TP
+.B \fB\-p\fR, \fB\-\-print\fR
+Print annotated source files to standard output instead of to
+individual files named like \fIprofile-BUILDID/source/PATH/FOO.c\fP.
+
+.TP
+.B \fB\-w\fR, \fB\-\-context\-width\fR \fIWIDTH\fR
+This option limits the number of lines of context before and
+after each hit source line.  Without this option, the default is
+to use unlimited context, i.e., print all lines.
+
+.TP
+.B \fB\-s\fR, \fB\-\-stap\fR \fIPATH\fR
+Override the path to the systemtap program.
+
+.TP
+.B \fB\-v\fR, \fB\-\-verbose\fR
+Increase verbosity.  May be repeated for more verbosity.
+
+.SH EXAMPLES
+
+.SS Command
+
+.SAMPLE
+export DEBUGINFOD_URLS=https://debuginfod.elfutils.org/ # if needed
+stap-profile-annotate -w 1 -c '/usr/bin/stress -t 5 --cpu 2'
+.ESAMPLE
+
+.SS Output
+
+.SAMPLE
+Starting stap data collector.
+stress: info: [88582] dispatching hogs: 4 cpu, 0 io, 0 vm, 0 hdd
+stress: info: [88582] successful run completed in 5s
+Counted 19798 known userspace hits.
+Ignored 12342 kernel hits.
+Stopped stap data collector.
+Consumed 321 profile records of 19798 hits across 3 buildids.
+0001228 (6.20%) hits in profile-10da92de76b289c2e9cfb145ca1edc4e850ec4da/source/usr/src/debug/
+	glibc-2.32-10.fc33.x86_64/stdlib/rand.c over 3 lines.
+0004241 (21.42%) hits in profile-10da92de76b289c2e9cfb145ca1edc4e850ec4da/source/usr/src/debug/
+	glibc-2.32-10.fc33.x86_64/stdlib/random_r.c over 18 lines.
+0000094 (0.47%) hits in profile-10da92de76b289c2e9cfb145ca1edc4e850ec4da/source/usr/src/debug/
+	glibc-2.32-10.fc33.x86_64/stdlib/../sysdeps/unix/sysv/linux/x86/lowlevellock.h over 1 lines.
+0004769 (24.09%) hits in profile-10da92de76b289c2e9cfb145ca1edc4e850ec4da/source/usr/src/debug/
+	glibc-2.32-10.fc33.x86_64/stdlib/random.c over 6 lines.
+0001401 (7.08%) hits in profile-520e2b0352d6ac72cb3b58df4f44137e29a94250/source/usr/src/debug/
+	stress-1.0.4-26.fc33.x86_64/src/stress.c over 1 lines.
+00001038 (5.24%) hits in buildid 520e2b0352d6ac72cb3b58df4f44137e29a94250 with unknown source
+0003109 (15.70%) hits in profile-07ae52cfc7f4eda1d13383c04564e3236e059993/source/usr/src/debug/
+	glibc-2.32-10.fc33.x86_64/math/../sysdeps/ieee754/dbl-64/e_sqrt.c over 3 lines.
+0003918 (19.79%) hits in profile-07ae52cfc7f4eda1d13383c04564e3236e059993/source/usr/src/debug/
+	glibc-2.32-10.fc33.x86_64/math/w_sqrt_compat.c over 3 lines.
+.ESAMPLE
+
+.SS Example Annotated Source File
+
+Found in: \fBprofile-07ae52cfc7f4eda1d13383c04564e3236e059993/source/\fR
+\fBusr/src/debug/glibc-2.32-10.fc33.x86_64/math/w_sqrt_compat.c\fR
+
+.SAMPLE
+        {
+0000730   if (__builtin_expect (isless (x, 0.0), 0) && _LIB_VERSION != _IEEE_)
+0000353     return __kernel_standard (x, x, 26); /* sqrt(negative) */
+        
+0002799   return __ieee754_sqrt (x);
+        }
+        libm_alias_double (__sqrt, sqrt)
+.ESAMPLE
+
+
+.SH SEE ALSO
+.nh
+.nf
+.IR stap (1),
+.IR stapprobes (3stap),
+.IR debuginfod-find (1)

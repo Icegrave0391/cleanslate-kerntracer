@@ -1,0 +1,143 @@
+# faccessat2 __________________________________________________
+# new function faccessat2() was added to Linux in version 5.8.
+# with commit c8ffd8bcdd28296a198f237cc595148a8d4adfbe
+#
+# from man faccessat2:  the raw Linux faccessat() system call does not have a
+# flags argument.  To allow  for  a  proper implementation,  Linux  5.8 added
+# the faccessat2() system call, which supports the flags argument and allows
+# a correct implementation of the faccessat() wrapper function (in glibc)
+#
+# long sys_faccessat2(int dfd, const char __user *filename, int mode, int flags)
+
+@define _SYSCALL_FACCESSAT2_NAME
+%(
+	name = "faccessat2"
+%)
+
+@define _SYSCALL_FACCESSAT2_ARGSTR
+%(
+	argstr = sprintf("%s, %s, %s, %s", dirfd_str, pathname, mode_str, flags_str)
+%)
+
+@define _SYSCALL_FACCESSAT2_REGARGS
+%(
+	dirfd = int_arg(1)
+	dirfd_str = _dfd_str(dirfd)
+	pathname = user_string_quoted(pointer_arg(2))
+	pathname_unquoted = user_string_nofault(pointer_arg(2))
+	mode = int_arg(3)
+	mode_str = _access_mode_str(mode)
+	flags = int_arg(4)
+	flags_str = _faccessat2_flags_str(flags)
+%)
+
+@define _SYSCALL_FACCESSAT2_REGARGS_STORE
+%(
+        if (@probewrite(dirfd))
+          set_int_arg(1, dirfd)
+
+	if (@probewrite(pathname_unquoted))
+	  set_user_string_arg(pointer_arg(2), pathname_unquoted)
+
+	if (@probewrite(mode))
+	  set_int_arg(3, mode)
+
+        if (@probewrite(flags))
+          set_int_arg(4, flags)
+%)
+
+probe syscall.faccessat2 = dw_syscall.faccessat2 !, nd_syscall.faccessat2 ? {}
+probe syscall.faccessat2.return = dw_syscall.faccessat2.return !, nd_syscall.faccessat2.return ? {}
+
+# dw_faccessat2 _____________________________________________________
+
+probe dw_syscall.faccessat2 = kernel.function("sys_faccessat2").call ?
+{
+	@__syscall_compat_gate(@const("__NR_faccessat2"),
+			       @const("__NR_compat_faccessat2"))
+	@_SYSCALL_FACCESSAT2_NAME
+	dirfd = __int32($dfd)
+	dirfd_str = _dfd_str(__int32($dfd))
+	pathname = user_string_quoted($filename)
+	mode = __int32($mode)
+	mode_str = _access_mode_str(__int32($mode))
+	flags = __int32($flags)
+	flags_str = _faccessat2_flags_str(__int32($flags))
+	@_SYSCALL_FACCESSAT2_ARGSTR
+}
+probe dw_syscall.faccessat2.return = kernel.function("sys_faccessat2").return ?
+{
+	@__syscall_compat_gate(@const("__NR_faccessat2"),
+			       @const("__NR_compat_faccessat2"))
+	@_SYSCALL_FACCESSAT2_NAME
+	@SYSC_RETVALSTR($return)
+}
+
+# nd_faccessat2 _____________________________________________________
+
+probe nd_syscall.faccessat2 = nd1_syscall.faccessat2!, nd2_syscall.faccessat2!, tp_syscall.faccessat2
+  { }
+
+probe nd1_syscall.faccessat2 = kprobe.function("sys_faccessat2") ?
+{
+	@__syscall_compat_gate(@const("__NR_faccessat2"),
+			       @const("__NR_compat_faccessat2"))
+	@_SYSCALL_FACCESSAT2_NAME
+	asmlinkage()
+	@_SYSCALL_FACCESSAT2_REGARGS
+	@_SYSCALL_FACCESSAT2_ARGSTR
+}
+
+/* kernel 4.17+ */
+probe nd2_syscall.faccessat2 = kprobe.function(@arch_syscall_prefix "sys_faccessat2") ?
+{
+	__set_syscall_pt_regs(pointer_arg(1))
+        @_SYSCALL_FACCESSAT2_NAME
+        @_SYSCALL_FACCESSAT2_REGARGS
+        @_SYSCALL_FACCESSAT2_ARGSTR
+},
+{
+        %( @_IS_SREG_KERNEL %? @_SYSCALL_FACCESSAT2_REGARGS_STORE %)
+}
+
+/* kernel 3.5+, but undesirable because it affects all syscalls */
+probe tp_syscall.faccessat2 = kernel.trace("sys_enter")
+{
+        __set_syscall_pt_regs($regs)
+	@__syscall_compat_gate(@const("__NR_faccessat2"),
+			       @const("__NR_compat_faccessat2"))
+        @_SYSCALL_FACCESSAT2_NAME
+        @_SYSCALL_FACCESSAT2_REGARGS
+        @_SYSCALL_FACCESSAT2_ARGSTR
+},
+{
+        %( @_IS_SREG_KERNEL %? @_SYSCALL_FACCESSAT2_REGARGS_STORE %)
+}
+
+probe nd_syscall.faccessat2.return = nd1_syscall.faccessat2.return!, nd2_syscall.faccessat2.return!, tp_syscall.faccessat2.return
+  { }
+
+probe nd1_syscall.faccessat2.return = kprobe.function("sys_faccessat2").return ?
+{
+	@__syscall_compat_gate(@const("__NR_faccessat2"),
+			       @const("__NR_compat_faccessat2"))
+	@_SYSCALL_FACCESSAT2_NAME
+	@SYSC_RETVALSTR(returnval())
+}
+
+/* kernel 4.17+ */
+probe nd2_syscall.faccessat2.return = kprobe.function(@arch_syscall_prefix "sys_faccessat2").return ?
+{
+	@_SYSCALL_FACCESSAT2_NAME
+	@SYSC_RETVALSTR(returnval())
+}
+
+/* kernel 3.5+, but undesirable because it affects all syscalls */
+probe tp_syscall.faccessat2.return = kernel.trace("sys_exit")
+{
+	__set_syscall_pt_regs($regs)
+	@__syscall_compat_gate(@const("__NR_faccessat2"),
+			       @const("__NR_compat_faccessat2"))
+	@_SYSCALL_FACCESSAT2_NAME
+	@SYSC_RETVALSTR($ret)
+}

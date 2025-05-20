@@ -1,0 +1,224 @@
+// uconversions tapset -- BPF version
+// Copyright (C) 2018-2022 Red Hat Inc.
+//
+// This file is part of systemtap, and is free software.  You can
+// redistribute it and/or modify it under the terms of the GNU General
+// Public License (GPL); either version 2, or (at your option) any
+// later version.
+
+// TODO: Really need a solution for redundant docstrings.
+// TODO: Use jump_to_catch/register_error for user_long{,_warn} type functions.
+
+function user_string_n:string (addr:long, n:long)
+{ /* pure */ /* bpf */
+  // TODO: Does not provide address in error message.
+  return user_string_n(addr, n, "user string copy fault")
+}
+
+function user_string_n:string (addr:long, n:long, err_msg:string)
+%( 1 == 0 %?
+{ /* pure */ /* bpf */
+  /* !!! ACHTUNG !!!
+   * bpf uses the same bpf_probe_read() helpers for kernel and user
+   * addresses, on the assumption that the address spaces coincide.
+   * Which only really works on x86_64 in Current Day.
+   *
+   * If the address space is changed, it may return the wrong data.
+   * TODO PR25168: Fix this as soon as BPF ships proper, separate
+   * bpf_probe_read_{user,kernel}() helpers.
+   */
+  %( arch == "x86_64" %?
+     // TODO: Does not use the provided err_msg.
+     return kernel_string_n(addr, n) // calls probe_read_str()
+  %:
+     // TODO: Use error() function.
+     print("ERROR(unsupported): %s", err_msg)
+     exit()
+  %)
+}
+%:
+%{ /* bpf */ /* pure */
+  /* if (n > BPF_MAXSTRINGLEN) n = BPF_MAXSTRINGLEN; */
+  jle $n, BPF_MAXSTRINGLEN, skip
+  mov $n, BPF_MAXSTRINGLEN
+
+  /* buf = bpf_stk_alloc(BPF_MAXSTRINGLEN);
+     buf[0] = 0x0; // guarantee NUL byte
+     rc = bpf_probe_read_user_str(buf, n, addr); */
+  skip: alloc, $buf, BPF_MAXSTRINGLEN
+  stw [$buf+0], 0 /* guarantee NUL byte */
+  call $rc, probe_read_user_str, $buf, $n, $addr
+  call -, printf, "hello from the new bpf assembler"
+  /* TODO <- should work if the helper is named bpf_probe_read_user_str() too */
+  /* TODO <- substitute probe_read_str automatically for older bpf? */
+
+  /* if (rc < 0) error("...", addr); */
+  jsge $rc, 0, done
+  call -, printf, "ERROR: string copy fault at %p [man error::fault]\n", $addr
+  /* TODO <- document stapbpf version of error::fault */
+  /* TODO <- return value reg should be optional */
+  /* TODO <- use jump_to_catch error handling? */
+  call -, printf, "%s", $err_msg
+  call -, exit
+
+  /* return buf; */
+  done: mov $$, $buf
+%}
+%)
+
+function user_string_n_warn:string (addr:long, n:long, warn_msg:string)
+%( 1 == 1 %?
+{ /* pure */ /* bpf */
+  /* !!! ACHTUNG !!!
+   * bpf uses the same bpf_probe_read() helpers for kernel and user
+   * addresses, on the assumption that the address spaces coincide.
+   * Which only really works on x86_64 in Current Day.
+   *
+   * If the address space is changed, it may return the wrong data.
+   * TODO PR25168: Fix this as soon as BPF ships proper, separate
+   * bpf_probe_read_{user,kernel}() helpers.
+   */
+  %( arch == "x86_64" %?
+     return kernel_string_n(addr, n, warn_msg) // calls probe_read_str()
+  %:
+     return warn_msg // don't even bother
+  %)
+}
+%:
+%{ /* bpf */ /* pure */
+  /* buf = bpf_stk_alloc(BPF_MAXSTRINGLEN);
+     buf[0] = 0x0; // guarantee NUL byte
+     rc = bpf_probe_read_user_str(buf, BPF_MAXSTRINGLEN, addr); */
+  alloc, $buf, BPF_MAXSTRINGLEN;
+  0x62, $buf, -, -, 0x0; /* stw [$buf+0], 0x0 -- guarantee NUL byte */
+  call, $rc, probe_read_user_str, $buf, BPF_MAXSTRINGLEN, $addr;
+
+  /* if (rc < 0) return err_msg;
+     return buf; */
+  0xc5, $rc, -, _err, 0; /* jslt $rc, 0, _err */
+  0xbf, $$, $buf, -, -; /* mov $$, $buf */
+  0x05, -, -, _done, -; /* ja _done; */
+
+  label, _err;
+  0xbf, $$, $warn_msg, -, -; /* mov $$, $warn_msg */
+
+  label, _done;
+%}
+%)
+
+function __bpf_probe_read_user_error:long (addr:long, size:long)
+%{ /* bpf */ /* pure */
+  /* if (size > 8) error("...", addr, size); */
+  0xb5, $size, -, _skip, 8; /* jle $n, 8, _skip */
+  call, -, printf, "ERROR: attempted to read %ul (>8) bytes from %p into unsigned long\n", $size, $addr;
+  call, -, exit;
+
+  label, _skip;
+  /* buf = bpf_stk_alloc(8); // size <= 8
+     *buf = (unsigned long)0x0; // guarantee leading zeroes
+     rc = bpf_probe_read(buf, size, addr);
+   */
+  alloc, $buf, 8;
+  0x7a, $buf, -, -, 0x0; /* stdw [buf+0], 0 -- guarantee leading zeroes */
+  /* TODO PR25168: probe_read is used for both kernel and user memory.
+     BPF will soon deprecate these in favour of separate functions. */
+  call, $rc, probe_read, $buf, $size, $addr;
+  /* call, $rc, probe_read_user, $buf, $size, $addr; */
+  /* XXX code for testing LITTLE ENDIAN / BIG ENDIAN */
+  /* 0xb7, $rc, -, -, 0x0;
+  0x62, $buf, -, -, 0xdeadbeef;
+  0x62, $buf, -, 4, 0xea7b3375; /* end test */
+
+  /* if (rc < 0) error("...", addr); */
+  0x75, $rc, -, _done, 0; /* jsge $rc, 0, _done */
+  call, -, printf, "ERROR: user copy fault at %p [man error::fault]\n", $addr; /* TODO document stapbpf version of error::fault */
+  call, -, exit;
+
+  label, _done;
+  /* return *(unsigned long *)buf; */
+  0x79, $$, $buf, 0x0, -; /* ldxdw $$, buf */
+%}
+// XXX I assumed I would need to return buf >> 8*(8-size) here,
+// but buf is already correctly aligned for smaller sizes. Hmm.
+
+function __signext:long (src:long, size:long) { /* pure */ /* bpf */
+  // XXX 2'S COMPLEMENT; assumes upper bits of size are zero
+  // as provided by __bpf_probe_read_user_error()
+  // thanks to https://graphics.stanford.edu/~seander/bithacks
+  bits = 8*size
+  mask = 1 << (bits-1)
+  return (src ^ mask) - mask
+}
+
+function __bpf_probe_read_user_error_signed (addr:long, size:long) { /* pure */ /* bpf */
+  return __signext(__bpf_probe_read_user_error(addr, size), size)
+}
+
+// TODO We can't be sure of exact lengths of {char,short,int,long}
+// so the best guess for now is 1,2,4,8 to match the BPF definitions.
+// However, I'm pretty sure sizeof.stp uses some @cast() trickery to
+// get the size of a data type. Should we capture it as a macro?
+
+function user_char_error:long (addr:long) { /* pure */ /* bpf */
+  // XXX: Note that the lkm version is also reading a signed char,
+  // which gets sign extended to a long just like this. I was surprised.
+  return __bpf_probe_read_user_error_signed(addr, 1)
+}
+
+function user_short_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error_signed(addr, 2)
+}
+
+function user_ushort_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error(addr, 2)
+}
+
+function user_int_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error_signed(addr, 4)
+}
+
+function user_long_error:long (addr:long) { /* pure */ /* bpf */
+  /* XXX code for testing LITTLE ENDIAN / BIG ENDIAN */
+  /* printf("1: %lx\n2: %x\n4: %lx\n8: %lx\n",
+    __bpf_probe_read_user_error(addr, 1),
+    __bpf_probe_read_user_error(addr, 2),
+    __bpf_probe_read_user_error(addr, 4),
+    __bpf_probe_read_user_error(addr, 8)) /* end test */
+  return __bpf_probe_read_user_error(addr, 8) // XXX no sign extension needed
+}
+
+function user_ulong_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error(addr, 8)
+}
+
+function user_int8_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error_signed(addr, 1)
+}
+
+function user_uint8_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error(addr, 1)
+}
+
+function user_int16_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error_signed(addr, 2)
+}
+
+function user_uint16_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error(addr, 2)
+}
+
+function user_int32_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error_signed(addr, 4)
+}
+
+function user_uint32_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error(addr, 4)
+}
+
+function user_int64_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error(addr, 8) // XXX no sign extension needed
+}
+
+function user_uint64_error:long (addr:long) { /* pure */ /* bpf */
+  return __bpf_probe_read_user_error_(addr, 8)
+}

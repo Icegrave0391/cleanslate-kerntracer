@@ -1,0 +1,12 @@
+global stats;
+
+probe oneshot {
+    stats["k"] <<< 1;
+    stats["k"] <<< 2;
+    stats["k"] <<< 3;
+    printf("variance = %d\n", @variance(stats["k"], 7));
+}
+
+probe never {
+    print(@hist_log(stats["k"]));
+}

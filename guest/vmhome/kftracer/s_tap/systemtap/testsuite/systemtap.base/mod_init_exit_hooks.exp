@@ -1,0 +1,61 @@
+set test "mod_init_exit_hooks"
+set testpath "$srcdir/$subdir"
+set work_dir [pwd]
+
+if {! [installtest_p]} { untested $test; return }
+
+# --- TEST 1 ---
+
+set subtest1 "TEST 1: init hook - set a C global"
+foreach runtime [get_runtime_list] {
+    if {$runtime eq ""} {
+        set runtime "kernel"
+    }
+    set test_name "$test: $subtest1 ($runtime)"
+    set stp_opts "-g"
+    set cmd "stap $stp_opts --runtime=$runtime '$srcdir/$subdir/${test}_1.stp'"
+    set exit_code [run_cmd_2way $cmd out stderr]
+    set exp_out "res: 2\n"
+    is "${test_name}: stdout" $out $exp_out
+    is "${test_name}: exit code" $exit_code 0
+    if {$stderr ne ""} {
+        send_log "stderr:\n$stderr"
+    }
+}
+
+# --- TEST 2 ---
+
+set subtest2 "TEST 2: init & exit hook"
+foreach runtime [get_runtime_list] {
+    if {$runtime eq ""} {
+        set runtime "kernel"
+    }
+    set test_name "$test: $subtest2 ($runtime)"
+    set stp_opts "-g -DDEBUG_MEM"
+    set cmd "stap $stp_opts --runtime=$runtime '$srcdir/$subdir/${test}_2.stp'"
+    set exit_code [run_cmd_2way $cmd out stderr]
+    set exp_out "res: 17\n"
+    is "${test_name}: stdout" $out $exp_out
+    is "${test_name}: exit code" $exit_code 0
+    if {$stderr ne ""} {
+        send_log "stderr:\n$stderr"
+    }
+}
+
+# --- TEST 3 ---
+
+set subtest3 "TEST 3: failed init hook"
+foreach runtime [get_runtime_list] {
+    if {$runtime eq ""} {
+        set runtime "kernel"
+    }
+    set test_name "$test: $subtest3 ($runtime)"
+    set stp_opts "-g"
+    set cmd "stap $stp_opts --runtime=$runtime '$srcdir/$subdir/${test}_3.stp'"
+    set exit_code [run_cmd_2way $cmd out stderr]
+    set exp_out ""
+    is "${test_name}: stdout" $out $exp_out
+    isnt "${test_name}: exit code" $exit_code 0
+    set stderr_pat "^ERROR: Failed to run STAP_MODULE_INIT_HOOK \\(-12\\)\$"
+    like "${test_name}: stderr" $stderr $stderr_pat "-lineanchor"
+}

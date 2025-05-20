@@ -1,0 +1,9 @@
+global tracing
+
+probe syscall.openat { tracing[tid()] = 1 }
+probe syscall.openat.return { delete tracing[tid()] }
+
+probe kernel.function("*").call {
+    if (tid() in tracing)
+        printf("→ %s\n", probefunc())
+}

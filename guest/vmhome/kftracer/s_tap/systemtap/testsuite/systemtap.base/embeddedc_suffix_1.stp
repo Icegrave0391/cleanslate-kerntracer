@@ -1,0 +1,24 @@
+global a = 32;
+
+%{
+static long foo(void);
+%}
+
+%{ /* pragma:suffix */
+static long foo(void) {
+    return global(s___global_a);
+}
+%}
+
+function my_f:long()
+%{ /* unprivileged */
+    STAP_RETURN (foo());
+%}
+
+probe oneshot {
+    println("res: ", my_f());
+}
+
+probe never {
+    a++;
+}

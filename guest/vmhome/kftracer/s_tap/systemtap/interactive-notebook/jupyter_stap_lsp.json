@@ -1,0 +1,14 @@
+{
+  "LanguageServerManager": {
+    "language_servers": {
+      "stap-language": {
+        "version": 2,
+        "argv": ["stap", "--language-server"],
+        "debug_argv": ["stap", "--language-server", "-v"],
+        "languages": ["systemtap"],
+        "mime_types": ["text/systemtap", "text/x-systemtap"],
+        "display_name": "systemtap-language-server"
+      }
+    }
+  }
+}

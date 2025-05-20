@@ -1,0 +1,432 @@
+set test "user-hw-breakpoint-addr"
+set testpath "$srcdir/$subdir"
+
+if {! [installtest_p]} { untested $test; return }
+if {! [uretprobes_p]} { untested $test; return }
+
+# --- TEST 1 ---
+
+set subtest1 "TEST 1: process.data(ADDR).rw ubacktrace okay"
+
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest1: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_1.stp" \
+                                 "./${test}_1.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest1: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest1 ($runtime)"
+            set cmd "stap --ldd --runtime=$runtime -c ./a.out './${test}_1.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set out_pat "\\smain\\+0x\[^\\n\]+\\w\\.c:3\\s.*?\\n.*?\\smain\\+0x.*?\\w\\.c:4\\s"
+            like "${test_name}: stdout" $out $out_pat "-lineanchor"
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 2 ---
+
+set subtest2 "TEST 2: process.data(ADDR).rw hit count okay"
+
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest2: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_2.stp" \
+                                 "./${test}_2.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest2: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest2 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_2.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out "Hit
+Hit
+Hit
+"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 3 ---
+
+set subtest3 "TEST 3: process.data(ADDR).write hit count okay"
+
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest3: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_3.stp" \
+                                 "./${test}_3.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest3: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest3 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_3.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out "Hit
+Hit
+"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 4 ---
+
+set subtest4 "TEST 4: process.data(ADDR).write ubacktrace okay"
+
+set res [target_compile ${testpath}/${test}_1.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest4: unable to compile ${test}_1.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_4.stp" \
+                                 "./${test}_4.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest4: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest4 ($runtime)"
+            set cmd "stap --ldd --runtime=$runtime -c ./a.out './${test}_4.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set out_pat "\\A~~~
+ 0x\[0-9a-f\]+ : execve\\+0x\[0-9a-f\]/0x\[0-9a-f\]+ \\\[\[^\\n\\\]\]+/libc-\[^\\\]\\n\]+\\\]
+~~~
+ 0x\[0-9a-f\]+ : main\\+0x\[0-9a-f\]+/0x\[0-9a-f\]+ at \[^\\n\]+\\w\\.c:4 \\\[\[^\\\[\\n\]+\\\]"
+            like "${test_name}: stdout" $out $out_pat "-lineanchor"
+            set no_out_pat "\\smain\\+.*?~~~.*?\\smain\\+"
+            unlike "${test_name}: stdout should not match" $out $no_out_pat "-lineanchor"
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 5 ---
+
+set subtest5 "TEST 5: process.data(ADDR).length.write hit count okay (length 1 hit)"
+
+set res [target_compile ${testpath}/${test}_5.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest5: unable to compile ${test}_5.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_5.stp" \
+                                 "./${test}_5.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest5: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest5 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_5.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out "Hit
+Hit
+"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 6 ---
+
+set subtest6 "TEST 6: process.data(ADDR).length.write hit count okay (length 1 not hit)"
+
+set res [target_compile ${testpath}/${test}_6.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest6: unable to compile ${test}_6.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_5.stp" \
+                                 "./${test}_5.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest6: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest6 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_5.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out "Hit\n"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 7 ---
+
+set subtest7 "TEST 7: process.data(ADDR).length.write hit count okay (length 2 hit)"
+
+set res [target_compile ${testpath}/${test}_6.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest7: unable to compile ${test}_6.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_7.stp" \
+                                 "./${test}_7.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest7: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest7 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_7.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out "Hit
+Hit
+"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 8 ---
+
+set subtest8 "TEST 8: process.data(ADDR).length.write hit count okay (length 2 NOT hit)"
+
+set res [target_compile ${testpath}/${test}_8.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest8: unable to compile ${test}_8.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_7.stp" \
+                                 "./${test}_7.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest8: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest8 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_7.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out "Hit\n"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 9 ---
+
+set subtest9 "TEST 9: process.data(ADDR).length.write hit count okay (length 4 hit)"
+
+set res [target_compile ${testpath}/${test}_8.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest9: unable to compile ${test}_8.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_9.stp" \
+                                 "./${test}_9.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest9: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest9 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_9.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out "Hit
+Hit
+"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 10 ---
+
+set subtest10 "TEST 10: process.data(ADDR).length.write hit count okay (length 4 NOT hit)"
+
+set res [target_compile ${testpath}/${test}_10.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest10: unable to compile ${test}_10.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_9.stp" \
+                                 "./${test}_9.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest10: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest10 ($runtime)"
+            set cmd "stap --runtime=$runtime -c ./a.out './${test}_9.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set exp_out "Hit\n"
+            is "${test_name}: stdout" $out $exp_out
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 11 ---
+
+set subtest11 "TEST 11: process.data(ADDR).length.write hit ubt okay (length 8 hit)"
+
+# execve might need 1 or 2 writes to intialize a[0..7]. so checking count
+
+set res [target_compile ${testpath}/${test}_10.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest11: unable to compile ${test}_10.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_11.stp" \
+                                 "./${test}_11.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest11: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest11 ($runtime)"
+            set cmd "stap --ldd --runtime=$runtime -c ./a.out './${test}_11.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set out_pat " 0x\[0-9a-f\]+ : main\\+0x\[0-9a-f\]+/0x\[0-9a-f\]+ at \[^\\n\]+\\w\\.c:7 \\\[\[^\\\[\\n\]+\\\]"
+            like "${test_name}: stdout" $out $out_pat "-lineanchor"
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 12 ---
+
+set subtest12 "TEST 12: process.data(ADDR).length.write hit ubt okay (length 8 hit on boundary)"
+
+# execve might need 1 or 2 writes to intialize a[0..7]
+
+set res [target_compile ${testpath}/${test}_12.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest12: unable to compile ${test}_12.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_11.stp" \
+                                 "./${test}_11.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest12: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest12 ($runtime)"
+            set cmd "stap --ldd --runtime=$runtime -c ./a.out './${test}_11.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set out_pat " 0x\[0-9a-f\]+ : main\\+0x\[0-9a-f\]+/0x\[0-9a-f\]+ at \[^\\n\]+\\w\\.c:7 \\\[\[^\\\[\\n\]+\\\]"
+            like "${test_name}: stdout" $out $out_pat "-lineanchor"
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}
+
+# --- TEST 13 ---
+
+set subtest13 "TEST 13: process.data(ADDR).length.write hit ubt okay (length 8 NOT hit)"
+
+# execve might need 1 or 2 writes to intialize a[0..7]
+
+set res [target_compile ${testpath}/${test}_13.c ./a.out executable \
+    "additional_flags=-O additional_flags=-g additional_flags=-O0 additional_flags=-g additional_flags=-fno-PIC additional_flags=-no-pie"]
+if {$res ne ""} {
+    verbose "target_compile failed: $res" 2
+    fail "$test: $subtest13: unable to compile ${test}_13.c"
+} else {
+    if {! [process_template_file "$srcdir/$subdir/${test}_11.stp" \
+                                 "./${test}_11.stp" "./a.out" nm_err]} {
+        fail "$test: $subtest13: $nm_err"
+    } else {
+        foreach runtime [get_runtime_list] {
+            if {$runtime eq ""} {
+                set runtime "kernel"
+            }
+            set test_name "$test: $subtest13 ($runtime)"
+            set cmd "stap --ldd --runtime=$runtime -c ./a.out './${test}_11.stp'"
+            set exit_code [run_cmd_2way_as_root $cmd out stderr]
+            set out_pat " execve\\+0x\[0-9a-f\]+"
+            like "${test_name}: stdout" $out $out_pat "-lineanchor"
+            set no_out_pat "\\ymain\\y"
+            unlike "${test_name}: stdout should not match" $out $no_out_pat "-lineanchor"
+            is "${test_name}: exit code" $exit_code 0
+            if {$stderr ne ""} {
+                send_log "stderr:\n$stderr"
+            }
+        }
+    }
+}

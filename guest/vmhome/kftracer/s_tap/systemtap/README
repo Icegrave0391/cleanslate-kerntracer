@@ -1,0 +1,149 @@
+systemtap: a linux trace/probe tool
+
+Visit the project web site at <http://sourceware.org/systemtap>,
+for documentation and mailing lists for developers and users.
+
+This is free software.
+See the COPYING file for redistribution/modification terms.
+See the INSTALL file for generic build instructions.
+See the HACKING file for contribution advice.
+
+Prerequisites:
+
+- linux kernel
+- kernel module build environment (kernel-devel rpm) and/or dyninst
+- optionally, debugging information for kernel/user-space being instrumented
+- C compiler (same as what kernel was compiled with), to build kernel modules
+- C++11 compiler such as gcc 4.8+, to build systemtap itself
+- elfutils 0.151+ with libdwfl for debugging information parsing
+- Python for tools which are scripts, such as dtrace(1)
+- root privileges
+
+Installation steps:
+
+- If equipped with elfutils version 0.178 or later, try using debuginfod
+  for automatic debuginfo downloading.  This experimental public server
+  may be enough:
+  % export DEBUGINFOD_URLS=https://debuginfod.elfutils.org/
+  % export DEBUGINFOD_PROGRESS=1
+  See https://sourceware.org/elfutils/Debuginfod.html for more details.
+  
+- Otherwise, install any debuginfo packages you need, for kernel
+  and/or userspace.  On modern Fedora, # debuginfo-install kernel [...]
+  
+  (Beware of confusion between kernel vs. kernel-debug vs kernel-PAE etc.
+  variants.  Each likely has a corresponding development and debuginfo
+  package.)
+
+- Install the systemtap package.
+  On modern Fedora, # yum install systemtap systemtap-runtime
+
+Build steps:
+
+- Consider installing the kernel-debuginfo, kernel-devel, gcc and
+  dependent packages (or see below if you are building your own
+  kernels from source).  If using only the pure-userspace dyninst
+  backend, install gcc and dyninst-devel.
+  
+- If available, install your distribution's copy of elfutils and its
+  development headers/libraries.
+  Or if desired, build elfutils separately one time, and install
+  it to /usr/local.
+  See https://elfutils.org/
+  elfutils version 0.178 introduces automatic debuginfo downloading,
+  which can makes systemtap usage easier.
+
+- On modern Fedora, install general optional build-requisites:
+  # yum-builddep systemtap
+  On modern Debian/Ubuntu, similarly:
+  # apt-get build-dep systemtap
+
+- Download systemtap sources:
+  https://sourceware.org/systemtap/ftp/releases/
+  https://sourceware.org/systemtap/ftp/snapshots/
+  (or)
+  git clone git://sourceware.org/git/systemtap.git
+      (or) https://sourceware.org/git/systemtap.git
+
+- Build systemtap normally:
+  % .../configure [other autoconf options]
+  Add env LDFLAGS=-L/path/ CPPFLAGS=-I/path/ before configure
+  to locate libraries in non-system directories.
+
+  Consider configuring with "--prefix=DIRECTORY" to specify an
+  installation directory other than /usr/local.  It can be an ordinary
+  personal directory.
+
+  % make all
+  # make install
+  To uninstall systemtap:
+  # make uninstall
+
+  Alternately, on a Fedora-like system:
+  % make rpm
+  # rpm -i /path/to/rpmbuild/.../systemtap*rpm
+
+
+- Run systemtap:
+
+  To run systemtap after installation, add $prefix/bin to your $PATH, or
+  refer to $prefix/bin/stap directly.  If you keep your build tree
+  around, you can also use the "stap" binary there.  
+
+  Some samples should be available under $prefix/share/doc/systemtap/examples.
+
+  For the normal linux-kernel-module based backend, run "stap" as
+  root.  If desired, create "stapdev" and "stapusr" entries in
+  /etc/groups.  Any users in "stapdev"+"stapusr" will be able to run
+  systemtap as if with root privileges.  Users in "stapusr" only may
+  launch (with "staprun") pre-compiled probe modules (created by "stap
+  -p4 ...") that a system administrator copied under
+  /lib/modules/`uname -r`/systemtap.  "stapusr" may also be permitted
+  to create arbitrary unprivileged systemtap scripts of their own.
+  See README.unprivileged for additional setup instructions.
+
+  To run a simple test.
+  # stap -v -e 'probe vfs.read {printf("read performed\n"); exit()}'
+
+  To run the full test suite from the build tree, install dejagnu,
+  then run with root privileges:
+  # make installcheck
+
+  For the prototype dyninst pure-userspace backend, run "stap" as any user.
+  % stap --runtime=dyninst -e 'probe process.function("*") { 
+                               println(pn(), ":", $$parms) }' -c 'ls'
+
+  For the prototype bpf backend, run "stap" as "root"
+  # stap --runtime=bpf -e 'probe kernel.function("do_exit") {
+                                 printf("bye %d\n", pid()) }'
+
+
+
+Tips:
+
+- By default, systemtap looks for the debug info in these locations:
+  /boot/vmlinux-`uname -r`
+  /usr/lib/debug/lib/modules/`uname -r`/vmlinux
+  /lib/modules/`uname -r`/vmlinux
+  /lib/modules/`uname -r`/build/vmlinux
+
+
+Building a kernel.org kernel:
+
+- Build the kernel using your normal procedures.  Enable
+  CONFIG_DEBUG_INFO, CONFIG_KPROBES, CONFIG_RELAY, CONFIG_DEBUG_FS,
+  CONFIG_MODULES, CONFIG_MODULE_UNLOAD, CONFIG_UPROBES if able
+- % make modules_install install headers_install
+- Boot into the kernel.
+
+- If you wish to leave the kernel build tree in place, simply run
+  % stap -r /path/to/kernel/build/tree [...]
+  You're done.
+
+- Or else, if you wish to install the kernel build/debuginfo data into
+  a place where systemtap will find it without the "-r" option:
+  % ln -s /path/to/kernel/build/tree /lib/modules/RELEASE/build 
+
+- Instead of using the "-r" option, you can also use the environment 
+  variable SYSTEMTAP_RELEASE to direct systemtap to the kernel data.
+

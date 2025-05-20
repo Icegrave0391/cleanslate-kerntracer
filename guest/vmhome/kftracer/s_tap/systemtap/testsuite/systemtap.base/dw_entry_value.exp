@@ -1,0 +1,23 @@
+set test "dw_entry_value"
+set test_flags "additional_flags=-g"
+set test_flags "$test_flags additional_flags=-Og"
+
+set res [target_compile $srcdir/$subdir/$test.c $test executable "$test_flags"]
+if { $res != "" } {
+    verbose "target_compile failed: $res" 2
+    fail "$test: unable to compile $test.c"
+} else {
+    pass "$test: compiled $test.c"
+}
+
+set ::result_string {systemtap starting probe
+systemtap ending probe
+systemtap test success}
+
+if { ![catch { exec eu-readelf -w $test | grep entry_value: }] } {
+    stap_run2 $srcdir/$subdir/$test.stp -c ./${test} -w
+} else {
+    untested "$test: no DW_OP_GNU_entry_value found"
+}
+
+catch { exec rm -f $test }

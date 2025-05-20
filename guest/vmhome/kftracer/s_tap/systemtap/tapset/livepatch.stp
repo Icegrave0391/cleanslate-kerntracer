@@ -1,0 +1,116 @@
+// livepatch tapset macros
+// Copyright (C) 2022 Red Hat Inc.
+//
+// This file is part of systemtap, and is free software.  You can
+// redistribute it and/or modify it under the terms of the GNU General
+// Public License (GPL); either version 2, or (at your option) any
+// later version.
+private cve_id
+private cve_load_time
+
+global cve_notify_p  = 1
+global cve_fix_p     = 1
+global cve_trace_p   = 1
+global cve_enabled_p = 1
+global cve_tmpdisabled_s = -1
+
+probe begin {
+  cve_id = module_name()
+  cve_load_time = gettimeofday_s()
+
+  if (cve_notify_p)
+    printf("%s mitigation loaded\n", cve_id)
+}
+
+probe end,error {
+  if (cve_notify_p)
+    printf("%s mitigation unloaded\n", cve_id)
+}
+
+# Parameter reading and updating
+@define cve_probe_procfs_parameter (glbl, f_name) %(
+  probe procfs(@f_name).read
+    { $value = sprintf("%d\n", @glbl) }
+
+  probe procfs(@f_name).write
+    { @glbl = strtol($value, 10) }
+%)
+
+@cve_probe_procfs_parameter(cve_notify_p  , "cve_notify_p")
+@cve_probe_procfs_parameter(cve_trace_p   , "cve_trace_p")
+@cve_probe_procfs_parameter(cve_fix_p     , "cve_fix_p")
+@cve_probe_procfs_parameter(cve_enabled_p , "cve_enabled_p")
+
+probe procfs("cve_tmpdisabled_s").read
+  { $value = sprintf("%d\n", cve_tmpdisabled_s) }
+probe procfs("cve_tmpdisabled_s").write
+{ cve_tmpdisabled_s = strtol($value, 10)
+  if (cve_tmpdisabled_s > 0)
+    cve_enabled_p = 0  # trigger temporary disable
+}
+
+
+# The metric accumulation and prometheus
+global cve_metrics
+
+/**
+ * sfunction cve_count_metric - Increment the count of key
+ *
+ * @key: The metric
+ *
+ * Description: This function increments the count of the metric
+ * key by 1. The metrics can be accessed in
+ * /proc/systemtap/MODULE_NAME/__prometheus
+ */
+function cve_count_metric (key:string) {
+  cve_metrics[key] ++
+}
+
+/**
+ * sfunction cve_record_metric - Set the value of key
+ *
+ * @key: The metric
+ * @value: The new value
+ *
+ * Description: This function sets the value of the metric
+ * key. The metrics can be accessed in
+ * /proc/systemtap/MODULE_NAME/__prometheus
+ */
+function cve_record_metric (key:string, value:long) {
+  cve_metrics[key] = value
+}
+
+probe prometheus {
+  cve_record_metric("runtime", gettimeofday_s() - cve_load_time)
+  @prometheus_dump_array1(cve_metrics, cve_id, "metric")
+}
+
+# Disabling the patch
+probe timer.s(1) {
+  if(!cve_enabled_p && cve_tmpdisabled_s >= 0){
+    if(cve_tmpdisabled_s > 0){
+      cve_tmpdisabled_s--
+    }else{
+      if (cve_notify_p)
+        printf("%s reenabling\n", cve_id)
+      cve_enabled_p = 1
+      cve_tmpdisabled_s = -1
+    }
+  }
+}
+
+/**
+ * sfunction cve_tmpdisable - Disable the cve livepatch
+ *
+ * @duration: The number of seconds to disable
+ *
+ * Description: This function temporarily disables the
+ * conditionals which use cve_enabled_p for duration seconds.
+ * If duration is -1, disable the livepatch until reenabled.
+ */
+function cve_tmpdisable(duration:long){
+  if (cve_notify_p)
+    printf("%s disabling temporarily\n", cve_id)
+  cve_enabled_p = 0
+  cve_tmpdisabled_s = duration
+}

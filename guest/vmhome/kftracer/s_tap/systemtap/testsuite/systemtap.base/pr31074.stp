@@ -1,0 +1,88 @@
+/*
+ * pr31074.stp
+ *
+ * Check that the set_kernel_string function work correctly.
+ */
+
+probe begin {  println("systemtap starting probe")  }
+probe end   {  println("systemtap ending probe")    }
+
+global errors = 0
+
+function assert_string(test, expected, value)
+{
+    if (value == expected)
+        return 1
+    printf("systemtap test failure - %s: expected \"%s\", got \"%s\"\n",
+           test, expected, value)
+    errors++
+    return 0
+}
+
+function assert_not_reached(test)
+{
+    printf("systemtap test failure - %s: missing exception\n", test)
+    errors++
+}
+
+function assert_buffer_untouched(test, addr)
+{
+  if (!buffer_42(addr)) {
+    printf("systemtap test failure - %s: buffer overwritten\n", test)
+    errors++
+  }
+}  
+
+
+probe end(1)
+{
+    test = "set_kernel_string"
+    addr3 = get_buffer3()
+    addr2 = get_buffer2()
+    if (assert_string(test, "", kernel_string(addr2))) {
+        set_kernel_string(addr2, "bar")
+        assert_string(test, "bar", kernel_string(addr2))
+    }
+    addr1 = get_buffer1()
+    if (assert_string(test, "", kernel_string(addr1))) {
+        set_kernel_string(addr1, "foo")
+        assert_string(test, "foo", kernel_string(addr1))
+    }
+    /* now check to make sure that "bar" has not been overwritten */
+   assert_string("no null overrun", "bar", kernel_string(addr2))
+   assert_buffer_untouched("no overrun", addr3)
+    if (!errors)
+        println("systemtap test success")
+}
+
+%{
+  static char buffer_x[4+4+MAXSTRINGLEN];
+%}
+
+function get_buffer1:long () %{
+  static char *buffer1 = &(buffer_x[0]);
+  memset(buffer1, 0, 4);
+  STAP_RETVALUE = (long)buffer1;
+%}
+
+function get_buffer2:long () %{
+  static char *buffer2 = &(buffer_x[4]);
+  memset(buffer2, 0, 4);
+  STAP_RETVALUE = (long)buffer2;
+%}
+
+function get_buffer3:long () %{
+  static char *buffer3 = &(buffer_x[8]);
+  memset(buffer3, 42, MAXSTRINGLEN);
+  STAP_RETVALUE = (long)buffer3;
+%}
+
+function buffer_42:long (addr:long) %{
+  int i;
+  char *buffer3 = (char *)STAP_ARG_addr;
+  STAP_RETVALUE = 1;
+  for(i=0; i< MAXSTRINGLEN; ++i){
+    if (buffer3[i] != 42) 
+      STAP_RETVALUE = 0;
+  }
+%}

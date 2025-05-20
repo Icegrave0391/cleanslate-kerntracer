@@ -1,0 +1,13 @@
+// Testcase for PR14107 missing kernel asm CFI.
+//
+// Note that newer (rhel9) kernels having upstream
+// commit 5ad18b2e60b75c7297a998dea702451d33a052ed
+// use force_sig_info_to_task() rather than
+// force_sig_info()
+//
+probe kernel.function("force_sig_info_to_task") !,
+      kernel.function("force_sig_info") ! {
+  if (pid() == target()) {
+       print_ubacktrace()
+  }
+}

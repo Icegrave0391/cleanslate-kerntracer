@@ -1,0 +1,15 @@
+title: SystemTap python 3 support tapset
+name: pyexample.stp
+version: 1.0
+keywords: simple
+author: Stan Cox
+subsystem: none
+status: production
+exit: fixed
+output: trace
+requires: python3-debuginfo
+scope: system-wide
+description: A python support tapset that displays backtraces and variable values
+test_support: stap -p2 pyexample.stp python3
+test_check: stap -p4 pyexample.stp python3
+test_installcheck: PYTHONPATH=$PY3EXECDIR stap -g --suppress-time-limits -c '/usr/bin/python3 -m HelperSDT pyexample.py 35' pyexample.stp python3

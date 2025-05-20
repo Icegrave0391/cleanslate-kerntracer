@@ -1,0 +1,54 @@
+#! /usr/bin/env stap
+
+global traced_pid, command
+global pgout, bgwriteout, kupdate
+
+function log_event:long ()
+{
+  return (!traced_pid || traced_pid == pid())
+}
+
+probe kernel.trace("balance_dirty_pages")		# v3.2+
+{
+  if (!log_event()) next
+  bgwriteout[pid()] <<< (@defined($dirtied) ? $dirtied
+			 : (@defined($written) ? $written : $count))
+  command[pid()] = execname()
+}
+
+probe kernel.trace("writeback_pages_written")	# v2.6.36+
+{
+  if (!log_event()) next
+  kupdate[pid()] <<< (@defined($pages_written) ? $pages_written : $count)
+  command[pid()] = execname()
+}
+
+probe kernel.trace("mm_vmscan_writepage")		# v2.6.36+
+{
+  if (!log_event()) next
+  pgout[pid()] <<< 1
+  command[pid()] = execname()
+}
+
+probe begin {
+  printf("Starting data collection\n")
+  if (target())
+    printf("mode Specific Pid, traced pid: %d\n\n", target())
+  else
+    printf("mode - All Pids\n\n")
+}
+
+probe end, error {
+  printf("Terminating data collection\n")
+  printf("                               Pdflush    Pdflush    Kupdate    Kupdate       Pgout\n")
+  printf("Command                 Pid      count        sum      count        sum       count\n")
+  printf("-------                 ---    -------    -------    -------    -------       -----\n")
+  foreach (pid+ in command)
+    printf("%-16s %10d %10d %10d %10d %10d %11d\n",
+           command[pid], pid,
+           @count(bgwriteout[pid]),
+           (@count(bgwriteout[pid]) ? @sum(bgwriteout[pid]) : 0),
+           @count(kupdate[pid]),
+           (@count(kupdate[pid]) ? @sum(kupdate[pid]) : 0),
+           @count(pgout[pid]))
+}

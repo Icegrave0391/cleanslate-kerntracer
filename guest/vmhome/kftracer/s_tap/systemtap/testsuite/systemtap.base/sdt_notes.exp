@@ -1,0 +1,73 @@
+set test "sdt_notes"
+
+# Test layout of .note.stapsdt section and interaction with eu-readelf and gdb
+
+set exeflags [sdt_includes]
+set exeflags "$exeflags additional_flags=-O2"
+
+set res [target_compile $srcdir/$subdir/sdt_types.c \
+	     sdt_types.x executable $exeflags]
+if { $res != "" } {
+    verbose "target_compile failed: $res" 2
+    untested "$test compiling types"
+} else {
+    pass "$test compiling types"
+}
+
+set elfutils_ok 0
+# Does elfutils support stapsdt notes?
+eval spawn "rpm -q elfutils"
+expect {
+    -re {elfutils-0.17} { incr elfutils_ok }
+    -re {elfutils-0.18} { incr elfutils_ok }
+    -re {elfutils-0.19} { incr elfutils_ok }
+}
+    
+if { $elfutils_ok > 0 } {
+set ok 0
+# not all eu-readelf versions support --notes=.note.stapsdt
+set cmd "bash -c {eu-readelf --notes ./sdt_types.x |& grep '\@' |& sed 's/.\[0-9\]\@/\\n&/g'}"
+eval spawn $cmd
+expect {
+    -timeout 180
+    -re {[1248]@} { incr ok; exp_continue }
+    eof { }
+}
+if { $ok == 106} {
+    pass "$test eu-readelf"
+} else {
+    fail "$test eu-readelf $ok"
+}
+# $elfutils_ok 
+} else {
+    untested "$test eu-readelf (failed elfutils version check)"
+}
+
+# Does gdb support -probe-stap?
+set gdb_ok 0
+eval spawn "rpm -q gdb"
+expect {
+    -re {gdb-7.[3456789]} { incr gdb_ok }
+    -re {gdb-8} { incr gdb_ok }
+    -re {gdb-1[0-9]} { incr gdb_ok }
+}
+
+if { $gdb_ok > 0 } {
+set ok 0
+set cmd "gdb -batch -q -ex \"info probes stap provider ptr_int_var\" -ex \"b -probe-stap provider:ptr_int_var\" -ex run -ex \"print/x {\\\$_probe_arg2}\" ./sdt_types.x"
+eval spawn $cmd
+expect {
+    -timeout 180
+    -re {1 = .0x7fffffff} { incr ok; exp_continue }
+    eof { }
+}
+if { $ok == 0} {
+    fail "$test gdb probe-stap"
+} else {
+    pass "$test gdb probe-stap"
+}
+# $gdb_ok 
+} else {
+    untested "$test gdb (failed gdb version check)"
+}
+

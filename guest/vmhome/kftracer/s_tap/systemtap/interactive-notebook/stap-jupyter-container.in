@@ -1,0 +1,153 @@
+#!/bin/bash
+# A launcher/builder/publisher for isystemtap containers
+# Copyright (C) 2023 Red Hat Inc.
+#
+# This file is part of systemtap, and is free software.  You can
+# redistribute it and/or modify it under the terms of the GNU General
+# Public License (GPL); either version 2, or (at your option) any
+# later version.
+set -e
+
+usage() { echo "Usage: stap-jupyter-container [--repo REPOSITORY] [--image IMAGE] [--tag TAG] [--keyname KEYNAME] --{run, pull, build, publish, remove}" 1>&2; exit 1; }
+
+NOTEBOOK_DIR="@prefix@/share/systemtap/interactive-notebook"
+declare -A options=( ["--repo"]="quay.io" ["--image"]="systemtap/isystemtap" ["--tag"]="latest" ["--keyname"]="id_rsa" )
+
+while (( "$#" )); do
+    # Parse the mode
+    if [[ $1 == --*(run|pull|build|publish|remove) ]]; then
+        if [ -z "$MODE" ]; then
+            MODE=$1;
+        else
+            echo The mode may only be defined once; usage
+        fi
+    # Parse options
+    elif [[ $1 == --*(repo|image|tag|keyname)* ]]; then
+        flag=$1
+        if [[ $flag == --*=* ]]; then
+            arg=`echo $flag | awk -F "=" '{print $2}'`
+            flag=`echo $flag | awk -F "=" '{print $1}'`
+            if [ -z "$arg" ]; then echo "$flag cannot have an empty argument"; usage; fi
+        else
+            if [ $# -lt 2 ]; then echo "$flag cannot have an empty argument"; usage; fi
+            arg="$2"
+            shift
+        fi
+        options[$flag]=$arg
+    else
+        echo $1 is not a valid argument; usage
+    fi
+    shift
+done
+
+
+if [ "$MODE" = '--run' ]; then
+    HOST_USER=`whoami`
+    # The container user
+    NB_USER="jovyan"
+
+    HOST_SSH_DIR=$HOME/.ssh
+    PRV_KEY_FILE=$HOST_SSH_DIR/${options[--keyname]}
+    PUB_KEY_FILE=$HOST_SSH_DIR/${options[--keyname]}.pub
+    if [ ! -f $PUB_KEY_FILE -o ! -f $PRV_KEY_FILE ]; then
+        echo "A ssh public-private key pair is required! Create one with ssh-keygen";
+        echo "If using --keyname ${options[--keyname]} they must be called ${options[--keyname]} and ${options[--keyname]}.pub"
+        exit 1
+    fi
+
+    # Each run of the container will generate a tmpdir in /tmp
+    CONTAINER_TMP_DIR=`mktemp -d "/tmp/systemtap_jupyter_container_XXXXXXXXXX"`
+    chmod 777 $CONTAINER_TMP_DIR
+    echo "Using tempdir $CONTAINER_TMP_DIR"
+    CONTAINER_SSH_DIR=$CONTAINER_TMP_DIR/.ssh
+    LOCALHOST=127.0.0.1
+
+    # We store the private key & a config file in this .ssh dir which will be mounted
+    echo "Setting up local .ssh directory $CONTAINER_SSH_DIR for ssh from container to localhost. Your ssh keys will never be saved in the container"
+    mkdir -m 700 $CONTAINER_SSH_DIR/
+    echo -e "Host $LOCALHOST\n\tStrictHostKeyChecking no\n\tUser $HOST_USER\n" > $CONTAINER_SSH_DIR/config
+    chmod 600 $CONTAINER_SSH_DIR/config
+    cp -pv $PRV_KEY_FILE $CONTAINER_SSH_DIR
+
+    # If the public key is not in authorized_keys (on the host), add it
+    if ! grep -Fxq "`cat $PUB_KEY_FILE`" $HOST_SSH_DIR/authorized_keys 2> /dev/null
+    then
+        # Since the keys exist in HOST_SSH_DIR its safe to assume the directory exists and is well formed
+        cat $PUB_KEY_FILE >> $HOST_SSH_DIR/authorized_keys
+        chmod 600 $HOST_SSH_DIR/authorized_keys
+    fi
+
+    # Extract the constants.py values, since the locally installed version of stap
+    # is what the container needs (tr removes whitespace)
+    STAP_VERSION_DEF=`grep VERSION $NOTEBOOK_DIR/isystemtap/constants.py | tr -d " \t\n\r"`
+    STAP_PREFIX_DEF=`grep PREFIX $NOTEBOOK_DIR/isystemtap/constants.py | tr -d " \t\n\r"`
+    STAP_PKGDATADIR_DEF=`grep PKGDATADIR $NOTEBOOK_DIR/isystemtap/constants.py | tr -d " \t\n\r"`
+    # We also unpack the static dir containing the examples since
+    # we need to mount that 
+    STAP_PKGDATADIR=`echo "$STAP_PKGDATADIR_DEF" | tr -d "' " | awk -F "=" '{print $2}'`
+
+    run_args=(
+        # We need privileged network access to freely ssh/run websockets, etc.
+        --privileged  \
+        --net=host    \
+        # MOUNTED VOLUMES ----------------------
+        # Monitor mode interactions occur in /proc/systemtap/MODULE_NAME
+        -v /proc:/proc:rw \
+        # The directory where we will find the examples, tapsets, etc.
+        # If installed correctly it is the parent of NOTEBOOK_DIR
+        -v $STAP_PKGDATADIR:$STAP_PKGDATADIR \
+        -v $CONTAINER_SSH_DIR:/home/$NB_USER/.ssh \
+        # ENVIRONMENT VARIABLES ------------------
+        -e $STAP_VERSION_DEF \
+        -e $STAP_PREFIX_DEF \
+        -e $STAP_PKGDATADIR_DEF
+    )
+
+    if [ $EUID -ne 0 ]; then
+        # When running as a regular user we remap so that the container id 0 (which is the podman caller) maps
+        # to the u/gid of jovyan the container user
+        NB_UID=1000
+        NB_GID=100
+        SUBUID_SIZE=$(( $(podman info --format "{{ range .Host.IDMappings.UIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+        SUBGID_SIZE=$(( $(podman info --format "{{ range .Host.IDMappings.GIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+
+        run_args+=(
+            --user $NB_UID:$NB_GID \
+            --uidmap $NB_UID:0:1 --uidmap 0:1:$NB_UID --uidmap $(($NB_UID+1)):$(($NB_UID+1)):$(($SUBUID_SIZE-$NB_UID)) \
+            --gidmap $NB_GID:0:1 --gidmap 0:1:$NB_GID --gidmap $(($NB_GID+1)):$(($NB_GID+1)):$(($SUBGID_SIZE-$NB_GID)) \
+            # It's convinient to be able to access the host's home directory and working directory
+            -v $PWD:/home/$NB_USER/working_dir \
+            -v $HOME:/home/$NB_USER/${HOST_USER}_home_dir
+        )
+    else
+        # When running as root we create a workdir so we can share data with the user (in the temp dir)
+        echo Creating a shared host-container working directory
+        WORKING_DIR=$CONTAINER_TMP_DIR/workdir
+        mkdir -v $WORKING_DIR
+
+        run_args+=(
+            -v $WORKING_DIR:/home/$NB_USER/working_dir \
+            --user root \
+            -e CHOWN_EXTRA="/home/$NB_USER/.ssh",/home/$NB_USER/working_dir \
+            -e CHOWN_EXTRA_OPTS="-R"
+        )
+    fi
+
+    podman run -it --rm --name isystemtap "${run_args[@]}" "${options[--repo]}/${options[--image]}:${options[--tag]}"
+elif [ "$MODE" = '--pull' ]; then
+    podman pull "${options[--repo]}/${options[--image]}:${options[--tag]}"
+elif [ "$MODE" = '--build' ]; then
+    # Build the image 
+    podman build \
+        --file "$NOTEBOOK_DIR/container/Dockerfile" \
+        --format="docker" \
+        --tag="${options[--image]}:${options[--tag]}" \
+        "$NOTEBOOK_DIR/.."
+elif [ "$MODE" = '--publish' ]; then
+    podman login $REPO
+    podman push "${options[--image]}" "${options[--repo]}/${options[--image]}:${options[--tag]}"
+elif [ "$MODE" = '--remove' ]; then
+    podman image rm "${options[--repo]}/${options[--image]}:${options[--tag]}"
+else
+    usage;
+fi

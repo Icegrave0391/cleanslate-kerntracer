@@ -1,0 +1,15 @@
+probe kernel.data("blah_no_such_symbol").write {
+    if (pid() == target()) {
+        println("Hit");
+    }
+}
+
+probe kernel.data(0x$^ADDR_a).rw {
+    if (pid() == target()) {
+        print_ubacktrace_fileline();
+    }
+}
+
+probe timer.s(1) {
+    exit();
+}

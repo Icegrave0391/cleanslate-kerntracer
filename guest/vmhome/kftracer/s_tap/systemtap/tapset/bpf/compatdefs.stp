@@ -1,0 +1,9 @@
+function _stp_is_compat_task2:long (task:long) {
+  // FIXME does not currently handle compatibility mode
+  return 0;
+}
+
+function _stp_is_compat_task:long(void)
+{
+  _stp_is_compat_task2(task_current())
+}

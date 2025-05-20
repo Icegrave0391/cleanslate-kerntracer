@@ -1,0 +1,12 @@
+function _stp_bpf_syscall_get_nr:long(regs:long)
+{
+  return @choose_defined( @cast(regs, "struct pt_regs", "kernel")->orig_ax, // STAPCONF_X86_UNIREGS
+          @choose_defined(@cast(regs, "struct pt_regs", "kernel")->orig_rax, // __x86_64__
+	    @choose_defined(@cast(regs, "struct pt_regs", "kernel")->orig_eax, // __i386__
+	      @choose_defined(@cast(regs, "struct pt_regs", "kernel")->ARM_r7, // __arm__
+                @choose_defined(@cast(regs, "struct pt_regs", "kernel")->regs[2], //__mips__
+                  @choose_defined(@cast(regs, "struct pt_regs", "kernel")->gpr[0], //__powerpc__
+                    @choose_defined(@cast(regs, "struct pt_regs", "kernel")->gprs[2], // __s390__ || __s390x__
+                      @choose_defined(@cast(regs, "struct pt_regs", "kernel")->syscallno, // __aarch64__
+		                        @cast(regs, "struct pt_regs", "kernel")->a7)))))))); // __riscv__
+}

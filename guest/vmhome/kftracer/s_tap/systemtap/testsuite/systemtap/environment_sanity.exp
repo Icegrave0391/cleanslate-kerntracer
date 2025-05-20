@@ -1,0 +1,14 @@
+set test "environment - compiler"
+environment_sanity_test
+# a failure causes a NOTREACHED early dejagnu exit
+pass $test
+
+set test "environment - systemtap self-probing"
+if [catch {exec stap -p4 -e {probe process.function("main") {exit()}} -c stap} output] {
+    verbose -log "$output"
+    fail "$test"
+} else {
+    verbose -log "$output"
+    pass "$test"
+}
+
