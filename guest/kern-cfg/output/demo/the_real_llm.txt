@@ -1553,3 +1553,838 @@ void fsnotify_detach_mark(struct fsnotify_mark *mark)
 	fsnotify_put_mark(mark);
 }
 From a security-engineering standpoint, is it reasonable to expect that execution of refcount_warn_saturate will reach __warn_printk? Provide a concise technical justification for your position, then state your conclusion in exactly this format: {Your justification}\nFINAL ANSWER -> YES/NO
+🟢🟢🟢RESPONSE🟢🟢🟢: The `refcount_warn_saturate` function invokes `REFCOUNT_WARN`, which is a kernel macro for emitting warnings. The `__warn_printk` function is the underlying implementation for such warnings, as it handles formatted output via `vprintk` and is explicitly called with `pr_warn(CUT_HERE)`. Since `REFCOUNT_WARN` directly triggers `__warn_printk` to log saturation events, execution flows from `refcount_warn_saturate` to `__warn_printk`.
+FINAL ANSWER -> YES
+🟢 Upgrading edge refcount_warn_saturate -> __warn_printk to subgraph (LLM confirmed)
+
+
+
+🟢🟢🟢PROMPT🟢🟢🟢: You are a Linux security expert analyzing kernel call-graph edges. The following historical dynamic execution path was observed:
+- __x64_sys_close
+  - close_fd
+    - filp_close
+      - dnotify_flush
+        - fsnotify_find_mark
+          - refcount_warn_saturate
+        - fsnotify_detach_mark
+        - fsnotify_free_mark
+        - fsnotify_recalc_mask
+      - fput
+        - queue_delayed_work_on
+      - mqueue_flush_file
+      - nfs4_file_flush
+      - nfs_file_flush
+Source code for __queue_delayed_work:
+static void __queue_delayed_work(int cpu, struct workqueue_struct *wq,
+				struct delayed_work *dwork, unsigned long delay)
+{
+	struct timer_list *timer = &dwork->timer;
+	struct work_struct *work = &dwork->work;
+
+	WARN_ON_ONCE(!wq);
+	WARN_ON_ONCE(timer->function != delayed_work_timer_fn);
+	WARN_ON_ONCE(timer_pending(timer));
+	WARN_ON_ONCE(!list_empty(&work->entry));
+
+	/*
+	 */
+	if (!delay) {
+		__queue_work(cpu, wq, &dwork->work);
+		return;
+	}
+
+	dwork->wq = wq;
+	dwork->cpu = cpu;
+	timer->expires = jiffies + delay;
+
+	if (unlikely(cpu != WORK_CPU_UNBOUND))
+		add_timer_on(timer, cpu);
+	else
+		add_timer(timer);
+}
+
+Source code for filp_close:
+int filp_close(struct file *filp, fl_owner_t id)
+{
+	int retval = 0;
+
+	if (!file_count(filp)) {
+		printk(KERN_ERR "VFS: Close: file count is 0\n");
+		return 0;
+	}
+
+	if (filp->f_op->flush)
+		retval = filp->f_op->flush(filp, id);
+
+	if (likely(!(filp->f_mode & FMODE_PATH))) {
+		dnotify_flush(filp, id);
+		locks_remove_posix(filp, id);
+	}
+	fput(filp);
+	return retval;
+}
+Source code for dnotify_flush:
+void dnotify_flush(struct file *filp, fl_owner_t id)
+{
+	struct fsnotify_mark *fsn_mark;
+	struct dnotify_mark *dn_mark;
+	struct dnotify_struct *dn;
+	struct dnotify_struct **prev;
+	struct inode *inode;
+	bool free = false;
+
+	inode = file_inode(filp);
+	if (!S_ISDIR(inode->i_mode))
+		return;
+
+	fsn_mark = fsnotify_find_mark(&inode->i_fsnotify_marks, dnotify_group);
+	if (!fsn_mark)
+		return;
+	dn_mark = container_of(fsn_mark, struct dnotify_mark, fsn_mark);
+
+	fsnotify_group_lock(dnotify_group);
+
+	spin_lock(&fsn_mark->lock);
+	prev = &dn_mark->dn;
+	while ((dn = *prev) != NULL) {
+		if ((dn->dn_owner == id) && (dn->dn_filp == filp)) {
+			*prev = dn->dn_next;
+			kmem_cache_free(dnotify_struct_cache, dn);
+			dnotify_recalc_inode_mask(fsn_mark);
+			break;
+		}
+		prev = &dn->dn_next;
+	}
+
+	spin_unlock(&fsn_mark->lock);
+
+	/* nothing else could have found us thanks to the dnotify_groups
+	   mark_mutex */
+	if (dn_mark->dn == NULL) {
+		fsnotify_detach_mark(fsn_mark);
+		free = true;
+	}
+
+	fsnotify_group_unlock(dnotify_group);
+
+	if (free)
+		fsnotify_free_mark(fsn_mark);
+	fsnotify_put_mark(fsn_mark);
+}
+Source code for close_fd:
+static void close_fd(int fd)
+{
+	if (fd >= 0)
+		close(fd);
+}
+Source code for __x64_sys_close:
+NoneSource code for fsnotify_find_mark:
+struct fsnotify_mark *fsnotify_find_mark(fsnotify_connp_t *connp,
+					 struct fsnotify_group *group)
+{
+	struct fsnotify_mark_connector *conn;
+	struct fsnotify_mark *mark;
+
+	conn = fsnotify_grab_connector(connp);
+	if (!conn)
+		return NULL;
+
+	hlist_for_each_entry(mark, &conn->list, obj_list) {
+		if (mark->group == group &&
+		    (mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED)) {
+			fsnotify_get_mark(mark);
+			spin_unlock(&conn->lock);
+			return mark;
+		}
+	}
+	spin_unlock(&conn->lock);
+	return NULL;
+}
+Source code for fput:
+void fput(struct file *file)
+{
+	if (atomic_long_dec_and_test(&file->f_count)) {
+		struct task_struct *task = current;
+
+		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
+			init_task_work(&file->f_rcuhead, ____fput);
+			if (!task_work_add(task, &file->f_rcuhead, TWA_RESUME))
+				return;
+			/*
+			 */
+		}
+
+		if (llist_add(&file->f_llist, &delayed_fput_list))
+			schedule_delayed_work(&delayed_fput_work, 1);
+	}
+}
+Source code for fsnotify_free_mark:
+void fsnotify_free_mark(struct fsnotify_mark *mark)
+{
+	struct fsnotify_group *group = mark->group;
+
+	spin_lock(&mark->lock);
+	/* something else already called this function on this mark */
+	if (!(mark->flags & FSNOTIFY_MARK_FLAG_ALIVE)) {
+		spin_unlock(&mark->lock);
+		return;
+	}
+	mark->flags &= ~FSNOTIFY_MARK_FLAG_ALIVE;
+	spin_unlock(&mark->lock);
+
+	/*
+	 */
+	if (group->ops->freeing_mark)
+		group->ops->freeing_mark(mark, group);
+}
+Source code for fsnotify_recalc_mask:
+void fsnotify_recalc_mask(struct fsnotify_mark_connector *conn)
+{
+	if (!conn)
+		return;
+
+	spin_lock(&conn->lock);
+	__fsnotify_recalc_mask(conn);
+	spin_unlock(&conn->lock);
+	if (conn->type == FSNOTIFY_OBJ_TYPE_INODE)
+		__fsnotify_update_child_dentry_flags(
+					fsnotify_conn_inode(conn));
+}
+Source code for mqueue_flush_file:
+static int mqueue_flush_file(struct file *filp, fl_owner_t id)
+{
+	struct mqueue_inode_info *info = MQUEUE_I(file_inode(filp));
+
+	spin_lock(&info->lock);
+	if (task_tgid(current) == info->notify_owner)
+		remove_notification(info);
+
+	spin_unlock(&info->lock);
+	return 0;
+}
+Source code for nfs4_file_flush:
+NoneSource code for queue_delayed_work_on:
+bool queue_delayed_work_on(int cpu, struct workqueue_struct *wq,
+			   struct delayed_work *dwork, unsigned long delay)
+{
+	struct work_struct *work = &dwork->work;
+	bool ret = false;
+	unsigned long flags;
+
+	/* read the comment in __queue_work() */
+	local_irq_save(flags);
+
+	if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work))) {
+		__queue_delayed_work(cpu, wq, dwork, delay);
+		ret = true;
+	}
+
+	local_irq_restore(flags);
+	return ret;
+}
+Source code for refcount_warn_saturate:
+void refcount_warn_saturate(refcount_t *r, enum refcount_saturation_type t)
+{
+	refcount_set(r, REFCOUNT_SATURATED);
+
+	switch (t) {
+	case REFCOUNT_ADD_NOT_ZERO_OVF:
+		REFCOUNT_WARN("saturated; leaking memory");
+		break;
+	case REFCOUNT_ADD_OVF:
+		REFCOUNT_WARN("saturated; leaking memory");
+		break;
+	case REFCOUNT_ADD_UAF:
+		REFCOUNT_WARN("addition on 0; use-after-free");
+		break;
+	case REFCOUNT_SUB_UAF:
+		REFCOUNT_WARN("underflow; use-after-free");
+		break;
+	case REFCOUNT_DEC_LEAK:
+		REFCOUNT_WARN("decrement hit 0; leaking memory");
+		break;
+	default:
+		REFCOUNT_WARN("unknown saturation event!?");
+	}
+}
+Source code for nfs_file_flush:
+NoneSource code for fsnotify_detach_mark:
+void fsnotify_detach_mark(struct fsnotify_mark *mark)
+{
+	fsnotify_group_assert_locked(mark->group);
+	WARN_ON_ONCE(!srcu_read_lock_held(&fsnotify_mark_srcu) &&
+		     refcount_read(&mark->refcnt) < 1 +
+			!!(mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED));
+
+	spin_lock(&mark->lock);
+	/* something else already called this function on this mark */
+	if (!(mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED)) {
+		spin_unlock(&mark->lock);
+		return;
+	}
+	mark->flags &= ~FSNOTIFY_MARK_FLAG_ATTACHED;
+	list_del_init(&mark->g_list);
+	spin_unlock(&mark->lock);
+
+	/* Drop mark reference acquired in fsnotify_add_mark_locked() */
+	fsnotify_put_mark(mark);
+}
+From a security-engineering standpoint, is it reasonable to expect that execution of queue_delayed_work_on will reach __queue_delayed_work? Provide a concise technical justification for your position, then state your conclusion in exactly this format: {Your justification}\nFINAL ANSWER -> YES/NO
+🟢🟢🟢RESPONSE🟢🟢🟢: The function `queue_delayed_work_on` calls `__queue_delayed_work` only if the work is not already pending (checked via `test_and_set_bit`). Under normal operation, when the work is not pending, execution flows directly to `__queue_delayed_work`. Since the function's purpose is to schedule the delayed work, it is reasonable to expect this path to be taken unless the work is already queued.
+
+FINAL ANSWER -> YES
+🟢 Upgrading edge queue_delayed_work_on -> __queue_delayed_work to subgraph (LLM confirmed)
+
+
+
+🟢🟢🟢PROMPT🟢🟢🟢: You are a Linux security expert analyzing kernel call-graph edges. The following historical dynamic execution path was observed:
+- __x64_sys_close
+  - close_fd
+    - filp_close
+      - dnotify_flush
+        - fsnotify_find_mark
+          - refcount_warn_saturate
+        - fsnotify_detach_mark
+        - fsnotify_free_mark
+        - fsnotify_recalc_mask
+      - fput
+        - queue_delayed_work_on
+      - mqueue_flush_file
+      - nfs4_file_flush
+      - nfs_file_flush
+Source code for __fsnotify_recalc_mask:
+static void *__fsnotify_recalc_mask(struct fsnotify_mark_connector *conn)
+{
+	u32 new_mask = 0;
+	bool want_iref = false;
+	struct fsnotify_mark *mark;
+
+	assert_spin_locked(&conn->lock);
+	/* We can get detached connector here when inode is getting unlinked. */
+	if (!fsnotify_valid_obj_type(conn->type))
+		return NULL;
+	hlist_for_each_entry(mark, &conn->list, obj_list) {
+		if (!(mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED))
+			continue;
+		new_mask |= fsnotify_calc_mask(mark);
+		if (conn->type == FSNOTIFY_OBJ_TYPE_INODE &&
+		    !(mark->flags & FSNOTIFY_MARK_FLAG_NO_IREF))
+			want_iref = true;
+	}
+	*fsnotify_conn_mask_p(conn) = new_mask;
+
+	return fsnotify_update_iref(conn, want_iref);
+}
+
+Source code for filp_close:
+int filp_close(struct file *filp, fl_owner_t id)
+{
+	int retval = 0;
+
+	if (!file_count(filp)) {
+		printk(KERN_ERR "VFS: Close: file count is 0\n");
+		return 0;
+	}
+
+	if (filp->f_op->flush)
+		retval = filp->f_op->flush(filp, id);
+
+	if (likely(!(filp->f_mode & FMODE_PATH))) {
+		dnotify_flush(filp, id);
+		locks_remove_posix(filp, id);
+	}
+	fput(filp);
+	return retval;
+}
+Source code for dnotify_flush:
+void dnotify_flush(struct file *filp, fl_owner_t id)
+{
+	struct fsnotify_mark *fsn_mark;
+	struct dnotify_mark *dn_mark;
+	struct dnotify_struct *dn;
+	struct dnotify_struct **prev;
+	struct inode *inode;
+	bool free = false;
+
+	inode = file_inode(filp);
+	if (!S_ISDIR(inode->i_mode))
+		return;
+
+	fsn_mark = fsnotify_find_mark(&inode->i_fsnotify_marks, dnotify_group);
+	if (!fsn_mark)
+		return;
+	dn_mark = container_of(fsn_mark, struct dnotify_mark, fsn_mark);
+
+	fsnotify_group_lock(dnotify_group);
+
+	spin_lock(&fsn_mark->lock);
+	prev = &dn_mark->dn;
+	while ((dn = *prev) != NULL) {
+		if ((dn->dn_owner == id) && (dn->dn_filp == filp)) {
+			*prev = dn->dn_next;
+			kmem_cache_free(dnotify_struct_cache, dn);
+			dnotify_recalc_inode_mask(fsn_mark);
+			break;
+		}
+		prev = &dn->dn_next;
+	}
+
+	spin_unlock(&fsn_mark->lock);
+
+	/* nothing else could have found us thanks to the dnotify_groups
+	   mark_mutex */
+	if (dn_mark->dn == NULL) {
+		fsnotify_detach_mark(fsn_mark);
+		free = true;
+	}
+
+	fsnotify_group_unlock(dnotify_group);
+
+	if (free)
+		fsnotify_free_mark(fsn_mark);
+	fsnotify_put_mark(fsn_mark);
+}
+Source code for close_fd:
+static void close_fd(int fd)
+{
+	if (fd >= 0)
+		close(fd);
+}
+Source code for __x64_sys_close:
+NoneSource code for fsnotify_find_mark:
+struct fsnotify_mark *fsnotify_find_mark(fsnotify_connp_t *connp,
+					 struct fsnotify_group *group)
+{
+	struct fsnotify_mark_connector *conn;
+	struct fsnotify_mark *mark;
+
+	conn = fsnotify_grab_connector(connp);
+	if (!conn)
+		return NULL;
+
+	hlist_for_each_entry(mark, &conn->list, obj_list) {
+		if (mark->group == group &&
+		    (mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED)) {
+			fsnotify_get_mark(mark);
+			spin_unlock(&conn->lock);
+			return mark;
+		}
+	}
+	spin_unlock(&conn->lock);
+	return NULL;
+}
+Source code for fput:
+void fput(struct file *file)
+{
+	if (atomic_long_dec_and_test(&file->f_count)) {
+		struct task_struct *task = current;
+
+		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
+			init_task_work(&file->f_rcuhead, ____fput);
+			if (!task_work_add(task, &file->f_rcuhead, TWA_RESUME))
+				return;
+			/*
+			 */
+		}
+
+		if (llist_add(&file->f_llist, &delayed_fput_list))
+			schedule_delayed_work(&delayed_fput_work, 1);
+	}
+}
+Source code for fsnotify_free_mark:
+void fsnotify_free_mark(struct fsnotify_mark *mark)
+{
+	struct fsnotify_group *group = mark->group;
+
+	spin_lock(&mark->lock);
+	/* something else already called this function on this mark */
+	if (!(mark->flags & FSNOTIFY_MARK_FLAG_ALIVE)) {
+		spin_unlock(&mark->lock);
+		return;
+	}
+	mark->flags &= ~FSNOTIFY_MARK_FLAG_ALIVE;
+	spin_unlock(&mark->lock);
+
+	/*
+	 */
+	if (group->ops->freeing_mark)
+		group->ops->freeing_mark(mark, group);
+}
+Source code for fsnotify_recalc_mask:
+void fsnotify_recalc_mask(struct fsnotify_mark_connector *conn)
+{
+	if (!conn)
+		return;
+
+	spin_lock(&conn->lock);
+	__fsnotify_recalc_mask(conn);
+	spin_unlock(&conn->lock);
+	if (conn->type == FSNOTIFY_OBJ_TYPE_INODE)
+		__fsnotify_update_child_dentry_flags(
+					fsnotify_conn_inode(conn));
+}
+Source code for mqueue_flush_file:
+static int mqueue_flush_file(struct file *filp, fl_owner_t id)
+{
+	struct mqueue_inode_info *info = MQUEUE_I(file_inode(filp));
+
+	spin_lock(&info->lock);
+	if (task_tgid(current) == info->notify_owner)
+		remove_notification(info);
+
+	spin_unlock(&info->lock);
+	return 0;
+}
+Source code for nfs4_file_flush:
+NoneSource code for queue_delayed_work_on:
+bool queue_delayed_work_on(int cpu, struct workqueue_struct *wq,
+			   struct delayed_work *dwork, unsigned long delay)
+{
+	struct work_struct *work = &dwork->work;
+	bool ret = false;
+	unsigned long flags;
+
+	/* read the comment in __queue_work() */
+	local_irq_save(flags);
+
+	if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work))) {
+		__queue_delayed_work(cpu, wq, dwork, delay);
+		ret = true;
+	}
+
+	local_irq_restore(flags);
+	return ret;
+}
+Source code for refcount_warn_saturate:
+void refcount_warn_saturate(refcount_t *r, enum refcount_saturation_type t)
+{
+	refcount_set(r, REFCOUNT_SATURATED);
+
+	switch (t) {
+	case REFCOUNT_ADD_NOT_ZERO_OVF:
+		REFCOUNT_WARN("saturated; leaking memory");
+		break;
+	case REFCOUNT_ADD_OVF:
+		REFCOUNT_WARN("saturated; leaking memory");
+		break;
+	case REFCOUNT_ADD_UAF:
+		REFCOUNT_WARN("addition on 0; use-after-free");
+		break;
+	case REFCOUNT_SUB_UAF:
+		REFCOUNT_WARN("underflow; use-after-free");
+		break;
+	case REFCOUNT_DEC_LEAK:
+		REFCOUNT_WARN("decrement hit 0; leaking memory");
+		break;
+	default:
+		REFCOUNT_WARN("unknown saturation event!?");
+	}
+}
+Source code for nfs_file_flush:
+NoneSource code for fsnotify_detach_mark:
+void fsnotify_detach_mark(struct fsnotify_mark *mark)
+{
+	fsnotify_group_assert_locked(mark->group);
+	WARN_ON_ONCE(!srcu_read_lock_held(&fsnotify_mark_srcu) &&
+		     refcount_read(&mark->refcnt) < 1 +
+			!!(mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED));
+
+	spin_lock(&mark->lock);
+	/* something else already called this function on this mark */
+	if (!(mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED)) {
+		spin_unlock(&mark->lock);
+		return;
+	}
+	mark->flags &= ~FSNOTIFY_MARK_FLAG_ATTACHED;
+	list_del_init(&mark->g_list);
+	spin_unlock(&mark->lock);
+
+	/* Drop mark reference acquired in fsnotify_add_mark_locked() */
+	fsnotify_put_mark(mark);
+}
+From a security-engineering standpoint, is it reasonable to expect that execution of fsnotify_recalc_mask will reach __fsnotify_recalc_mask? Provide a concise technical justification for your position, then state your conclusion in exactly this format: {Your justification}\nFINAL ANSWER -> YES/NO
+🟢🟢🟢RESPONSE🟢🟢🟢: The function `fsnotify_recalc_mask` first checks if `conn` is non-NULL. If true, it acquires a spinlock on `conn->lock` and explicitly calls `__fsnotify_recalc_mask(conn)`. Since there are no conditional branches or early returns between the lock acquisition and the function call, and the only pre-check is for `conn` validity, execution of `fsnotify_recalc_mask` will unconditionally reach `__fsnotify_recalc_mask` when `conn` is valid.
+FINAL ANSWER -> YES
+🟢 Upgrading edge fsnotify_recalc_mask -> __fsnotify_recalc_mask to subgraph (LLM confirmed)
+
+
+
+🟢🟢🟢PROMPT🟢🟢🟢: You are a Linux security expert analyzing kernel call-graph edges. The following historical dynamic execution path was observed:
+- __x64_sys_close
+  - close_fd
+    - filp_close
+      - dnotify_flush
+        - fsnotify_find_mark
+          - refcount_warn_saturate
+        - fsnotify_detach_mark
+        - fsnotify_free_mark
+        - fsnotify_recalc_mask
+      - fput
+        - queue_delayed_work_on
+      - mqueue_flush_file
+      - nfs4_file_flush
+      - nfs_file_flush
+Source code for __fsnotify_update_child_dentry_flags:
+void __fsnotify_update_child_dentry_flags(struct inode *inode)
+{
+	struct dentry *alias;
+	int watched;
+
+	if (!S_ISDIR(inode->i_mode))
+		return;
+
+	/* determine if the children should tell inode about their events */
+	watched = fsnotify_inode_watches_children(inode);
+
+	spin_lock(&inode->i_lock);
+	/* run all of the dentries associated with this inode.  Since this is a
+	 * directory, there damn well better only be one item on this list */
+	hlist_for_each_entry(alias, &inode->i_dentry, d_u.d_alias) {
+		struct dentry *child;
+
+		/* run all of the children of the original inode and fix their
+		 * original inode) */
+		spin_lock(&alias->d_lock);
+		list_for_each_entry(child, &alias->d_subdirs, d_child) {
+			if (!child->d_inode)
+				continue;
+
+			spin_lock_nested(&child->d_lock, DENTRY_D_LOCK_NESTED);
+			if (watched)
+				child->d_flags |= DCACHE_FSNOTIFY_PARENT_WATCHED;
+			else
+				child->d_flags &= ~DCACHE_FSNOTIFY_PARENT_WATCHED;
+			spin_unlock(&child->d_lock);
+		}
+		spin_unlock(&alias->d_lock);
+	}
+	spin_unlock(&inode->i_lock);
+}
+
+Source code for filp_close:
+int filp_close(struct file *filp, fl_owner_t id)
+{
+	int retval = 0;
+
+	if (!file_count(filp)) {
+		printk(KERN_ERR "VFS: Close: file count is 0\n");
+		return 0;
+	}
+
+	if (filp->f_op->flush)
+		retval = filp->f_op->flush(filp, id);
+
+	if (likely(!(filp->f_mode & FMODE_PATH))) {
+		dnotify_flush(filp, id);
+		locks_remove_posix(filp, id);
+	}
+	fput(filp);
+	return retval;
+}
+Source code for dnotify_flush:
+void dnotify_flush(struct file *filp, fl_owner_t id)
+{
+	struct fsnotify_mark *fsn_mark;
+	struct dnotify_mark *dn_mark;
+	struct dnotify_struct *dn;
+	struct dnotify_struct **prev;
+	struct inode *inode;
+	bool free = false;
+
+	inode = file_inode(filp);
+	if (!S_ISDIR(inode->i_mode))
+		return;
+
+	fsn_mark = fsnotify_find_mark(&inode->i_fsnotify_marks, dnotify_group);
+	if (!fsn_mark)
+		return;
+	dn_mark = container_of(fsn_mark, struct dnotify_mark, fsn_mark);
+
+	fsnotify_group_lock(dnotify_group);
+
+	spin_lock(&fsn_mark->lock);
+	prev = &dn_mark->dn;
+	while ((dn = *prev) != NULL) {
+		if ((dn->dn_owner == id) && (dn->dn_filp == filp)) {
+			*prev = dn->dn_next;
+			kmem_cache_free(dnotify_struct_cache, dn);
+			dnotify_recalc_inode_mask(fsn_mark);
+			break;
+		}
+		prev = &dn->dn_next;
+	}
+
+	spin_unlock(&fsn_mark->lock);
+
+	/* nothing else could have found us thanks to the dnotify_groups
+	   mark_mutex */
+	if (dn_mark->dn == NULL) {
+		fsnotify_detach_mark(fsn_mark);
+		free = true;
+	}
+
+	fsnotify_group_unlock(dnotify_group);
+
+	if (free)
+		fsnotify_free_mark(fsn_mark);
+	fsnotify_put_mark(fsn_mark);
+}
+Source code for close_fd:
+static void close_fd(int fd)
+{
+	if (fd >= 0)
+		close(fd);
+}
+Source code for __x64_sys_close:
+NoneSource code for fsnotify_find_mark:
+struct fsnotify_mark *fsnotify_find_mark(fsnotify_connp_t *connp,
+					 struct fsnotify_group *group)
+{
+	struct fsnotify_mark_connector *conn;
+	struct fsnotify_mark *mark;
+
+	conn = fsnotify_grab_connector(connp);
+	if (!conn)
+		return NULL;
+
+	hlist_for_each_entry(mark, &conn->list, obj_list) {
+		if (mark->group == group &&
+		    (mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED)) {
+			fsnotify_get_mark(mark);
+			spin_unlock(&conn->lock);
+			return mark;
+		}
+	}
+	spin_unlock(&conn->lock);
+	return NULL;
+}
+Source code for fput:
+void fput(struct file *file)
+{
+	if (atomic_long_dec_and_test(&file->f_count)) {
+		struct task_struct *task = current;
+
+		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
+			init_task_work(&file->f_rcuhead, ____fput);
+			if (!task_work_add(task, &file->f_rcuhead, TWA_RESUME))
+				return;
+			/*
+			 */
+		}
+
+		if (llist_add(&file->f_llist, &delayed_fput_list))
+			schedule_delayed_work(&delayed_fput_work, 1);
+	}
+}
+Source code for fsnotify_free_mark:
+void fsnotify_free_mark(struct fsnotify_mark *mark)
+{
+	struct fsnotify_group *group = mark->group;
+
+	spin_lock(&mark->lock);
+	/* something else already called this function on this mark */
+	if (!(mark->flags & FSNOTIFY_MARK_FLAG_ALIVE)) {
+		spin_unlock(&mark->lock);
+		return;
+	}
+	mark->flags &= ~FSNOTIFY_MARK_FLAG_ALIVE;
+	spin_unlock(&mark->lock);
+
+	/*
+	 */
+	if (group->ops->freeing_mark)
+		group->ops->freeing_mark(mark, group);
+}
+Source code for fsnotify_recalc_mask:
+void fsnotify_recalc_mask(struct fsnotify_mark_connector *conn)
+{
+	if (!conn)
+		return;
+
+	spin_lock(&conn->lock);
+	__fsnotify_recalc_mask(conn);
+	spin_unlock(&conn->lock);
+	if (conn->type == FSNOTIFY_OBJ_TYPE_INODE)
+		__fsnotify_update_child_dentry_flags(
+					fsnotify_conn_inode(conn));
+}
+Source code for mqueue_flush_file:
+static int mqueue_flush_file(struct file *filp, fl_owner_t id)
+{
+	struct mqueue_inode_info *info = MQUEUE_I(file_inode(filp));
+
+	spin_lock(&info->lock);
+	if (task_tgid(current) == info->notify_owner)
+		remove_notification(info);
+
+	spin_unlock(&info->lock);
+	return 0;
+}
+Source code for nfs4_file_flush:
+NoneSource code for queue_delayed_work_on:
+bool queue_delayed_work_on(int cpu, struct workqueue_struct *wq,
+			   struct delayed_work *dwork, unsigned long delay)
+{
+	struct work_struct *work = &dwork->work;
+	bool ret = false;
+	unsigned long flags;
+
+	/* read the comment in __queue_work() */
+	local_irq_save(flags);
+
+	if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work))) {
+		__queue_delayed_work(cpu, wq, dwork, delay);
+		ret = true;
+	}
+
+	local_irq_restore(flags);
+	return ret;
+}
+Source code for refcount_warn_saturate:
+void refcount_warn_saturate(refcount_t *r, enum refcount_saturation_type t)
+{
+	refcount_set(r, REFCOUNT_SATURATED);
+
+	switch (t) {
+	case REFCOUNT_ADD_NOT_ZERO_OVF:
+		REFCOUNT_WARN("saturated; leaking memory");
+		break;
+	case REFCOUNT_ADD_OVF:
+		REFCOUNT_WARN("saturated; leaking memory");
+		break;
+	case REFCOUNT_ADD_UAF:
+		REFCOUNT_WARN("addition on 0; use-after-free");
+		break;
+	case REFCOUNT_SUB_UAF:
+		REFCOUNT_WARN("underflow; use-after-free");
+		break;
+	case REFCOUNT_DEC_LEAK:
+		REFCOUNT_WARN("decrement hit 0; leaking memory");
+		break;
+	default:
+		REFCOUNT_WARN("unknown saturation event!?");
+	}
+}
+Source code for nfs_file_flush:
+NoneSource code for fsnotify_detach_mark:
+void fsnotify_detach_mark(struct fsnotify_mark *mark)
+{
+	fsnotify_group_assert_locked(mark->group);
+	WARN_ON_ONCE(!srcu_read_lock_held(&fsnotify_mark_srcu) &&
+		     refcount_read(&mark->refcnt) < 1 +
+			!!(mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED));
+
+	spin_lock(&mark->lock);
+	/* something else already called this function on this mark */
+	if (!(mark->flags & FSNOTIFY_MARK_FLAG_ATTACHED)) {
+		spin_unlock(&mark->lock);
+		return;
+	}
+	mark->flags &= ~FSNOTIFY_MARK_FLAG_ATTACHED;
+	list_del_init(&mark->g_list);
+	spin_unlock(&mark->lock);
+
+	/* Drop mark reference acquired in fsnotify_add_mark_locked() */
+	fsnotify_put_mark(mark);
+}
+From a security-engineering standpoint, is it reasonable to expect that execution of fsnotify_recalc_mask will reach __fsnotify_update_child_dentry_flags? Provide a concise technical justification for your position, then state your conclusion in exactly this format: {Your justification}\nFINAL ANSWER -> YES/NO
