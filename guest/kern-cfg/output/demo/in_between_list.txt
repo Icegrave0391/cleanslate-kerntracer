@@ -1,1 +1,2204 @@
-
+__x64_sys_close, (no source for __x64_sys_close or close_fd)
+close_fd, (no path to filp_close)
+filp_close, dnotify_flush
+dnotify_flush, fsnotify_find_mark
+fsnotify_find_mark, (no path to refcount_warn_saturate)
+refcount_warn_saturate, (no path to __warn_printk)
+dnotify_flush, fsnotify_detach_mark
+dnotify_flush, fsnotify_free_mark
+fsnotify_free_mark, (no path to inotify_freeing_mark)
+inotify_freeing_mark, inotify_ignored_and_remove_idr
+inotify_ignored_and_remove_idr, (no path to dec_ucount)
+inotify_ignored_and_remove_idr, inotify_handle_inode_event
+inotify_handle_inode_event, (no path to __kmalloc)
+__kmalloc, (no path to __kmalloc_large_node)
+__kmalloc_large_node, (no path to dump_stack)
+__kmalloc_large_node, (no path to mod_node_page_state)
+__kmalloc, (no path to __kmem_cache_alloc_node)
+inotify_handle_inode_event, fsnotify_destroy_event
+inotify_handle_inode_event, (no path to fsnotify_insert_event)
+fsnotify_insert_event, (no path to inotify_free_event)
+fsnotify_insert_event, (no path to inotify_merge)
+inotify_handle_inode_event, strcpy
+inotify_ignored_and_remove_idr, inotify_remove_from_idr
+inotify_remove_from_idr, (no path to fsnotify_get_mark)
+inotify_remove_from_idr, (no path to idr_find)
+idr_find, radix_tree_lookup
+inotify_remove_from_idr, idr_remove
+idr_remove, radix_tree_delete_item
+radix_tree_delete_item, __radix_tree_delete
+__radix_tree_delete, delete_node
+dnotify_flush, (no path to fsnotify_recalc_mask)
+fsnotify_recalc_mask, __fsnotify_recalc_mask
+__fsnotify_recalc_mask, (no path to ihold)
+fsnotify_recalc_mask, __fsnotify_update_child_dentry_flags
+filp_close, fput
+fput, (no path to llist_add_batch)
+fput, (no path to queue_delayed_work_on)
+queue_delayed_work_on, __queue_delayed_work
+filp_close, (no path to mqueue_flush_file)
+mqueue_flush_file, (no path to netlink_sendskb)
+netlink_sendskb, (no path to netlink_data_ready)
+netlink_sendskb, (no path to netlink_deliver_tap)
+netlink_deliver_tap, (no path to __alloc_skb)
+__alloc_skb, (no path to __kmalloc_node_track_caller)
+__alloc_skb, (no path to gfp_pfmemalloc_allowed)
+__alloc_skb, (no path to kmem_cache_alloc_bulk)
+kmem_cache_alloc_bulk, (no path to kmem_cache_free_bulk)
+kmem_cache_free_bulk, (no path to build_detached_freelist)
+build_detached_freelist, (no source for build_detached_freelist or cache_from_obj)
+cache_from_obj, (no source for cache_from_obj or print_tracking)
+print_tracking, (no path to stack_depot_print)
+stack_depot_print, stack_trace_print
+build_detached_freelist, free_large_kmalloc
+__alloc_skb, kmem_cache_alloc_node
+__alloc_skb, ksize
+netlink_deliver_tap, (no path to is_vmalloc_addr)
+netlink_deliver_tap, (no path to skb_clone)
+skb_clone, __skb_clone
+__skb_clone, __copy_skb_header
+skb_clone, (no path to skb_copy_ubufs)
+netlink_deliver_tap, (no path to skb_put)
+skb_put, skb_over_panic
+skb_over_panic, skb_panic
+netlink_sendskb, (no path to skb_queue_tail)
+netlink_sendskb, (no path to sock_def_readable)
+sock_def_readable, (no path to __wake_up_sync_key)
+__wake_up_sync_key, (no path to autoremove_wake_function)
+__wake_up_sync_key, (no source for __wake_up_sync_key or barrier_wake)
+barrier_wake, (no source for barrier_wake or i915_sw_fence_complete)
+__wake_up_sync_key, (no path to child_wait_callback)
+__wake_up_sync_key, (no path to cwt_wakefn)
+__wake_up_sync_key, (no path to default_wake_function)
+__wake_up_sync_key, (no path to do_rps_boost)
+do_rps_boost, drm_crtc_vblank_put
+drm_crtc_vblank_put, drm_vblank_put
+drm_vblank_put, (no path to dev_driver_string)
+drm_vblank_put, (no path to drm_vblank_disable_and_save)
+drm_vblank_disable_and_save, (no path to bdw_disable_vblank)
+drm_vblank_disable_and_save, drm_update_vblank_count, __get_vblank_counter, drm_crtc_from_index
+drm_vblank_disable_and_save, (no path to drm_simple_kms_crtc_disable_vblank)
+drm_vblank_disable_and_save, drm_update_vblank_count
+drm_update_vblank_count, __get_vblank_counter
+__get_vblank_counter, (no path to g4x_get_vblank_counter)
+__get_vblank_counter, (no path to i915_get_vblank_counter)
+drm_update_vblank_count, (no path to intel_crtc_get_vblank_timestamp)
+intel_crtc_get_vblank_timestamp, (no source for intel_crtc_get_vblank_timestamp or drm_crtc_vblank_helper_get_vblank_timestamp_internal)
+drm_crtc_vblank_helper_get_vblank_timestamp_internal, (no source for drm_crtc_vblank_helper_get_vblank_timestamp_internal or i915_get_crtc_scanoutpos)
+i915_get_crtc_scanoutpos, __intel_get_crtc_scanline
+drm_crtc_vblank_helper_get_vblank_timestamp_internal, (no source for drm_crtc_vblank_helper_get_vblank_timestamp_internal or ns_to_timespec64)
+drm_vblank_disable_and_save, (no path to i8xx_disable_vblank)
+drm_vblank_disable_and_save, (no path to i915gm_disable_vblank)
+drm_vblank_disable_and_save, (no path to i965_disable_vblank)
+i965_disable_vblank, i915_disable_pipestat
+i915_disable_pipestat, i915_pipestat_enable_mask
+drm_vblank_disable_and_save, (no path to ilk_disable_vblank)
+ilk_disable_vblank, (no source for ilk_disable_vblank or fwtable_read32)
+fwtable_read32, (no source for fwtable_read32 or ___force_wake_auto)
+___force_wake_auto, (no source for ___force_wake_auto or fw_domains_get_normal)
+___force_wake_auto, (no source for ___force_wake_auto or fw_domains_get_with_fallback)
+fw_domains_get_with_fallback, (no source for fw_domains_get_with_fallback or __drm_err)
+fw_domains_get_with_fallback, (no source for fw_domains_get_with_fallback or add_taint_for_CI)
+add_taint_for_CI, (no source for add_taint_for_CI or __i915_printk)
+__i915_printk, (no source for __i915_printk or _dev_notice)
+__i915_printk, (no source for __i915_printk or test_taint)
+fw_domains_get_with_fallback, (no source for fw_domains_get_with_fallback or fw_domain_wait_ack_with_fallback)
+fw_domain_wait_ack_with_fallback, (no source for fw_domain_wait_ack_with_fallback or ___drm_dbg)
+___force_wake_auto, (no path to fw_domains_get_with_thread_status)
+fwtable_read32, (no source for fwtable_read32 or check_for_unclaimed_mmio)
+fwtable_read32, (no source for fwtable_read32 or find_fw_domain)
+do_rps_boost, intel_rps_boost
+__wake_up_sync_key, (no path to ep_autoremove_wake_function)
+__wake_up_sync_key, (no path to ep_poll_callback)
+ep_poll_callback, (no path to __pm_stay_awake)
+__pm_stay_awake, wakeup_source_report_event
+ep_poll_callback, (no path to sock_from_file)
+__wake_up_sync_key, (no path to i915_sw_fence_wake)
+__wake_up_sync_key, (no path to io_async_buf_func)
+io_async_buf_func, io_req_task_queue
+__wake_up_sync_key, (no path to io_poll_wake)
+io_poll_wake, (no path to __io_req_task_work_add)
+__io_req_task_work_add, (no path to blk_queue_usage_counter_release)
+__io_req_task_work_add, (no path to blkg_release)
+__io_req_task_work_add, (no path to css_killed_ref_fn)
+__io_req_task_work_add, (no path to css_release)
+__io_req_task_work_add, (no path to free_ioctx_reqs)
+__io_req_task_work_add, (no path to io_eventfd_signal)
+io_eventfd_signal, eventfd_signal_mask
+__io_req_task_work_add, (no path to io_ring_ctx_ref_free)
+__io_req_task_work_add, (no path to io_rsrc_node_ref_zero)
+__io_req_task_work_add, (no path to no_op)
+__io_req_task_work_add, (no path to percpu_ref_exit)
+__io_req_task_work_add, (no path to percpu_ref_noop_confirm_switch)
+__io_req_task_work_add, (no path to percpu_ref_reinit)
+__io_req_task_work_add, (no path to percpu_ref_resurrect)
+percpu_ref_resurrect, __percpu_ref_switch_mode
+__io_req_task_work_add, (no path to percpu_ref_switch_to_atomic_sync)
+percpu_ref_switch_to_atomic_sync, (no path to init_wait_entry)
+__io_req_task_work_add, (no path to percpu_ref_switch_to_percpu)
+__io_req_task_work_add, (no path to swap_users_ref_free)
+io_poll_wake, io_pollfree_wake
+__wake_up_sync_key, (no path to io_wake_function)
+__wake_up_sync_key, (no path to io_wqe_hash_wake)
+io_wqe_hash_wake, io_wqe_activate_free_worker
+__wake_up_sync_key, (no path to iocg_wake_fn)
+__wake_up_sync_key, (no path to kyber_domain_wake)
+kyber_domain_wake, sbitmap_del_wait_queue
+__wake_up_sync_key, (no path to p9_pollwake)
+__wake_up_sync_key, (no path to percpu_rwsem_wake_function)
+__wake_up_sync_key, (no path to pollwake)
+__wake_up_sync_key, (no path to receiver_wake_function)
+__wake_up_sync_key, (no path to rq_qos_wake_function)
+rq_qos_wake_function, (no path to iolat_acquire_inflight)
+iolat_acquire_inflight, rq_wait_inc_below
+__wake_up_sync_key, (no path to synchronous_wake_function)
+__wake_up_sync_key, (no path to unix_dgram_peer_wake_relay)
+__wake_up_sync_key, (no source for __wake_up_sync_key or var_wake_function)
+__wake_up_sync_key, (no path to wake_bit_function)
+__wake_up_sync_key, (no path to wake_page_function)
+wake_page_function, wake_up_state
+__wake_up_sync_key, (no path to woken_wake_function)
+sock_def_readable, (no path to sock_wake_async)
+sock_wake_async, kill_fasync
+kill_fasync, (no path to send_sigio)
+send_sigio, send_sigio_to_task
+netlink_sendskb, (no path to svc_data_ready)
+netlink_sendskb, (no path to svc_tcp_listen_data_ready)
+svc_tcp_listen_data_ready, svc_xprt_enqueue
+svc_xprt_enqueue, svc_pool_for_cpu
+svc_xprt_enqueue, (no path to svc_tcp_has_wspace)
+svc_xprt_enqueue, (no path to svc_udp_has_wspace)
+netlink_sendskb, (no path to xs_data_ready)
+xs_data_ready, (no path to cubictcp_init)
+xs_data_ready, (no path to inet6_cleanup_sock)
+xs_data_ready, (no path to inet6_destroy_sock)
+inet6_destroy_sock, fl6_free_socklist
+fl6_free_socklist, fl_release
+xs_data_ready, (no path to inet6_sock_destruct)
+xs_data_ready, (no path to inet_bhash2_reset_saddr)
+inet_bhash2_reset_saddr, __inet_bhash2_update_saddr
+xs_data_ready, (no path to inet_csk_prepare_forced_close)
+xs_data_ready, (no path to inet_put_port)
+inet_put_port, (no source for inet_put_port or local_bh_enable)
+local_bh_enable, (no source for local_bh_enable or __local_bh_enable_ip)
+xs_data_ready, (no path to inet_sock_destruct)
+inet_sock_destruct, dst_release
+dst_release, (no path to net_ratelimit)
+xs_data_ready, (no path to inet_unhash)
+xs_data_ready, (no path to ip6_datagram_release_cb)
+ip6_datagram_release_cb, (no path to dst_blackhole_check)
+ip6_datagram_release_cb, ip6_datagram_dst_update
+ip6_datagram_dst_update, (no path to __fl6_sock_lookup)
+ip6_datagram_dst_update, fl6_update_dst
+ip6_datagram_dst_update, ip6_dst_lookup_flow
+ip6_dst_lookup_flow, ip6_dst_lookup_tail
+ip6_dst_lookup_tail, (no path to ipv6_dev_get_saddr)
+ipv6_dev_get_saddr, __ipv6_dev_get_saddr
+__ipv6_dev_get_saddr, ipv6_get_saddr_eval
+ipv6_dev_get_saddr, ipv6_addr_label
+ip6_datagram_dst_update, ip6_sk_dst_store_flow
+ip6_datagram_dst_update, (no path to security_sk_classify_flow)
+security_sk_classify_flow, (no path to selinux_sk_getsecid)
+ip6_datagram_release_cb, (no path to ip6_dst_check)
+ip6_datagram_release_cb, (no path to ipv4_dst_check)
+ip6_datagram_release_cb, (no path to xfrm_dst_check)
+xfrm_dst_check, (no path to dst_blackhole_cow_metrics)
+xfrm_dst_check, (no path to dst_cow_metrics_generic)
+xfrm_dst_check, (no path to ipv4_cow_metrics)
+xfrm_dst_check, (no path to xfrm_state_mtu)
+xs_data_ready, (no path to ip6_flush_pending_frames)
+ip6_flush_pending_frames, (no path to ip6_cork_release)
+xs_data_ready, (no path to ip_sock_set_freebind)
+xs_data_ready, (no path to ip_sock_set_pktinfo)
+xs_data_ready, (no path to ip_sock_set_recverr)
+xs_data_ready, (no path to mrtsock_destruct)
+mrtsock_destruct, inet_netconf_notify_devconf
+inet_netconf_notify_devconf, inet_netconf_fill_devconf
+inet_netconf_fill_devconf, (no source for inet_netconf_fill_devconf or __nlmsg_put)
+inet_netconf_fill_devconf, (no path to nla_put)
+inet_netconf_notify_devconf, rtnl_set_sk_err
+rtnl_set_sk_err, netlink_set_err
+mrtsock_destruct, mroute_clean_tables
+mroute_clean_tables, ipmr_destroy_unres
+ipmr_destroy_unres, rtnl_unicast
+ipmr_destroy_unres, skb_dequeue
+ipmr_destroy_unres, skb_trim
+mroute_clean_tables, mroute_netlink_event
+mroute_netlink_event, ipmr_fill_mroute
+ipmr_fill_mroute, mr_fill_mroute
+mr_fill_mroute, nla_reserve_nohdr
+mroute_clean_tables, (no source for mroute_clean_tables or rhltable_remove)
+rhltable_remove, (no source for rhltable_remove or __rht_bucket_nested)
+rhltable_remove, (no source for rhltable_remove or acpi_get_cpuid)
+rhltable_remove, (no source for rhltable_remove or acpi_get_phys_id)
+acpi_get_phys_id, (no source for acpi_get_phys_id or acpi_get_table)
+acpi_get_table, (no source for acpi_get_table or acpi_tb_get_table)
+acpi_tb_get_table, (no source for acpi_tb_get_table or acpi_tb_validate_table)
+acpi_tb_validate_table, (no source for acpi_tb_validate_table or acpi_tb_acquire_table)
+acpi_tb_acquire_table, (no source for acpi_tb_acquire_table or acpi_os_map_memory)
+acpi_os_map_memory, (no source for acpi_os_map_memory or acpi_os_map_iomem)
+acpi_os_map_iomem, (no source for acpi_os_map_iomem or __acpi_map_table)
+__acpi_map_table, (no source for __acpi_map_table or early_memremap)
+early_memremap, (no source for early_memremap or __early_ioremap)
+__early_ioremap, (no source for __early_ioremap or __early_set_fixmap)
+__early_ioremap, (no source for __early_ioremap or native_set_fixmap)
+native_set_fixmap, (no path to set_pte_vaddr)
+set_pte_vaddr, (no path to set_pte_vaddr_p4d)
+set_pte_vaddr_p4d, __set_pte_vaddr
+set_pte_vaddr_p4d, (no path to spp_getpage)
+early_memremap, (no source for early_memremap or early_memremap_pgprot_adjust)
+acpi_os_map_iomem, (no source for acpi_os_map_iomem or ioremap_cache)
+ioremap_cache, __ioremap_caller
+__ioremap_caller, (no path to free_vm_area)
+__ioremap_caller, (no path to get_vm_area_caller)
+__ioremap_caller, (no path to iomem_map_sanity_check)
+__ioremap_caller, (no path to ioremap_page_range)
+ioremap_page_range, (no path to vmap_p4d_range)
+vmap_p4d_range, (no path to __p4d_alloc)
+vmap_p4d_range, (no path to __pmd_alloc)
+vmap_p4d_range, (no path to __pte_alloc_kernel)
+vmap_p4d_range, (no path to __pud_alloc)
+vmap_p4d_range, (no path to pmd_free_pte_page)
+vmap_p4d_range, (no path to pmd_set_huge)
+pmd_set_huge, (no path to pmd_huge)
+vmap_p4d_range, (no path to pud_free_pmd_page)
+pud_free_pmd_page, (no path to __get_free_pages)
+vmap_p4d_range, (no path to pud_set_huge)
+pud_set_huge, (no path to pud_huge)
+__ioremap_caller, (no path to memtype_kernel_map_sync)
+memtype_kernel_map_sync, ioremap_change_attr
+ioremap_change_attr, _set_memory_uc
+ioremap_change_attr, _set_memory_wb
+ioremap_change_attr, _set_memory_wc
+ioremap_change_attr, _set_memory_wt
+_set_memory_wt, (no path to change_page_attr_set_clr)
+change_page_attr_set_clr, __change_page_attr_set_clr
+__change_page_attr_set_clr, (no path to __cpa_process_fault)
+__cpa_process_fault, populate_pgd
+populate_pgd, (no path to populate_pmd)
+populate_pgd, (no path to unmap_pmd_range)
+unmap_pmd_range, __unmap_pmd_range
+__change_page_attr_set_clr, (no path to pfn_range_is_mapped)
+__change_page_attr_set_clr, (no path to static_protections)
+change_page_attr_set_clr, cpa_flush
+cpa_flush, flush_tlb_all
+cpa_flush, (no path to lookup_address_in_pgd)
+change_page_attr_set_clr, pgprot2cachemode
+change_page_attr_set_clr, vm_unmap_aliases
+__ioremap_caller, (no path to memtype_reserve)
+memtype_reserve, memtype_check_insert
+memtype_reserve, (no path to mtrr_type_lookup)
+mtrr_type_lookup, mtrr_type_lookup_variable
+__ioremap_caller, (no path to walk_mem_res)
+walk_mem_res, (no path to __ioremap_collect_map_flags)
+__ioremap_collect_map_flags, __ioremap_check_ram
+walk_mem_res, (no path to mem_region_callback)
+mem_region_callback, kernel_ident_mapping_init
+kernel_ident_mapping_init, alloc_pgt_page
+alloc_pgt_page, (no path to get_safe_page)
+get_safe_page, (no path to get_image_page)
+get_image_page, (no path to memory_bm_find_bit)
+alloc_pgt_page, (no path to kimage_alloc_control_pages)
+kimage_alloc_control_pages, kimage_alloc_crash_control_pages
+kimage_alloc_control_pages, kimage_alloc_normal_control_pages
+kimage_alloc_normal_control_pages, (no path to arch_kexec_post_alloc_pages)
+kimage_alloc_normal_control_pages, (no path to arch_kexec_pre_free_pages)
+kernel_ident_mapping_init, ident_p4d_init
+ident_p4d_init, ident_pud_init
+acpi_get_phys_id, map_madt_entry
+rhltable_remove, (no source for rhltable_remove or crypto_has_alg)
+crypto_has_alg, (no path to crypto_destroy_instance)
+crypto_destroy_instance, (no path to crypto_aead_free_instance)
+crypto_aead_free_instance, (no path to aead_geniv_free)
+crypto_aead_free_instance, (no path to crypto_authenc_esn_free)
+crypto_aead_free_instance, (no path to crypto_authenc_free)
+crypto_aead_free_instance, (no path to crypto_ccm_free)
+crypto_aead_free_instance, (no path to crypto_gcm_free)
+crypto_aead_free_instance, (no path to crypto_rfc4106_free)
+crypto_aead_free_instance, (no path to crypto_rfc4309_free)
+crypto_aead_free_instance, (no path to crypto_rfc4543_free)
+crypto_destroy_instance, (no path to crypto_ahash_free_instance)
+crypto_destroy_instance, (no path to crypto_akcipher_free_instance)
+crypto_akcipher_free_instance, (no path to pkcs1pad_free)
+crypto_destroy_instance, (no path to crypto_kpp_free_instance)
+crypto_destroy_instance, (no path to crypto_shash_free_instance)
+crypto_shash_free_instance, (no path to shash_free_singlespawn_instance)
+crypto_destroy_instance, (no path to crypto_skcipher_free_instance)
+crypto_skcipher_free_instance, (no path to crypto_rfc3686_free)
+crypto_skcipher_free_instance, (no path to skcipher_free_instance_simple)
+skcipher_free_instance_simple, (no path to crypto_drop_spawn)
+crypto_has_alg, (no path to crypto_larval_destroy)
+crypto_has_alg, (no path to crypto_larval_kill)
+crypto_larval_kill, complete_all
+crypto_has_alg, crypto_mod_put
+crypto_has_alg, (no path to crypto_shoot_alg)
+crypto_has_alg, (no path to crypto_unregister_alg)
+crypto_unregister_alg, (no path to crypto_remove_spawns)
+crypto_unregister_alg, down_write
+down_write, (no path to __down_write_common)
+__down_write_common, (no source for __down_write_common or rwsem_spin_on_owner)
+crypto_unregister_alg, up_write
+rhltable_remove, (no source for rhltable_remove or crypto_has_kpp)
+rhltable_remove, (no source for rhltable_remove or crypto_has_shash)
+rhltable_remove, (no source for rhltable_remove or crypto_has_skcipher)
+rhltable_remove, (no source for rhltable_remove or csum_partial)
+rhltable_remove, (no source for rhltable_remove or csum_partial_ext)
+rhltable_remove, (no source for rhltable_remove or ip4_key_hashfn)
+rhltable_remove, (no source for rhltable_remove or ip4_obj_hashfn)
+rhltable_remove, (no source for rhltable_remove or ip6frag_key_hashfn)
+rhltable_remove, (no source for rhltable_remove or ip6frag_obj_hashfn)
+ip6frag_obj_hashfn, (no source for ip6frag_obj_hashfn or jhash2)
+rhltable_remove, (no source for rhltable_remove or jhash)
+rhltable_remove, (no source for rhltable_remove or netlink_hash)
+rhltable_remove, (no source for rhltable_remove or phy_unregister_fixup)
+rhltable_remove, (no source for rhltable_remove or rhashtable_jhash2)
+rhltable_remove, (no source for rhltable_remove or spi_populate_sync_msg)
+rhltable_remove, (no source for rhltable_remove or warn_crc32c_csum_update)
+rhltable_remove, (no source for rhltable_remove or xdp_mem_id_hashfn)
+rhltable_remove, (no source for rhltable_remove or xfrm_pol_bin_key)
+rhltable_remove, (no source for rhltable_remove or xfrm_pol_bin_obj)
+mroute_clean_tables, unregister_netdevice_many
+unregister_netdevice_many, (no path to _find_next_bit)
+unregister_netdevice_many, (no path to bpf_prog_change_xdp)
+unregister_netdevice_many, dev_mc_flush
+unregister_netdevice_many, dev_shutdown
+dev_shutdown, (no path to qdisc_destroy)
+qdisc_destroy, (no path to fifo_destroy)
+qdisc_destroy, gen_kill_estimator
+qdisc_destroy, (no path to mq_destroy)
+qdisc_destroy, (no path to pfifo_fast_destroy)
+qdisc_destroy, qdisc_hash_del
+qdisc_destroy, qdisc_put_stab
+qdisc_destroy, qdisc_reset
+qdisc_reset, (no path to pfifo_fast_reset)
+qdisc_reset, (no source for qdisc_reset or qdisc_reset_queue)
+qdisc_reset_queue, (no source for qdisc_reset_queue or rtnl_kfree_skbs)
+unregister_netdevice_many, dev_uc_flush
+unregister_netdevice_many, (no path to flush_work)
+flush_work, __flush_work
+__flush_work, (no path to __init_swait_queue_head)
+__flush_work, (no path to check_flush_dependency)
+check_flush_dependency, (no path to kthread_data)
+unregister_netdevice_many, (no path to ieee80211_uninit)
+ieee80211_uninit, (no path to ieee80211_destroy_frag_cache)
+ieee80211_uninit, (no path to ieee80211_free_keys)
+ieee80211_free_keys, cancel_delayed_work_sync
+ieee80211_free_keys, ieee80211_free_keys_iface
+ieee80211_free_keys_iface, ieee80211_key_replace
+ieee80211_key_replace, (no path to ___ieee80211_stop_tx_ba_session)
+___ieee80211_stop_tx_ba_session, drv_ampdu_action
+ieee80211_key_replace, __ieee80211_set_default_key
+ieee80211_key_replace, ieee80211_check_fast_rx
+ieee80211_key_replace, __ieee80211_set_default_key, ieee80211_check_fast_xmit_iface, ieee80211_check_fast_xmit
+ieee80211_check_fast_xmit, kmemdup
+ieee80211_key_replace, __ieee80211_set_default_key, ieee80211_check_fast_xmit_iface
+ieee80211_key_replace, (no path to ieee80211_clear_fast_xmit)
+ieee80211_key_replace, (no path to ieee80211_flush_queues)
+ieee80211_flush_queues, __ieee80211_flush_queues
+__ieee80211_flush_queues, (no path to __ieee80211_stop_queue)
+__ieee80211_flush_queues, (no path to __ieee80211_wake_queue)
+__ieee80211_wake_queue, (no path to __tasklet_schedule)
+__tasklet_schedule, __tasklet_schedule_common
+__ieee80211_wake_queue, (no source for __ieee80211_wake_queue or _ieee80211_wake_txqs)
+__ieee80211_wake_queue, (no path to netif_tx_wake_queue)
+ieee80211_key_replace, ieee80211_key_disable_hw_accel
+ieee80211_key_replace, ieee80211_key_enable_hw_accel
+ieee80211_key_enable_hw_accel, drv_set_key
+ieee80211_key_replace, (no path to ieee80211_sta_tear_down_BA_sessions)
+ieee80211_sta_tear_down_BA_sessions, ___ieee80211_stop_rx_ba_session
+ieee80211_sta_tear_down_BA_sessions, ieee80211_stop_tx_ba_cb
+ieee80211_stop_tx_ba_cb, (no source for ieee80211_stop_tx_ba_cb or ieee80211_agg_splice_packets)
+ieee80211_agg_splice_packets, (no source for ieee80211_agg_splice_packets or ieee80211_stop_queue_by_reason)
+ieee80211_stop_tx_ba_cb, (no source for ieee80211_stop_tx_ba_cb or ieee80211_agg_start_txq)
+ieee80211_agg_start_txq, (no source for ieee80211_agg_start_txq or __ieee80211_schedule_txq)
+ieee80211_stop_tx_ba_cb, ieee80211_send_delba
+ieee80211_send_delba, (no path to __netdev_alloc_skb)
+__netdev_alloc_skb, (no path to page_frag_alloc_align)
+ieee80211_stop_tx_ba_cb, (no path to ieee80211_wake_queue_by_reason)
+ieee80211_free_keys, (no path to ieee80211_key_free_common)
+ieee80211_key_free_common, (no path to aead_key_free)
+ieee80211_key_free_common, ieee80211_aes_cmac_key_free
+ieee80211_key_free_common, ieee80211_aes_gmac_key_free
+ieee80211_aes_gmac_key_free, (no path to crypto_destroy_tfm)
+crypto_destroy_tfm, (no path to cbcmac_exit_tfm)
+crypto_destroy_tfm, (no path to cmac_exit_tfm)
+crypto_destroy_tfm, (no path to crypto_acomp_exit_tfm)
+crypto_destroy_tfm, (no path to crypto_aead_exit_tfm)
+crypto_aead_exit_tfm, (no path to aead_exit_geniv)
+crypto_aead_exit_tfm, (no path to crypto_authenc_esn_exit_tfm)
+crypto_aead_exit_tfm, (no path to crypto_authenc_exit_tfm)
+crypto_aead_exit_tfm, (no path to crypto_ccm_exit_tfm)
+crypto_aead_exit_tfm, (no path to crypto_gcm_exit_tfm)
+crypto_aead_exit_tfm, (no path to crypto_rfc4106_exit_tfm)
+crypto_aead_exit_tfm, (no path to crypto_rfc4309_exit_tfm)
+crypto_aead_exit_tfm, (no path to crypto_rfc4543_exit_tfm)
+crypto_rfc4543_exit_tfm, crypto_put_default_null_skcipher
+crypto_destroy_tfm, (no path to crypto_ahash_exit_tfm)
+crypto_destroy_tfm, (no path to crypto_akcipher_exit_tfm)
+crypto_akcipher_exit_tfm, (no path to pkcs1pad_exit_tfm)
+crypto_akcipher_exit_tfm, (no path to rsa_exit_tfm)
+rsa_exit_tfm, (no path to mpi_free)
+crypto_destroy_tfm, (no path to crypto_exit_scomp_ops_async)
+crypto_destroy_tfm, (no path to crypto_exit_shash_ops_async)
+crypto_destroy_tfm, (no path to crypto_kpp_exit_tfm)
+crypto_destroy_tfm, (no path to crypto_shash_exit_tfm)
+crypto_shash_exit_tfm, (no path to hmac_exit_tfm)
+crypto_destroy_tfm, (no path to crypto_skcipher_exit_tfm)
+crypto_skcipher_exit_tfm, (no path to crypto_rfc3686_exit_tfm)
+crypto_skcipher_exit_tfm, (no path to skcipher_exit_tfm_simple)
+crypto_destroy_tfm, (no path to drbg_kcapi_cleanup)
+drbg_kcapi_cleanup, (no path to drbg_fini_hash_kernel)
+crypto_destroy_tfm, (no path to ghash_exit_tfm)
+crypto_destroy_tfm, (no path to jent_kcapi_cleanup)
+jent_kcapi_cleanup, jent_entropy_collector_free
+jent_entropy_collector_free, jent_zfree
+ieee80211_uninit, (no path to ieee80211_link_stop)
+ieee80211_link_stop, ieee80211_link_release_channel
+ieee80211_link_release_channel, __ieee80211_link_release_channel
+__ieee80211_link_release_channel, ieee80211_assign_link_chanctx
+ieee80211_assign_link_chanctx, drv_assign_vif_chanctx
+ieee80211_assign_link_chanctx, drv_unassign_vif_chanctx
+ieee80211_assign_link_chanctx, ieee80211_vif_cfg_change_notify
+__ieee80211_link_release_channel, (no path to ieee80211_del_chanctx)
+ieee80211_del_chanctx, (no source for ieee80211_del_chanctx or ieee80211_s1g_channel_width)
+__ieee80211_link_release_channel, ieee80211_link_unreserve_chanctx
+__ieee80211_link_release_channel, ieee80211_vif_use_reserved_switch
+ieee80211_vif_use_reserved_switch, (no source for ieee80211_vif_use_reserved_switch or _dev_info)
+ieee80211_vif_use_reserved_switch, ieee80211_recalc_chanctx_chantype, ieee80211_change_chanctx, _ieee80211_recalc_chanctx_min_def
+_ieee80211_recalc_chanctx_min_def, ieee80211_chandef_downgrade
+_ieee80211_recalc_chanctx_min_def, (no path to ieee80211_sta_cap_rx_bw)
+ieee80211_vif_use_reserved_switch, (no source for ieee80211_vif_use_reserved_switch or cfg80211_chandef_compatible)
+cfg80211_chandef_compatible, (no source for cfg80211_chandef_compatible or chandef_primary_freqs)
+ieee80211_vif_use_reserved_switch, cfg80211_stop_iface
+ieee80211_vif_use_reserved_switch, (no path to drv_switch_vif_chanctx)
+ieee80211_vif_use_reserved_switch, (no path to ieee80211_add_chanctx)
+ieee80211_vif_use_reserved_switch, ieee80211_recalc_chanctx_chantype, ieee80211_change_chanctx, ieee80211_chan_bw_change
+ieee80211_chan_bw_change, ieee80211_sta_cur_vht_bw
+ieee80211_chan_bw_change, rate_control_rate_update
+rate_control_rate_update, drv_sta_rc_update
+ieee80211_vif_use_reserved_switch, ieee80211_recalc_radar_chanctx, ieee80211_hw_config
+ieee80211_hw_config, (no path to cfg80211_chandef_valid)
+ieee80211_vif_use_reserved_switch, ieee80211_link_info_change_notify
+ieee80211_link_info_change_notify, drv_link_info_changed
+ieee80211_vif_use_reserved_switch, (no source for ieee80211_vif_use_reserved_switch or ieee80211_link_use_reserved_assign)
+ieee80211_vif_use_reserved_switch, (no source for ieee80211_vif_use_reserved_switch or ieee80211_link_use_reserved_reassign)
+ieee80211_vif_use_reserved_switch, ieee80211_recalc_chanctx_chantype
+ieee80211_recalc_chanctx_chantype, ieee80211_change_chanctx
+ieee80211_vif_use_reserved_switch, ieee80211_recalc_radar_chanctx
+ieee80211_vif_use_reserved_switch, ieee80211_recalc_smps_chanctx
+ieee80211_vif_use_reserved_switch, ieee80211_recalc_txpower
+ieee80211_recalc_txpower, __ieee80211_recalc_txpower
+ieee80211_link_stop, ieee80211_mgd_stop_link
+ieee80211_uninit, (no path to ieee80211_vif_clear_links)
+ieee80211_vif_clear_links, ieee80211_free_links
+ieee80211_vif_clear_links, ieee80211_vif_update_links
+ieee80211_vif_update_links, drv_change_vif_links
+ieee80211_vif_update_links, (no path to ieee80211_free_key_list)
+ieee80211_vif_update_links, ieee80211_link_init
+ieee80211_vif_update_links, ieee80211_link_init, ieee80211_mgd_setup_link
+ieee80211_vif_update_links, (no path to ieee80211_remove_link_keys)
+unregister_netdevice_many, (no path to ipip6_tunnel_uninit)
+unregister_netdevice_many, (no path to netdev_offload_xstats_disable)
+unregister_netdevice_many, netdev_unregister_kobject
+netdev_unregister_kobject, (no path to kset_unregister)
+netdev_unregister_kobject, (no source for netdev_unregister_kobject or net_rx_queue_update_kobjects)
+netdev_unregister_kobject, (no source for netdev_unregister_kobject or netdev_queue_update_kobjects)
+netdev_queue_update_kobjects, (no source for netdev_queue_update_kobjects or sysfs_create_group)
+sysfs_create_group, internal_create_group
+internal_create_group, (no path to acpi_attr_is_visible)
+internal_create_group, (no source for internal_create_group or amd_branches_is_visible)
+internal_create_group, (no source for internal_create_group or amd_f17h_uncore_is_visible)
+internal_create_group, (no source for internal_create_group or amd_f19h_uncore_is_visible)
+internal_create_group, (no path to aspm_ctrl_attrs_are_visible)
+internal_create_group, (no path to atkbd_attr_is_visible)
+internal_create_group, (no source for internal_create_group or cache_default_attrs_is_visible)
+internal_create_group, (no source for internal_create_group or cache_private_attrs_is_visible)
+cache_private_attrs_is_visible, (no source for cache_private_attrs_is_visible or amd_nb_has_feature)
+internal_create_group, (no source for internal_create_group or cnt_ctl_is_visible)
+internal_create_group, (no source for internal_create_group or default_is_visible)
+internal_create_group, (no path to dev_string_attrs_are_visible)
+internal_create_group, (no path to disk_visible)
+internal_create_group, (no path to efi_attr_is_visible)
+internal_create_group, (no path to esrt_attr_is_visible)
+internal_create_group, (no source for internal_create_group or exra_is_visible)
+internal_create_group, (no path to hwmon_dev_attr_is_visible)
+internal_create_group, (no path to hybrid_events_is_visible)
+internal_create_group, (no path to hybrid_format_is_visible)
+internal_create_group, (no path to hybrid_tsx_is_visible)
+hybrid_tsx_is_visible, (no path to _find_first_bit)
+internal_create_group, (no source for internal_create_group or icx_iio_mapping_visible)
+internal_create_group, (no path to input_poller_attrs_visible)
+internal_create_group, (no path to intf_assoc_attrs_are_visible)
+internal_create_group, (no source for internal_create_group or is_visible)
+is_visible, (no source for is_visible or __fdget)
+__fdget, (no path to __fget_files)
+is_visible, (no source for is_visible or amd_pmu_event_map)
+is_visible, (no source for is_visible or cachemode2protval)
+is_visible, (no source for is_visible or dma_fence_context_alloc)
+is_visible, (no source for is_visible or get_zeroed_page)
+is_visible, (no source for is_visible or hswep_cbox_filter_mask)
+is_visible, (no source for is_visible or i8042_panic_blink)
+is_visible, (no source for is_visible or intel_pmu_event_map)
+is_visible, (no source for is_visible or ivbep_cbox_filter_mask)
+is_visible, (no source for is_visible or knc_pmu_event_map)
+is_visible, (no source for is_visible or knl_cha_filter_mask)
+is_visible, (no source for is_visible or misc_cg_res_total_usage)
+is_visible, (no source for is_visible or msleep_interruptible)
+is_visible, (no source for is_visible or no_blink)
+is_visible, (no source for is_visible or p4_pmu_event_map)
+is_visible, (no source for is_visible or p6_pmu_event_map)
+is_visible, (no source for is_visible or perf_get_hw_event_config)
+is_visible, (no source for is_visible or reciprocal_value)
+is_visible, (no source for is_visible or skx_cha_filter_mask)
+is_visible, (no source for is_visible or snbep_cbox_filter_mask)
+is_visible, (no source for is_visible or zhaoxin_pmu_event_map)
+internal_create_group, kernfs_create_dir_ns
+kernfs_create_dir_ns, kernfs_add_one
+kernfs_add_one, kernfs_activate
+kernfs_add_one, kernfs_link_sibling
+internal_create_group, kobject_get_ownership
+kobject_get_ownership, (no path to device_get_ownership)
+device_get_ownership, (no path to net_get_ownership)
+kobject_get_ownership, (no path to kset_get_ownership)
+kobject_get_ownership, (no path to netdev_queue_get_ownership)
+kobject_get_ownership, (no path to rx_queue_get_ownership)
+rx_queue_get_ownership, net_ns_get_ownership
+internal_create_group, (no source for internal_create_group or lbr_is_visible)
+internal_create_group, (no source for internal_create_group or not_visible)
+internal_create_group, (no path to nvmem_bin_attr_is_visible)
+internal_create_group, (no path to pci_bridge_attrs_are_visible)
+internal_create_group, (no path to pci_dev_attrs_are_visible)
+internal_create_group, (no path to pci_dev_config_attr_is_visible)
+internal_create_group, (no path to pci_dev_hp_attrs_are_visible)
+internal_create_group, (no path to pci_dev_reset_attr_is_visible)
+pci_dev_reset_attr_is_visible, pci_reset_supported
+internal_create_group, (no path to pci_dev_reset_method_attr_is_visible)
+internal_create_group, (no path to pci_dev_rom_attr_is_visible)
+internal_create_group, (no path to pcie_dev_attrs_are_visible)
+internal_create_group, (no source for internal_create_group or pebs_is_visible)
+internal_create_group, (no path to platform_dev_attrs_visible)
+internal_create_group, (no path to power_supply_attr_is_visible)
+internal_create_group, (no path to ptp_is_attribute_visible)
+internal_create_group, (no path to queue_attr_visible)
+internal_create_group, (no path to resource_resize_is_visible)
+resource_resize_is_visible, pci_rebar_get_current_size
+internal_create_group, (no path to rtc_attr_is_visible)
+internal_create_group, (no path to scsi_sdev_attr_is_visible)
+internal_create_group, (no path to scsi_sdev_bin_attr_is_visible)
+internal_create_group, (no source for internal_create_group or skx_iio_mapping_visible)
+internal_create_group, (no path to smbios_attr_is_visible)
+smbios_attr_is_visible, (no path to acpi_check_dsm)
+smbios_attr_is_visible, (no path to dmi_find_device)
+internal_create_group, (no source for internal_create_group or snr_iio_mapping_visible)
+internal_create_group, (no path to sysfs_add_bin_file_mode_ns)
+internal_create_group, (no path to sysfs_add_file_mode_ns)
+sysfs_add_file_mode_ns, __kernfs_create_file
+internal_create_group, sysfs_warn_dup
+sysfs_warn_dup, (no path to kernfs_path_from_node)
+kernfs_path_from_node, (no path to strlcpy)
+internal_create_group, (no path to target_attribute_is_visible)
+target_attribute_is_visible, (no path to scsi_is_host_device)
+internal_create_group, (no path to topology_is_visible)
+internal_create_group, (no path to trackpoint_is_attr_visible)
+internal_create_group, (no source for internal_create_group or tsx_is_visible)
+internal_create_group, (no path to virtblk_attrs_are_visible)
+internal_create_group, (no path to vpd_attr_is_visible)
+internal_create_group, (no source for internal_create_group or zen4_ibs_extensions_is_visible)
+netdev_queue_update_kobjects, (no source for netdev_queue_update_kobjects or sysfs_remove_group)
+sysfs_remove_group, kernfs_remove
+netdev_unregister_kobject, pm_runtime_set_memalloc_noio
+unregister_netdevice_many, (no path to netif_reset_xps_queues)
+netif_reset_xps_queues, clean_xps_maps
+unregister_netdevice_many, rtmsg_ifinfo_build_skb
+rtmsg_ifinfo_build_skb, if_nlmsg_size
+if_nlmsg_size, (no path to inet6_get_link_af_size)
+if_nlmsg_size, (no path to inet_get_link_af_size)
+if_nlmsg_size, (no path to ipip6_get_size)
+rtmsg_ifinfo_build_skb, rtnl_fill_ifinfo
+rtnl_fill_ifinfo, dev_get_flags
+rtnl_fill_ifinfo, (no path to dev_get_iflink)
+dev_get_iflink, (no path to ip_tunnel_get_iflink)
+dev_get_iflink, (no path to reg_vif_get_iflink)
+rtnl_fill_ifinfo, (no path to dev_get_phys_port_id)
+rtnl_fill_ifinfo, (no path to dev_get_phys_port_name)
+dev_get_phys_port_name, (no path to virtnet_get_phys_port_name)
+rtnl_fill_ifinfo, (no path to dev_get_port_parent_id)
+rtnl_fill_ifinfo, (no path to dev_xdp_prog_id)
+rtnl_fill_ifinfo, (no path to inet6_fill_link_af)
+inet6_fill_link_af, inet6_fill_ifla6_attrs
+rtnl_fill_ifinfo, (no path to inet_fill_link_af)
+rtnl_fill_ifinfo, (no path to ip_tunnel_get_link_net)
+rtnl_fill_ifinfo, (no path to ipip6_fill_info)
+rtnl_fill_ifinfo, memchr_inv
+rtnl_fill_ifinfo, (no path to netdev_master_upper_dev_get)
+rtnl_fill_ifinfo, (no path to nla_put_64bit)
+rtnl_fill_ifinfo, nla_put_ifalias
+nla_put_ifalias, dev_get_alias
+rtnl_fill_ifinfo, (no path to pci_bus_num_vf)
+rtnl_fill_ifinfo, (no path to peernet2id_alloc)
+peernet2id_alloc, (no path to idr_alloc)
+idr_alloc, (no path to idr_get_free)
+idr_get_free, radix_tree_extend
+idr_get_free, (no source for idr_get_free or radix_tree_node_alloc)
+idr_alloc, (no path to radix_tree_iter_replace)
+radix_tree_iter_replace, __radix_tree_replace
+idr_alloc, (no path to radix_tree_iter_tag_clear)
+peernet2id_alloc, (no path to idr_for_each)
+idr_for_each, (no path to acpi_bus_table_handler)
+acpi_bus_table_handler, acpi_scan_table_notify
+acpi_bus_table_handler, acpi_sysfs_table_handler
+acpi_sysfs_table_handler, acpi_table_attr_init
+acpi_table_attr_init, strcat
+acpi_table_attr_init, sysfs_create_bin_file
+idr_for_each, (no path to destroy_config)
+idr_for_each, (no path to drm_gem_one_name_info)
+drm_gem_one_name_info, seq_printf
+idr_for_each, (no source for idr_for_each or drm_syncobj_release_handle)
+drm_syncobj_release_handle, (no source for drm_syncobj_release_handle or drm_syncobj_replace_fence)
+drm_syncobj_replace_fence, syncobj_wait_syncobj_func
+syncobj_wait_syncobj_func, dma_fence_chain_find_seqno
+syncobj_wait_syncobj_func, dma_fence_get_stub
+dma_fence_get_stub, (no path to __memcpy_cb)
+dma_fence_get_stub, (no path to dma_buf_poll_cb)
+dma_fence_get_stub, (no path to dma_fence_array_cb_func)
+dma_fence_get_stub, (no path to dma_fence_chain_cb)
+dma_fence_get_stub, (no source for dma_fence_get_stub or dma_fence_default_wait_cb)
+dma_fence_get_stub, (no path to dma_i915_sw_fence_wake)
+dma_fence_get_stub, (no path to duration)
+dma_fence_get_stub, (no path to fence_check_cb_func)
+dma_fence_get_stub, (no path to i915_active_noop)
+dma_fence_get_stub, (no source for dma_fence_get_stub or node_retire)
+dma_fence_get_stub, (no path to request_wait_wake)
+dma_fence_get_stub, (no path to syncobj_wait_fence_func)
+idr_for_each, (no path to idr_callback)
+idr_for_each, (no path to ieee80211_free_ack_frame)
+idr_for_each, (no path to net_eq_idr)
+idr_for_each, (no path to rtnl_net_dumpid_one)
+idr_for_each, (no source for idr_for_each or sg_idr_max_id)
+idr_for_each, (no path to shm_try_destroy_orphaned)
+shm_try_destroy_orphaned, shm_destroy
+shm_destroy, (no path to ipc_rmid)
+ipc_rmid, ipc_kht_remove
+peernet2id_alloc, rtnl_net_notifyid
+rtnl_net_notifyid, rtnl_net_fill
+rtnl_fill_ifinfo, rtnl_fill_stats
+rtnl_fill_stats, dev_get_stats
+dev_get_stats, (no path to dev_get_tstats64)
+dev_get_stats, (no path to e1000e_get_stats64)
+e1000e_get_stats64, e1000e_update_stats
+dev_get_stats, (no source for dev_get_stats or ieee80211_get_stats64)
+dev_get_stats, (no path to loopback_get_stats64)
+dev_get_stats, (no path to net_failover_get_stats)
+dev_get_stats, (no source for dev_get_stats or nv_get_stats64)
+nv_get_stats64, (no source for nv_get_stats64 or nv_update_stats)
+dev_get_stats, (no source for dev_get_stats or rtl8139_get_stats64)
+dev_get_stats, (no source for dev_get_stats or rtl8169_get_stats64)
+rtl8169_get_stats64, (no source for rtl8169_get_stats64 or dev_fetch_sw_netstats)
+rtl8169_get_stats64, (no source for rtl8169_get_stats64 or netdev_stats_to_stats64)
+rtl8169_get_stats64, (no source for rtl8169_get_stats64 or rtl8169_do_counters)
+dev_get_stats, (no path to sky2_get_stats)
+dev_get_stats, (no path to tg3_get_stats64)
+tg3_get_stats64, tg3_get_nstats
+tg3_get_nstats, (no path to __tg3_readphy)
+tg3_get_nstats, (no path to __tg3_writephy)
+dev_get_stats, (no path to virtnet_stats)
+rtnl_fill_stats, nla_reserve_64bit
+rtnl_fill_ifinfo, rtnl_fill_vf
+rtnl_fill_vf, rtnl_fill_vfinfo
+unregister_netdevice_many, rtmsg_ifinfo_send
+unregister_netdevice_many, (no path to virtnet_xdp)
+virtnet_xdp, (no path to __napi_schedule)
+virtnet_xdp, (no source for virtnet_xdp or _dev_warn)
+virtnet_xdp, (no path to _virtnet_set_queues)
+virtnet_xdp, (no path to napi_disable)
+napi_disable, (no path to usleep_range_state)
+usleep_range_state, schedule_hrtimeout_range
+virtnet_xdp, (no path to napi_enable)
+virtnet_xdp, (no path to napi_schedule_prep)
+virtnet_xdp, (no path to netdev_printk)
+virtnet_xdp, (no source for virtnet_xdp or netdev_warn)
+netdev_warn, (no source for netdev_warn or __netdev_printk)
+virtnet_xdp, (no path to netif_set_real_num_rx_queues)
+virtnet_xdp, (no path to sg_init_one)
+virtnet_xdp, (no path to synchronize_net)
+virtnet_xdp, (no path to virtio_check_driver_offered_feature)
+virtnet_xdp, (no path to virtnet_send_command)
+virtnet_send_command, virtqueue_add_sgs
+virtqueue_add_sgs, sg_next
+virtqueue_add_sgs, virtqueue_add
+virtqueue_add, (no path to dma_map_page_attrs)
+dma_map_page_attrs, (no path to dma_dummy_map_page)
+dma_map_page_attrs, (no path to iommu_dma_map_page)
+iommu_dma_map_page, __iommu_dma_map
+__iommu_dma_map, (no source for __iommu_dma_map or free_iova_fast)
+free_iova_fast, (no source for free_iova_fast or free_iova)
+free_iova_fast, (no source for free_iova_fast or iova_magazine_free_pfns)
+iova_magazine_free_pfns, (no source for iova_magazine_free_pfns or free_iova_mem)
+iova_magazine_free_pfns, (no source for iova_magazine_free_pfns or private_find_iova)
+iova_magazine_free_pfns, (no source for iova_magazine_free_pfns or remove_iova)
+__iommu_dma_map, iommu_deferred_attach
+iommu_deferred_attach, (no path to amd_iommu_attach_device)
+amd_iommu_attach_device, (no path to acpi_dev_hid_uid_match)
+acpi_dev_hid_uid_match, acpi_device_hid
+amd_iommu_attach_device, detach_device
+detach_device, do_detach
+do_detach, (no path to amd_iommu_apply_erratum_63)
+amd_iommu_apply_erratum_63, (no path to get_dev_table)
+amd_iommu_attach_device, detach_device, do_detach, device_flush_dte
+amd_iommu_attach_device, (no path to pci_ats_queue_depth)
+amd_iommu_attach_device, (no path to pci_disable_pasid)
+amd_iommu_attach_device, (no path to pci_disable_pri)
+amd_iommu_attach_device, (no path to pci_enable_ats)
+amd_iommu_attach_device, (no path to pci_enable_pasid)
+amd_iommu_attach_device, (no path to pci_enable_pri)
+amd_iommu_attach_device, (no path to pci_prg_resp_pasid_required)
+amd_iommu_attach_device, (no path to pci_reset_pri)
+amd_iommu_attach_device, (no path to set_dte_entry)
+iommu_deferred_attach, (no path to amd_iommu_is_attach_deferred)
+iommu_deferred_attach, (no path to intel_iommu_attach_device)
+intel_iommu_attach_device, (no path to __xa_cmpxchg)
+__xa_cmpxchg, __xas_nomem
+intel_iommu_attach_device, (no path to _find_first_zero_bit)
+intel_iommu_attach_device, (no path to device_to_iommu)
+device_to_iommu, (no source for device_to_iommu or dmar_find_matched_drhd_unit)
+intel_iommu_attach_device, dmar_remove_one_dev_info
+dmar_remove_one_dev_info, intel_pasid_free_table
+dmar_remove_one_dev_info, intel_pasid_tear_down_entry
+intel_pasid_tear_down_entry, (no path to qi_flush_dev_iotlb_pasid)
+dmar_remove_one_dev_info, (no path to pci_disable_ats)
+dmar_remove_one_dev_info, (no path to xa_erase)
+intel_iommu_attach_device, (no path to domain_context_mapping_one)
+domain_context_mapping_one, iommu_context_addr
+domain_context_mapping_one, (no path to pci_ats_page_aligned)
+intel_iommu_attach_device, (no path to domain_update_iommu_cap)
+intel_iommu_attach_device, (no path to intel_pasid_alloc_table)
+intel_pasid_alloc_table, pci_max_pasids
+intel_iommu_attach_device, dmar_remove_one_dev_info, intel_pasid_tear_down_entry, intel_pasid_get_entry, intel_pasid_get_table
+intel_iommu_attach_device, (no path to intel_pasid_setup_first_level)
+intel_iommu_attach_device, (no path to intel_pasid_setup_pass_through)
+intel_iommu_attach_device, (no path to intel_pasid_setup_second_level)
+intel_pasid_setup_second_level, intel_pasid_get_entry
+intel_pasid_get_entry, alloc_pgtable_page
+intel_pasid_get_entry, free_pgtable_page
+intel_iommu_attach_device, (no path to pci_for_each_dma_alias)
+pci_for_each_dma_alias, (no path to clone_alias)
+pci_for_each_dma_alias, (no path to device_flush_dte_alias)
+pci_for_each_dma_alias, (no path to domain_context_clear_one_cb)
+domain_context_clear_one_cb, (no path to qi_flush_pasid_cache)
+pci_for_each_dma_alias, (no path to domain_context_mapped_cb)
+pci_for_each_dma_alias, (no path to domain_context_mapping_cb)
+pci_for_each_dma_alias, (no path to get_msi_id_cb)
+pci_for_each_dma_alias, (no path to get_pci_alias_or_group)
+iommu_deferred_attach, (no path to intel_iommu_is_attach_deferred)
+__iommu_dma_map, iommu_dma_alloc_iova
+iommu_dma_alloc_iova, (no source for iommu_dma_alloc_iova or alloc_iova_fast)
+alloc_iova_fast, (no source for alloc_iova_fast or alloc_iova)
+alloc_iova, (no source for alloc_iova or rb_prev)
+alloc_iova_fast, (no source for alloc_iova_fast or free_cpu_cached_iovas)
+__iommu_dma_map, iommu_map_atomic
+iommu_map_atomic, (no path to __iommu_map)
+__iommu_map, (no path to amd_iommu_map_pages)
+amd_iommu_map_pages, (no path to iommu_v1_map_pages)
+iommu_v1_map_pages, amd_iommu_domain_flush_complete
+iommu_v1_map_pages, amd_iommu_domain_flush_tlb_pde
+iommu_v1_map_pages, (no path to amd_iommu_update_and_flush_device_table)
+iommu_v1_map_pages, (no path to free_pt_lvl)
+amd_iommu_map_pages, (no path to iommu_v2_map_pages)
+iommu_v2_map_pages, amd_iommu_flush_page
+iommu_v2_map_pages, amd_iommu_flush_tlb
+amd_iommu_flush_tlb, (no path to __flush_pasid)
+iommu_v2_map_pages, (no path to free_pgtable)
+__iommu_map, (no path to intel_iommu_map_pages)
+intel_iommu_map_pages, (no source for intel_iommu_map_pages or __domain_mapping)
+__domain_mapping, (no source for __domain_mapping or dma_pte_clear_range)
+__domain_mapping, (no source for __domain_mapping or dma_pte_free_level)
+iommu_map_atomic, (no path to amd_iommu_iotlb_sync_map)
+iommu_map_atomic, (no path to intel_iommu_iotlb_sync_map)
+intel_iommu_iotlb_sync_map, (no path to iommu_flush_write_buffer)
+dma_map_page_attrs, (no path to is_swiotlb_active)
+dma_map_page_attrs, (no path to swiotlb_map)
+swiotlb_map, swiotlb_tbl_map_single
+virtqueue_add, (no path to dma_unmap_page_attrs)
+dma_unmap_page_attrs, (no path to iommu_dma_unmap_page)
+iommu_dma_unmap_page, __iommu_dma_unmap
+__iommu_dma_unmap, (no path to amd_iommu_iotlb_sync)
+amd_iommu_iotlb_sync, (no path to __domain_flush_pages)
+__domain_flush_pages, iommu_queue_command
+__domain_flush_pages, (no path to rlookup_amd_iommu)
+amd_iommu_iotlb_sync, amd_iommu_domain_flush_complete, amd_iommu_get_num_iommus
+amd_iommu_iotlb_sync, amd_iommu_domain_flush_complete, iommu_completion_wait
+__iommu_dma_unmap, (no path to intel_iommu_tlb_sync)
+intel_iommu_tlb_sync, iommu_flush_iotlb_psi
+__iommu_dma_unmap, iommu_dma_free_iova
+iommu_dma_free_iova, (no path to amd_iommu_flush_iotlb_all)
+iommu_dma_free_iova, (no path to intel_flush_iotlb_all)
+intel_flush_iotlb_all, (no path to qi_flush_dev_iotlb)
+intel_flush_iotlb_all, qi_flush_piotlb
+qi_flush_piotlb, qi_submit_sync
+intel_flush_iotlb_all, (no path to xa_load)
+iommu_dma_free_iova, (no path to put_pages_list)
+__iommu_dma_unmap, iommu_unmap_fast
+iommu_unmap_fast, __iommu_unmap
+__iommu_unmap, (no path to amd_iommu_unmap_pages)
+amd_iommu_unmap_pages, (no path to iommu_v1_unmap_pages)
+amd_iommu_unmap_pages, (no path to iommu_v2_unmap_pages)
+__iommu_unmap, (no path to intel_iommu_unmap_pages)
+intel_iommu_unmap_pages, (no path to domain_unmap)
+domain_unmap, dma_pte_clear_level
+dma_pte_clear_level, dma_pte_list_pagetables
+iommu_dma_unmap_page, iommu_get_dma_domain
+iommu_dma_unmap_page, iommu_iova_to_phys
+iommu_iova_to_phys, (no path to amd_iommu_iova_to_phys)
+amd_iommu_iova_to_phys, (no path to iommu_v1_iova_to_phys)
+iommu_v1_iova_to_phys, fetch_pte
+amd_iommu_iova_to_phys, (no path to iommu_v2_iova_to_phys)
+iommu_iova_to_phys, (no path to intel_iommu_iova_to_phys)
+intel_iommu_iova_to_phys, pfn_to_dma_pte
+pfn_to_dma_pte, (no path to clflush_cache_range)
+dma_unmap_page_attrs, (no path to swiotlb_sync_single_for_cpu)
+dma_unmap_page_attrs, (no path to swiotlb_tbl_unmap_single)
+swiotlb_tbl_unmap_single, swiotlb_bounce
+virtqueue_add, (no path to virtqueue_notify)
+virtqueue_add, (no path to vring_map_single)
+virtnet_send_command, virtqueue_get_buf
+virtqueue_get_buf, virtqueue_get_buf_ctx
+virtqueue_get_buf_ctx, (no path to detach_buf_packed)
+virtqueue_get_buf_ctx, (no path to detach_buf_split)
+virtnet_send_command, virtqueue_is_broken
+virtnet_send_command, virtqueue_kick
+virtqueue_kick, (no path to virtqueue_enable_cb)
+virtqueue_kick, (no path to virtqueue_enable_cb_delayed)
+virtqueue_kick, virtqueue_kick_prepare
+virtqueue_kick, (no path to vp_notify)
+vp_notify, iowrite16
+virtnet_xdp, (no path to virtqueue_disable_cb)
+mroute_clean_tables, vif_delete
+vif_delete, dev_set_allmulti
+dev_set_allmulti, __dev_set_allmulti
+__dev_set_allmulti, dev_set_rx_mode
+dev_set_rx_mode, (no path to e1000_set_rx_mode)
+e1000_set_rx_mode, (no path to e1000_clean_rx_ring)
+e1000_set_rx_mode, e1000_hash_mc_addr
+e1000_set_rx_mode, e1000_leave_82542_rst
+e1000_leave_82542_rst, e1000_configure_rx
+e1000_leave_82542_rst, (no source for e1000_leave_82542_rst or netdev_err)
+e1000_leave_82542_rst, (no path to pci_set_mwi)
+pci_set_mwi, (no path to pci_read_config_byte)
+pci_read_config_byte, (no source for pci_read_config_byte or pci_bus_read_config_byte)
+pci_set_mwi, (no path to pci_write_config_byte)
+pci_write_config_byte, (no source for pci_write_config_byte or pci_bus_write_config_byte)
+e1000_set_rx_mode, e1000_rar_set
+e1000_set_rx_mode, (no path to pci_clear_mwi)
+dev_set_rx_mode, (no path to e1000e_set_rx_mode)
+e1000e_set_rx_mode, (no path to e1000_acquire_nvm_80003es2lan)
+e1000e_set_rx_mode, (no path to e1000_acquire_nvm_82571)
+e1000_acquire_nvm_82571, e1000e_acquire_nvm
+e1000e_set_rx_mode, (no path to e1000_acquire_nvm_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_acquire_phy_80003es2lan)
+e1000e_set_rx_mode, (no path to e1000_acquire_swflag_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_cfg_on_link_up_80003es2lan)
+e1000e_set_rx_mode, (no path to e1000_check_for_copper_link_ich8lan)
+e1000_check_for_copper_link_ich8lan, (no path to e1000_get_link_up_info_80003es2lan)
+e1000_get_link_up_info_80003es2lan, e1000e_get_speed_and_duplex_fiber_serdes
+e1000_check_for_copper_link_ich8lan, (no path to e1000_get_link_up_info_ich8lan)
+e1000_check_for_copper_link_ich8lan, e1000_k1_gig_workaround_hv
+e1000_k1_gig_workaround_hv, e1000_configure_k1_ich8lan
+e1000_check_for_copper_link_ich8lan, e1000_link_stall_workaround_hv
+e1000_check_for_copper_link_ich8lan, e1000_set_eee_pchlan
+e1000_check_for_copper_link_ich8lan, e1000e_check_downshift
+e1000_check_for_copper_link_ich8lan, e1000e_config_fc_after_link_up
+e1000_check_for_copper_link_ich8lan, e1000e_get_speed_and_duplex_copper
+e1000e_set_rx_mode, (no path to e1000_check_polarity_igp)
+e1000e_set_rx_mode, (no path to e1000_check_polarity_m88)
+e1000e_set_rx_mode, (no path to e1000_cleanup_led_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_cleanup_led_pchlan)
+e1000e_set_rx_mode, (no path to e1000_get_bus_info_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_get_cable_length_80003es2lan)
+e1000e_set_rx_mode, (no path to e1000_get_cfg_done_80003es2lan)
+e1000e_set_rx_mode, (no path to e1000_get_cfg_done_82571)
+e1000e_set_rx_mode, (no path to e1000_get_cfg_done_ich8lan)
+e1000_get_cfg_done_ich8lan, e1000e_phy_init_script_igp3
+e1000e_set_rx_mode, (no path to e1000_get_hw_semaphore_82571)
+e1000e_set_rx_mode, (no path to e1000_id_led_init_pchlan)
+e1000e_set_rx_mode, (no path to e1000_init_hw_80003es2lan)
+e1000_init_hw_80003es2lan, e1000_clear_hw_cntrs_80003es2lan
+e1000_init_hw_80003es2lan, (no path to e1000_clear_vfta_82571)
+e1000_init_hw_80003es2lan, (no path to e1000_clear_vfta_generic)
+e1000e_set_rx_mode, (no path to e1000_init_hw_ich8lan)
+e1000_init_hw_ich8lan, e1000_clear_hw_cntrs_ich8lan
+e1000_clear_hw_cntrs_ich8lan, (no path to e1000_read_phy_reg_page_hv)
+e1000_clear_hw_cntrs_ich8lan, (no path to e1000_set_page_igp)
+e1000_clear_hw_cntrs_ich8lan, e1000e_clear_hw_cntrs_base
+e1000_init_hw_ich8lan, (no path to e1000_setup_link_82571)
+e1000_init_hw_ich8lan, e1000e_init_rx_addrs
+e1000_init_hw_ich8lan, e1000e_set_pcie_no_snoop
+e1000e_set_rx_mode, (no path to e1000_led_off_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_led_off_pchlan)
+e1000e_set_rx_mode, (no path to e1000_led_on_82574)
+e1000e_set_rx_mode, (no path to e1000_led_on_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_led_on_pchlan)
+e1000e_set_rx_mode, (no path to e1000_phy_force_speed_duplex_80003es2lan)
+e1000_phy_force_speed_duplex_80003es2lan, e1000e_phy_force_speed_duplex_setup
+e1000_phy_force_speed_duplex_80003es2lan, e1000e_phy_has_link_generic
+e1000_phy_force_speed_duplex_80003es2lan, e1000e_phy_reset_dsp
+e1000e_set_rx_mode, (no path to e1000_phy_hw_reset_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_rar_get_count_pch_lpt)
+e1000e_set_rx_mode, (no path to e1000_rar_set_pch2lan)
+e1000e_set_rx_mode, (no path to e1000_rar_set_pch_lpt)
+e1000e_set_rx_mode, (no path to e1000_read_mac_addr_80003es2lan)
+e1000_read_mac_addr_80003es2lan, e1000_read_mac_addr_generic
+e1000e_set_rx_mode, (no path to e1000_reset_hw_80003es2lan)
+e1000_reset_hw_80003es2lan, e1000_check_alt_mac_addr_generic
+e1000_reset_hw_80003es2lan, e1000e_get_auto_rd_done
+e1000_reset_hw_80003es2lan, (no path to e1000e_get_hw_semaphore)
+e1000_reset_hw_80003es2lan, (no path to e1000e_put_hw_semaphore)
+e1000e_set_rx_mode, (no path to e1000_reset_hw_ich8lan)
+e1000_reset_hw_ich8lan, e1000_post_phy_reset_ich8lan
+e1000_post_phy_reset_ich8lan, e1000_oem_bits_config_ich8lan
+e1000_reset_hw_ich8lan, e1000e_disable_pcie_master
+e1000e_set_rx_mode, (no path to e1000_setup_copper_link_ich8lan)
+e1000_setup_copper_link_ich8lan, e1000e_copper_link_setup_igp
+e1000e_copper_link_setup_igp, (no path to e1000_set_d0_lplu_state_82571)
+e1000e_copper_link_setup_igp, (no path to e1000_set_d0_lplu_state_82574)
+e1000e_copper_link_setup_igp, (no path to e1000_set_d0_lplu_state_ich8lan)
+e1000e_copper_link_setup_igp, (no path to e1000_set_lplu_state_pchlan)
+e1000_setup_copper_link_ich8lan, e1000e_copper_link_setup_m88
+e1000_setup_copper_link_ich8lan, e1000e_read_kmrn_reg
+e1000_setup_copper_link_ich8lan, e1000e_write_kmrn_reg
+e1000e_set_rx_mode, (no path to e1000_setup_copper_link_pch_lpt)
+e1000_setup_copper_link_pch_lpt, e1000_copper_link_setup_82577
+e1000_setup_copper_link_pch_lpt, e1000e_setup_copper_link
+e1000e_set_rx_mode, (no path to e1000_setup_led_pchlan)
+e1000e_set_rx_mode, (no path to e1000_setup_link_ich8lan)
+e1000_setup_link_ich8lan, e1000e_set_fc_watermarks
+e1000e_set_rx_mode, (no path to e1000_update_nvm_checksum_82571)
+e1000e_set_rx_mode, (no path to e1000_update_nvm_checksum_ich8lan)
+e1000_update_nvm_checksum_ich8lan, (no path to e1000_read_flash_data_ich8lan)
+e1000_update_nvm_checksum_ich8lan, (no path to e1000_write_flash_byte_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_update_nvm_checksum_spt)
+e1000_update_nvm_checksum_spt, e1000_erase_flash_bank_ich8lan
+e1000_update_nvm_checksum_spt, e1000_read_flash_dword_ich8lan
+e1000_update_nvm_checksum_spt, (no path to e1000_release_nvm_80003es2lan)
+e1000_update_nvm_checksum_spt, (no path to e1000_release_nvm_82571)
+e1000_release_nvm_82571, e1000e_release_nvm
+e1000_update_nvm_checksum_spt, (no path to e1000_release_nvm_ich8lan)
+e1000_update_nvm_checksum_spt, e1000_valid_nvm_bank_detect_ich8lan
+e1000_update_nvm_checksum_spt, (no path to e1000_write_flash_data32_ich8lan)
+e1000_write_flash_data32_ich8lan, e1000_flash_cycle_init_ich8lan
+e1000_update_nvm_checksum_spt, (no path to e1000e_reload_nvm_generic)
+e1000e_set_rx_mode, (no path to e1000_validate_nvm_checksum_82571)
+e1000e_set_rx_mode, (no path to e1000_validate_nvm_checksum_ich8lan)
+e1000e_set_rx_mode, (no path to e1000_write_vfta_generic)
+e1000e_set_rx_mode, (no path to e1000e_blink_led_generic)
+e1000e_set_rx_mode, (no path to e1000e_cleanup_led_generic)
+e1000e_set_rx_mode, (no path to e1000e_get_bus_info_pcie)
+e1000e_get_bus_info_pcie, (no path to e1000_set_lan_id_multi_port_pcie)
+e1000e_get_bus_info_pcie, (no path to e1000_set_lan_id_single_port)
+e1000e_set_rx_mode, (no path to e1000e_get_cable_length_igp_2)
+e1000e_set_rx_mode, (no path to e1000e_get_cable_length_m88)
+e1000e_set_rx_mode, (no path to e1000e_get_cfg_done_generic)
+e1000e_set_rx_mode, (no path to e1000e_get_phy_info_igp)
+e1000e_set_rx_mode, (no path to e1000e_get_phy_info_m88)
+e1000e_set_rx_mode, (no path to e1000e_id_led_init_generic)
+e1000e_id_led_init_generic, (no path to e1000_valid_led_default_82571)
+e1000e_id_led_init_generic, (no path to e1000_valid_led_default_ich8lan)
+e1000e_id_led_init_generic, (no path to e1000e_valid_led_default)
+e1000e_set_rx_mode, (no path to e1000e_led_off_generic)
+e1000e_set_rx_mode, (no path to e1000e_led_on_generic)
+e1000e_set_rx_mode, (no path to e1000e_phy_force_speed_duplex_igp)
+e1000e_phy_force_speed_duplex_igp, (no path to e1000_read_phy_reg_hv)
+e1000_read_phy_reg_hv, __e1000_read_phy_reg_hv
+e1000e_phy_force_speed_duplex_igp, (no path to e1000_write_phy_reg_hv)
+e1000_write_phy_reg_hv, __e1000_write_phy_reg_hv
+e1000e_phy_force_speed_duplex_igp, (no path to e1000e_read_phy_reg_bm)
+e1000e_phy_force_speed_duplex_igp, (no path to e1000e_read_phy_reg_bm2)
+e1000e_phy_force_speed_duplex_igp, (no path to e1000e_read_phy_reg_m88)
+e1000e_set_rx_mode, (no path to e1000e_phy_force_speed_duplex_m88)
+e1000e_phy_force_speed_duplex_m88, (no path to e1000e_config_collision_dist_generic)
+e1000e_set_rx_mode, (no path to e1000e_phy_hw_reset_generic)
+e1000e_phy_hw_reset_generic, (no path to __udelay)
+e1000e_phy_hw_reset_generic, (no path to e1000_check_polarity_82577)
+e1000e_phy_hw_reset_generic, (no path to e1000_get_cable_length_82577)
+e1000e_phy_hw_reset_generic, (no path to e1000_get_hw_semaphore_82574)
+e1000_get_hw_semaphore_82574, e1000_get_hw_semaphore_82573
+e1000e_phy_hw_reset_generic, (no path to e1000_get_phy_info_82577)
+e1000e_phy_hw_reset_generic, (no path to e1000_phy_force_speed_duplex_82577)
+e1000e_phy_hw_reset_generic, (no path to e1000_put_hw_semaphore_82571)
+e1000e_phy_hw_reset_generic, (no path to e1000_put_hw_semaphore_82574)
+e1000e_phy_hw_reset_generic, (no path to e1000_release_phy_80003es2lan)
+e1000e_phy_hw_reset_generic, (no path to e1000_release_swflag_ich8lan)
+e1000e_set_rx_mode, (no path to e1000e_phy_sw_reset)
+e1000e_phy_sw_reset, (no path to e1000_read_phy_reg_gg82563_80003es2lan)
+e1000e_phy_sw_reset, (no path to e1000_write_phy_reg_gg82563_80003es2lan)
+e1000_write_phy_reg_gg82563_80003es2lan, e1000e_read_phy_reg_mdic
+e1000_write_phy_reg_gg82563_80003es2lan, e1000e_write_phy_reg_mdic
+e1000e_phy_sw_reset, (no path to e1000e_read_phy_reg_igp)
+e1000e_phy_sw_reset, (no path to e1000e_write_phy_reg_bm)
+e1000e_phy_sw_reset, (no path to e1000e_write_phy_reg_bm2)
+e1000e_write_phy_reg_bm2, e1000_access_phy_wakeup_reg_bm
+e1000_access_phy_wakeup_reg_bm, e1000_disable_phy_wakeup_reg_access_bm
+e1000_access_phy_wakeup_reg_bm, e1000_enable_phy_wakeup_reg_access_bm
+e1000e_phy_sw_reset, (no path to e1000e_write_phy_reg_igp)
+e1000e_phy_sw_reset, (no path to e1000e_write_phy_reg_m88)
+e1000e_set_rx_mode, (no path to e1000e_rar_get_count_generic)
+e1000e_set_rx_mode, (no path to e1000e_rar_set_generic)
+e1000e_set_rx_mode, (no path to e1000e_release_hw_control)
+e1000e_set_rx_mode, (no path to e1000e_setup_led_generic)
+e1000e_set_rx_mode, (no path to e1000e_setup_link_generic)
+e1000e_set_rx_mode, (no path to e1000e_update_mc_addr_list_generic)
+e1000e_update_mc_addr_list_generic, (no path to __ew32)
+e1000e_set_rx_mode, (no path to e1000e_update_nvm_checksum_generic)
+e1000e_update_nvm_checksum_generic, (no path to e1000_write_nvm_80003es2lan)
+e1000e_update_nvm_checksum_generic, (no path to e1000_write_nvm_82571)
+e1000_write_nvm_82571, (no path to e1000e_poll_eerd_eewr_done)
+e1000_write_nvm_82571, e1000e_write_nvm_spi
+e1000e_write_nvm_spi, e1000_shift_out_eec_bits
+e1000e_update_nvm_checksum_generic, (no path to e1000_write_nvm_ich8lan)
+e1000e_set_rx_mode, (no path to e1000e_validate_nvm_checksum_generic)
+e1000e_validate_nvm_checksum_generic, (no path to e1000_read_nvm_ich8lan)
+e1000e_validate_nvm_checksum_generic, (no path to e1000_read_nvm_spt)
+e1000e_validate_nvm_checksum_generic, (no path to e1000e_read_nvm_eerd)
+dev_set_rx_mode, (no path to e100_set_multicast_list)
+e100_set_multicast_list, e100_exec_cb
+e100_exec_cb, (no path to e100_configure)
+e100_exec_cb, e100_exec_cmd
+e100_exec_cmd, ioread8
+e100_exec_cmd, iowrite8
+e100_exec_cb, (no path to e100_multi)
+e100_exec_cb, (no path to e100_setup_ucode)
+e100_exec_cb, (no path to e100_xmit_prepare)
+e100_xmit_prepare, (no path to skb_tstamp_tx)
+skb_tstamp_tx, __skb_tstamp_tx
+__skb_tstamp_tx, (no path to file_ns_capable)
+__skb_tstamp_tx, tcp_get_timestamping_opt_stats
+dev_set_rx_mode, (no path to ieee80211_set_multicast_list)
+ieee80211_set_multicast_list, __hw_addr_sync
+__hw_addr_sync, (no path to __hw_addr_add_ex)
+ieee80211_set_multicast_list, ieee80211_queue_work
+dev_set_rx_mode, (no path to net_failover_set_rx_mode)
+net_failover_set_rx_mode, dev_mc_sync_multiple
+net_failover_set_rx_mode, dev_uc_sync_multiple
+dev_uc_sync_multiple, __hw_addr_sync_multiple
+dev_set_rx_mode, (no path to nv_set_multicast)
+nv_set_multicast, (no source for nv_set_multicast or netdev_info)
+dev_set_rx_mode, (no path to rtl8139_set_rx_mode)
+rtl8139_set_rx_mode, (no path to ioread32)
+rtl8139_set_rx_mode, (no path to iowrite32)
+dev_set_rx_mode, (no path to rtl_set_rx_mode)
+dev_set_rx_mode, (no path to sky2_set_multicast)
+dev_set_rx_mode, (no path to tg3_set_rx_mode)
+tg3_set_rx_mode, __tg3_set_rx_mode
+__tg3_set_rx_mode, (no path to tg3_write32)
+__tg3_set_rx_mode, (no path to tg3_write32_mbox_5906)
+__tg3_set_rx_mode, (no path to tg3_write32_tx_mbox)
+__tg3_set_rx_mode, (no path to tg3_write_flush_reg32)
+__tg3_set_rx_mode, (no path to tg3_write_indirect_mbox)
+__tg3_set_rx_mode, (no path to tg3_write_indirect_reg32)
+__tg3_set_rx_mode, (no path to tg3_write_mem)
+tg3_write_mem, (no path to tg3_read32)
+tg3_write_mem, (no path to tg3_read_indirect_reg32)
+dev_set_rx_mode, (no path to virtnet_set_rx_mode)
+virtnet_set_rx_mode, sg_init_table
+vif_delete, ip_rt_multicast_event
+vif_delete, unregister_netdevice_queue
+xs_data_ready, (no source for xs_data_ready or netlink_kernel_release)
+xs_data_ready, (no path to netlink_sock_destruct)
+netlink_sock_destruct, (no path to ctnetlink_done)
+netlink_sock_destruct, (no path to ctnetlink_done_list)
+ctnetlink_done_list, (no path to nf_ct_destroy)
+nf_ct_destroy, nf_conntrack_free
+nf_conntrack_free, (no path to nf_nat_cleanup_conntrack)
+nf_nat_cleanup_conntrack, (no source for nf_nat_cleanup_conntrack or hash_by_src)
+nf_ct_destroy, nf_ct_remove_expectations
+nf_ct_remove_expectations, (no path to __nf_ct_ext_find)
+nf_ct_remove_expectations, (no path to nf_ct_unlink_expect_report)
+netlink_sock_destruct, (no path to ctnetlink_exp_done)
+ctnetlink_exp_done, nf_ct_expect_put
+netlink_sock_destruct, (no path to ctnetlink_start)
+ctnetlink_start, (no source for ctnetlink_start or ctnetlink_alloc_filter)
+ctnetlink_alloc_filter, (no source for ctnetlink_alloc_filter or ctnetlink_parse_tuple_filter)
+ctnetlink_parse_tuple_filter, (no source for ctnetlink_parse_tuple_filter or icmp_nlattr_to_tuple)
+ctnetlink_parse_tuple_filter, (no source for ctnetlink_parse_tuple_filter or icmpv6_nlattr_to_tuple)
+ctnetlink_parse_tuple_filter, (no source for ctnetlink_parse_tuple_filter or nf_ct_l4proto_find)
+ctnetlink_parse_tuple_filter, (no source for ctnetlink_parse_tuple_filter or nf_ct_port_nlattr_to_tuple)
+ctnetlink_parse_tuple_filter, (no source for ctnetlink_parse_tuple_filter or nla_memcpy)
+netlink_sock_destruct, (no path to ctrl_dumppolicy_done)
+netlink_sock_destruct, (no path to ctrl_dumppolicy_start)
+ctrl_dumppolicy_start, genl_get_cmd
+ctrl_dumppolicy_start, (no path to idr_get_next)
+idr_get_next, (no path to radix_tree_next_chunk)
+ctrl_dumppolicy_start, netlink_policy_dump_add_policy
+netlink_policy_dump_add_policy, (no path to krealloc)
+ctrl_dumppolicy_start, netlink_policy_dump_free
+ctrl_dumppolicy_start, (no path to strcmp)
+netlink_sock_destruct, (no path to ethnl_default_done)
+netlink_sock_destruct, (no path to ethnl_default_start)
+ethnl_default_start, (no path to eeprom_parse_request)
+ethnl_default_start, (no path to stats_parse_request)
+stats_parse_request, ethnl_update_bitset
+ethnl_update_bitset, ethnl_update_bitset32
+ethnl_update_bitset32, ethnl_compact_sanity_checks
+ethnl_update_bitset32, (no path to ethnl_parse_bit)
+ethnl_default_start, (no path to strset_parse_request)
+strset_parse_request, (no path to __nla_validate)
+netlink_sock_destruct, (no path to ethnl_tunnel_info_start)
+ethnl_tunnel_info_start, ethnl_parse_header_dev_get
+ethnl_parse_header_dev_get, dev_get_by_index
+ethnl_parse_header_dev_get, dev_get_by_name
+dev_get_by_name, (no path to full_name_hash)
+dev_get_by_name, (no path to strnlen)
+ethnl_parse_header_dev_get, strncmp
+netlink_sock_destruct, (no path to fib6_dump_done)
+netlink_sock_destruct, (no path to genl_parallel_done)
+netlink_sock_destruct, (no path to genl_start)
+genl_start, (no source for genl_start or genl_family_rcv_msg_attrs_parse)
+genl_family_rcv_msg_attrs_parse, (no source for genl_family_rcv_msg_attrs_parse or __nla_parse)
+__nla_parse, __nla_validate_parse
+__nla_validate_parse, (no path to memchr)
+__nla_validate_parse, (no path to nla_get_range_unsigned)
+__nla_validate_parse, (no path to nla_validate_array)
+__nla_validate_parse, (no path to validate_beacon_head)
+validate_beacon_head, ieee80211_hdrlen
+__nla_validate_parse, (no path to validate_he_capa)
+__nla_validate_parse, (no path to validate_ie_attr)
+netlink_sock_destruct, (no path to ioam6_genl_dumpns_done)
+netlink_sock_destruct, (no path to ioam6_genl_dumpns_start)
+netlink_sock_destruct, (no path to ioam6_genl_dumpsc_done)
+ioam6_genl_dumpsc_done, rhashtable_walk_exit
+netlink_sock_destruct, (no path to ioam6_genl_dumpsc_start)
+ioam6_genl_dumpsc_start, (no path to kmalloc_trace)
+ioam6_genl_dumpsc_start, rhashtable_walk_enter
+netlink_sock_destruct, module_put
+netlink_sock_destruct, (no path to nl80211_dump_wiphy_done)
+netlink_sock_destruct, (no path to seg6_genl_dumphmac_done)
+netlink_sock_destruct, (no path to seg6_genl_dumphmac_start)
+netlink_sock_destruct, (no path to xfrm_dump_policy_done)
+xfrm_dump_policy_done, xfrm_policy_walk_done
+netlink_sock_destruct, (no path to xfrm_dump_policy_start)
+xfrm_dump_policy_start, xfrm_policy_walk_init
+netlink_sock_destruct, (no path to xfrm_dump_sa_done)
+xfrm_dump_sa_done, xfrm_state_walk_done
+xs_data_ready, (no path to packet_sock_destruct)
+xs_data_ready, (no path to ping_unhash)
+xs_data_ready, (no path to ping_v6_destroy)
+xs_data_ready, (no path to queue_work_on)
+xs_data_ready, (no path to raw6_destroy)
+xs_data_ready, (no path to raw_destroy)
+xs_data_ready, (no path to raw_unhash_sk)
+xs_data_ready, (no path to reuseport_detach_sock)
+xs_data_ready, (no path to reuseport_has_conns_set)
+xs_data_ready, (no path to reuseport_stop_listen_sock)
+xs_data_ready, (no path to selinux_sk_free_security)
+selinux_sk_free_security, selinux_netlbl_sk_security_free
+selinux_netlbl_sk_security_free, (no path to __blk_mq_complete_request_remote)
+selinux_netlbl_sk_security_free, (no path to __cpa_flush_all)
+__cpa_flush_all, __flush_tlb_all
+selinux_netlbl_sk_security_free, (no path to __cpa_flush_tlb)
+__cpa_flush_tlb, flush_tlb_one_kernel
+selinux_netlbl_sk_security_free, (no path to __fix_erratum_688)
+selinux_netlbl_sk_security_free, (no path to __i915_request_ctor)
+__i915_request_ctor, (no path to __i915_sw_fence_init)
+__i915_request_ctor, i915_sched_node_init
+selinux_netlbl_sk_security_free, (no path to __profile_flip_buffers)
+selinux_netlbl_sk_security_free, (no path to __rdmsr_on_cpu)
+selinux_netlbl_sk_security_free, (no path to __rdmsr_safe_on_cpu)
+selinux_netlbl_sk_security_free, (no path to __rdmsr_safe_regs_on_cpu)
+selinux_netlbl_sk_security_free, (no path to __relay_set_buf_dentry)
+selinux_netlbl_sk_security_free, (no path to __symbol_put)
+__symbol_put, find_symbol
+find_symbol, (no path to bsearch)
+bsearch, (no path to acpi_bus_attach_private_data)
+acpi_bus_attach_private_data, (no source for acpi_bus_attach_private_data or acpi_attach_data)
+acpi_attach_data, (no source for acpi_attach_data or acpi_ns_attach_data)
+acpi_ns_attach_data, (no source for acpi_ns_attach_data or acpi_ut_create_internal_object_dbg)
+acpi_ut_create_internal_object_dbg, acpi_ut_allocate_object_desc_dbg
+acpi_ut_create_internal_object_dbg, acpi_ut_delete_object_desc
+acpi_ut_delete_object_desc, acpi_ut_get_descriptor_name
+bsearch, (no path to acpi_cst_latency_cmp)
+bsearch, (no path to acpi_fan_speed_cmp)
+bsearch, (no source for bsearch or acpi_video_cmp_level)
+bsearch, (no source for bsearch or cmp_acl_entry)
+bsearch, (no path to cmp_ex_search)
+bsearch, (no path to cmp_ex_sort)
+bsearch, (no path to cmp_name)
+bsearch, (no path to cmp_range)
+bsearch, (no path to cmppid)
+bsearch, (no path to compare_input_type)
+bsearch, (no path to compare_seq)
+bsearch, (no path to cpcompare)
+bsearch, (no path to drm_atomic_state_zpos_cmp)
+bsearch, (no path to drm_dp_dsc_sink_supported_input_bpcs)
+bsearch, (no path to drm_dp_get_pcon_max_frl_bw)
+bsearch, (no source for bsearch or drm_dp_subconnector_type)
+bsearch, (no path to ext4_getfsmap_dev_compare)
+bsearch, (no path to flat_acpi_madt_oem_check)
+bsearch, (no path to gid_cmp)
+bsearch, (no path to guc_mmio_reg_cmp)
+bsearch, (no path to jump_label_cmp)
+bsearch, (no path to keyring_detect_cycle_iterator)
+bsearch, (no path to keyring_diff_objects)
+bsearch, (no path to keyring_gc_check_iterator)
+bsearch, (no path to keyring_read_iterator)
+bsearch, (no path to keyring_search_iterator)
+keyring_search_iterator, (no path to asymmetric_key_cmp)
+keyring_search_iterator, (no path to asymmetric_key_cmp_name)
+keyring_search_iterator, (no path to asymmetric_key_cmp_partial)
+keyring_search_iterator, (no path to dns_resolver_cmp)
+keyring_search_iterator, (no path to key_default_cmp)
+keyring_search_iterator, key_task_permission
+key_task_permission, groups_search
+key_task_permission, security_key_permission
+security_key_permission, (no path to selinux_key_permission)
+keyring_search_iterator, (no path to lookup_user_key_possessed)
+bsearch, (no path to kstrtobool)
+bsearch, (no path to ncpus_cmp_func)
+bsearch, (no path to orc_sort_cmp)
+bsearch, (no path to physflat_acpi_madt_oem_check)
+bsearch, (no path to regcache_default_cmp)
+bsearch, (no path to static_call_site_cmp)
+bsearch, (no path to strcasecmp)
+bsearch, (no path to swp_entry_cmp)
+bsearch, (no path to ucs_cmp)
+selinux_netlbl_sk_security_free, (no path to __wbinvd)
+selinux_netlbl_sk_security_free, (no path to __wrmsr_on_cpu)
+selinux_netlbl_sk_security_free, (no path to __wrmsr_safe_on_cpu)
+selinux_netlbl_sk_security_free, (no path to __wrmsr_safe_regs_on_cpu)
+selinux_netlbl_sk_security_free, (no path to acpi_bus_detach_private_data)
+acpi_bus_detach_private_data, (no source for acpi_bus_detach_private_data or acpi_detach_data)
+acpi_detach_data, (no source for acpi_detach_data or acpi_ns_detach_data)
+acpi_ns_detach_data, (no source for acpi_ns_detach_data or acpi_ut_remove_reference)
+acpi_ut_remove_reference, acpi_ut_valid_internal_object
+acpi_detach_data, (no source for acpi_detach_data or acpi_ns_validate_handle)
+selinux_netlbl_sk_security_free, (no path to acpi_ev_asynch_enable_gpe)
+acpi_ev_asynch_enable_gpe, acpi_ev_finish_gpe
+acpi_ev_finish_gpe, acpi_hw_clear_gpe
+acpi_ev_finish_gpe, (no source for acpi_ev_finish_gpe or acpi_hw_low_set_gpe)
+acpi_hw_low_set_gpe, (no source for acpi_hw_low_set_gpe or acpi_hw_gpe_read)
+selinux_netlbl_sk_security_free, (no path to acpi_ev_asynch_execute_gpe_method)
+acpi_ev_asynch_execute_gpe_method, (no source for acpi_ev_asynch_execute_gpe_method or acpi_ev_queue_notify_request)
+acpi_ev_queue_notify_request, (no source for acpi_ev_queue_notify_request or acpi_ns_get_attached_object)
+acpi_ev_queue_notify_request, (no source for acpi_ev_queue_notify_request or acpi_ut_create_generic_state)
+acpi_ev_queue_notify_request, (no source for acpi_ev_queue_notify_request or acpi_ut_delete_generic_state)
+acpi_ut_delete_generic_state, acpi_os_release_object
+acpi_ev_asynch_execute_gpe_method, (no source for acpi_ev_asynch_execute_gpe_method or acpi_exception)
+acpi_exception, (no source for acpi_exception or acpi_os_printf)
+acpi_exception, (no source for acpi_exception or acpi_os_vprintf)
+acpi_os_vprintf, vsprintf
+acpi_ev_asynch_execute_gpe_method, acpi_os_execute
+acpi_ev_asynch_execute_gpe_method, acpi_ut_get_node_name
+acpi_ut_get_node_name, acpi_ut_repair_name
+acpi_ut_repair_name, acpi_ut_valid_name_char
+acpi_ut_repair_name, (no source for acpi_ut_repair_name or acpi_warning)
+selinux_netlbl_sk_security_free, (no path to acpi_notify_device_fixed)
+acpi_notify_device_fixed, (no path to acpi_ac_notify)
+acpi_ac_notify, (no path to acpi_format_exception)
+acpi_format_exception, (no source for acpi_format_exception or acpi_error)
+acpi_format_exception, acpi_ut_validate_exception
+acpi_ac_notify, (no source for acpi_ac_notify or acpi_handle_printk)
+acpi_handle_printk, (no source for acpi_handle_printk or acpi_get_name)
+acpi_get_name, (no source for acpi_get_name or acpi_ns_handle_to_name)
+acpi_get_name, (no source for acpi_get_name or acpi_ns_handle_to_pathname)
+acpi_ns_handle_to_pathname, (no source for acpi_ns_handle_to_pathname or acpi_ns_build_normalized_path)
+acpi_ns_handle_to_pathname, (no source for acpi_ns_handle_to_pathname or acpi_ut_initialize_buffer)
+acpi_get_name, (no source for acpi_get_name or acpi_ut_validate_buffer)
+acpi_ac_notify, kobject_uevent
+acpi_notify_device_fixed, (no path to acpi_battery_notify)
+acpi_battery_notify, acpi_battery_update, acpi_battery_get_info
+acpi_battery_get_info, (no path to strncpy)
+acpi_battery_notify, acpi_battery_update
+acpi_battery_update, acpi_battery_get_state
+acpi_battery_update, (no path to acpi_battery_set_alarm)
+acpi_battery_set_alarm, (no path to acpi_execute_simple_method)
+acpi_battery_update, (no path to acpi_has_method)
+acpi_has_method, (no source for acpi_has_method or acpi_get_handle)
+acpi_get_handle, (no source for acpi_get_handle or acpi_ns_get_node)
+acpi_battery_update, acpi_pm_wakeup_event
+acpi_pm_wakeup_event, pm_wakeup_dev_event
+pm_wakeup_dev_event, pm_wakeup_ws_event
+pm_wakeup_ws_event, wakeup_source_deactivate
+acpi_battery_update, (no path to dmi_get_system_info)
+acpi_battery_update, (no path to dmi_name_in_vendors)
+dmi_name_in_vendors, strstr
+acpi_battery_update, (no path to strncasecmp)
+acpi_battery_notify, msleep
+msleep, (no path to __msecs_to_jiffies)
+acpi_battery_notify, power_supply_changed
+power_supply_changed, pm_stay_awake
+acpi_notify_device_fixed, (no path to acpi_thermal_notify)
+acpi_thermal_notify, acpi_thermal_trips_update
+acpi_thermal_trips_update, (no source for acpi_thermal_trips_update or acpi_evaluate_reference)
+acpi_notify_device_fixed, (no path to acpi_video_bus_notify)
+acpi_video_bus_notify, acpi_notifier_call_chain
+acpi_video_bus_notify, acpi_video_device_enumerate
+acpi_notify_device_fixed, (no path to ata_acpi_ap_uevent)
+acpi_notify_device_fixed, (no path to ata_acpi_dev_uevent)
+ata_acpi_dev_uevent, (no path to kobject_uevent_env)
+kobject_uevent_env, add_uevent_var
+kobject_uevent_env, (no path to alloc_uevent_skb)
+alloc_uevent_skb, sprintf
+kobject_uevent_env, (no path to device_namespace)
+kobject_uevent_env, (no path to kobj_ns_ops)
+kobj_ns_ops, (no path to class_child_ns_type)
+kobj_ns_ops, (no path to class_dir_child_ns_type)
+kobj_ns_ops, (no path to nfs_netns_object_child_ns_type)
+kobj_ns_ops, (no source for kobj_ns_ops or rpc_sysfs_object_child_ns_type)
+kobject_uevent_env, kobject_get_path
+kobject_uevent_env, (no path to netdev_queue_namespace)
+kobject_uevent_env, (no path to netlink_has_listeners)
+kobject_uevent_env, (no path to nfs_netns_client_namespace)
+kobject_uevent_env, (no path to rpc_sysfs_client_namespace)
+kobject_uevent_env, (no path to rpc_sysfs_xprt_namespace)
+kobject_uevent_env, (no path to rpc_sysfs_xprt_switch_namespace)
+kobject_uevent_env, (no path to rx_queue_namespace)
+rx_queue_namespace, (no path to net_namespace)
+rx_queue_namespace, (no path to wiphy_namespace)
+acpi_notify_device_fixed, (no path to eeepc_acpi_notify)
+eeepc_acpi_notify, acpi_bus_generate_netlink_event
+acpi_bus_generate_netlink_event, genlmsg_put
+acpi_bus_generate_netlink_event, nla_reserve
+acpi_bus_generate_netlink_event, strscpy
+eeepc_acpi_notify, (no path to backlight_force_update)
+backlight_force_update, (no source for backlight_force_update or _dev_err)
+backlight_force_update, (no path to sysfs_notify)
+sysfs_notify, (no path to kernfs_find_and_get_ns)
+kernfs_find_and_get_ns, down_read
+down_read, (no path to __down_read_common)
+kernfs_find_and_get_ns, kernfs_find_ns
+sysfs_notify, kernfs_get
+sysfs_notify, kernfs_notify
+eeepc_acpi_notify, (no path to sparse_keymap_report_event)
+sparse_keymap_report_event, sparse_keymap_report_entry
+selinux_netlbl_sk_security_free, (no path to anon_vma_ctor)
+selinux_netlbl_sk_security_free, (no path to boost_set_msr_each)
+selinux_netlbl_sk_security_free, (no path to bts_buffer_free_aux)
+selinux_netlbl_sk_security_free, (no path to cmci_rediscover_work_func)
+cmci_rediscover_work_func, cmci_discover
+selinux_netlbl_sk_security_free, (no path to collect_cpu_info_local)
+collect_cpu_info_local, collect_cpu_info
+collect_cpu_info_local, (no path to collect_cpu_info_amd)
+selinux_netlbl_sk_security_free, (no path to cpuid_smp_cpuid)
+selinux_netlbl_sk_security_free, (no path to cr4_update_pce)
+cr4_update_pce, (no path to perf_clear_dirty_counters)
+selinux_netlbl_sk_security_free, (no path to devm_aperture_acquire_release)
+selinux_netlbl_sk_security_free, (no path to devm_bitmap_free)
+selinux_netlbl_sk_security_free, (no path to devm_i2c_release_dummy)
+devm_i2c_release_dummy, (no path to device_remove_software_node)
+device_remove_software_node, (no path to dev_fwnode)
+device_remove_software_node, set_secondary_fwnode
+device_remove_software_node, software_node_notify_remove
+software_node_notify_remove, sysfs_remove_link
+devm_i2c_release_dummy, (no path to is_acpi_device_node)
+selinux_netlbl_sk_security_free, (no path to devm_mipi_dsi_detach)
+devm_mipi_dsi_detach, (no path to gen11_dsi_host_detach)
+devm_mipi_dsi_detach, (no path to intel_dsi_host_detach)
+selinux_netlbl_sk_security_free, (no path to devm_mipi_dsi_device_unregister)
+selinux_netlbl_sk_security_free, (no path to devm_nvmem_unregister)
+selinux_netlbl_sk_security_free, (no path to devm_pci_alloc_host_bridge_release)
+selinux_netlbl_sk_security_free, (no path to devm_rtc_release_device)
+selinux_netlbl_sk_security_free, (no path to devm_rtc_unregister_device)
+devm_rtc_unregister_device, cdev_device_del
+cdev_device_del, (no path to kobj_unmap)
+devm_rtc_unregister_device, rtc_proc_del_device
+rtc_proc_del_device, remove_proc_entry
+remove_proc_entry, (no path to memcmp)
+remove_proc_entry, pde_put
+remove_proc_entry, (no path to strchr)
+remove_proc_entry, strlen
+selinux_netlbl_sk_security_free, (no path to devm_unregister_sys_off_handler)
+devm_unregister_sys_off_handler, (no path to atomic_notifier_chain_unregister)
+selinux_netlbl_sk_security_free, (no path to devres_free)
+selinux_netlbl_sk_security_free, (no path to do_drv_read)
+do_drv_read, (no path to cpu_freq_read_amd)
+do_drv_read, (no path to cpu_freq_read_intel)
+do_drv_read, (no path to cpu_freq_read_io)
+cpu_freq_read_io, acpi_os_read_port
+selinux_netlbl_sk_security_free, (no path to do_drv_write)
+do_drv_write, (no path to cpu_freq_write_amd)
+do_drv_write, (no path to cpu_freq_write_intel)
+do_drv_write, (no path to cpu_freq_write_io)
+cpu_freq_write_io, acpi_os_write_port
+selinux_netlbl_sk_security_free, (no path to do_flush_tlb_all)
+selinux_netlbl_sk_security_free, (no path to do_kernel_range_flush)
+selinux_netlbl_sk_security_free, (no path to do_nothing)
+selinux_netlbl_sk_security_free, (no path to do_sync_core)
+selinux_netlbl_sk_security_free, (no path to do_trace_netlink_extack)
+selinux_netlbl_sk_security_free, (no path to drm_bridge_remove_void)
+selinux_netlbl_sk_security_free, (no path to dummy_free)
+selinux_netlbl_sk_security_free, (no path to dump_stack_lvl)
+dump_stack_lvl, (no path to __printk_cpu_sync_put)
+dump_stack_lvl, (no path to __printk_cpu_sync_try_get)
+dump_stack_lvl, (no path to __printk_cpu_sync_wait)
+dump_stack_lvl, (no path to dump_stack_print_info)
+dump_stack_print_info, kexec_crash_loaded
+dump_stack_print_info, print_stop_info
+dump_stack_print_info, print_tainted
+dump_stack_print_info, print_worker_info
+print_worker_info, copy_from_kernel_nofault
+copy_from_kernel_nofault, copy_from_kernel_nofault_allowed
+print_worker_info, kthread_probe_data
+dump_stack_print_info, strcspn
+dump_stack_lvl, (no path to show_stack)
+show_stack, (no path to show_trace_log_lvl)
+show_trace_log_lvl, __kernel_text_address
+__kernel_text_address, kernel_text_address
+kernel_text_address, (no path to __is_insn_slot_addr)
+kernel_text_address, ct_nmi_enter
+ct_nmi_enter, ct_kernel_enter_state
+kernel_text_address, ct_nmi_exit
+ct_nmi_exit, ct_kernel_exit_state
+kernel_text_address, is_module_text_address
+show_trace_log_lvl, (no path to __show_regs)
+__show_regs, (no path to show_iret_regs)
+show_trace_log_lvl, (no path to __unwind_start)
+show_trace_log_lvl, get_stack_info
+get_stack_info, (no path to get_stack_info_noinstr)
+get_stack_info_noinstr, in_entry_stack
+in_entry_stack, (no path to get_cpu_entry_area)
+get_stack_info_noinstr, in_task_stack
+show_trace_log_lvl, (no path to show_opcodes)
+show_opcodes, (no source for show_opcodes or copy_from_user_nmi)
+copy_from_user_nmi, (no source for copy_from_user_nmi or nmi_uaccess_okay)
+show_trace_log_lvl, stack_type_name
+show_trace_log_lvl, unwind_get_return_address_ptr
+show_trace_log_lvl, unwind_next_frame
+unwind_next_frame, (no path to __module_address)
+unwind_next_frame, (no path to rethook_find_ret_addr)
+selinux_netlbl_sk_security_free, (no path to error)
+selinux_netlbl_sk_security_free, (no path to event_callback)
+selinux_netlbl_sk_security_free, (no path to ext4_free_link)
+ext4_free_link, (no path to __brelse)
+selinux_netlbl_sk_security_free, (no path to flip_smm_bit)
+flip_smm_bit, msr_clear_bit
+flip_smm_bit, msr_set_bit
+selinux_netlbl_sk_security_free, (no path to flush_ldt)
+flush_ldt, load_mm_ldt
+selinux_netlbl_sk_security_free, (no path to free_insn_page)
+selinux_netlbl_sk_security_free, (no path to free_optinsn_page)
+selinux_netlbl_sk_security_free, (no path to free_percpu)
+free_percpu, pcpu_free_area
+pcpu_free_area, (no path to __bitmap_clear)
+pcpu_free_area, (no path to _find_last_bit)
+pcpu_free_area, (no path to pcpu_chunk_refresh_hint)
+free_percpu, (no path to vmalloc_to_page)
+selinux_netlbl_sk_security_free, (no path to generate_random_guid)
+selinux_netlbl_sk_security_free, (no path to generate_random_uuid)
+generate_random_uuid, get_random_bytes
+get_random_bytes, _get_random_bytes
+_get_random_bytes, crng_make_state
+crng_make_state, extract_entropy
+extract_entropy, blake2s_final
+extract_entropy, (no path to blake2s_update)
+selinux_netlbl_sk_security_free, (no path to get_acpi_device)
+get_acpi_device, (no path to get_device)
+get_device, kobject_get
+selinux_netlbl_sk_security_free, (no path to hybrid_get_type)
+hybrid_get_type, get_this_hybrid_cpu_type
+selinux_netlbl_sk_security_free, (no path to init_once)
+init_once, (no path to __init_rwsem)
+init_once, (no path to ext4_fc_init_inode)
+selinux_netlbl_sk_security_free, (no path to intel_pmu_arch_lbr_restore)
+selinux_netlbl_sk_security_free, (no path to intel_pmu_arch_lbr_save)
+selinux_netlbl_sk_security_free, (no path to intel_pmu_arch_lbr_xrstors)
+intel_pmu_arch_lbr_xrstors, xrstors
+selinux_netlbl_sk_security_free, (no path to intel_pmu_arch_lbr_xsaves)
+intel_pmu_arch_lbr_xsaves, xsaves
+selinux_netlbl_sk_security_free, (no path to intel_pmu_lbr_restore)
+selinux_netlbl_sk_security_free, (no path to intel_pmu_lbr_save)
+selinux_netlbl_sk_security_free, (no path to invalidate_bh_lru)
+selinux_netlbl_sk_security_free, (no path to ioport_unmap)
+selinux_netlbl_sk_security_free, (no path to iounmap)
+iounmap, (no path to find_vm_area)
+iounmap, (no path to memtype_free)
+memtype_free, (no source for memtype_free or is_ISA_range)
+memtype_free, memtype_erase
+memtype_erase, (no path to __rb_insert_augmented)
+__rb_insert_augmented, (no source for __rb_insert_augmented or __anon_vma_interval_tree_augment_rotate)
+__rb_insert_augmented, (no source for __rb_insert_augmented or augment_callbacks_rotate)
+__rb_insert_augmented, (no source for __rb_insert_augmented or drm_mm_interval_tree_augment_rotate)
+__rb_insert_augmented, (no source for __rb_insert_augmented or free_vmap_area_rb_augment_cb_rotate)
+__rb_insert_augmented, (no source for __rb_insert_augmented or interval_augment_rotate)
+__rb_insert_augmented, (no source for __rb_insert_augmented or interval_tree_augment_rotate)
+__rb_insert_augmented, (no source for __rb_insert_augmented or vma_interval_tree_augment_rotate)
+__rb_insert_augmented, (no source for __rb_insert_augmented or vma_res_itree_augment_rotate)
+memtype_erase, (no source for memtype_erase or interval_remove)
+interval_remove, (no source for interval_remove or __rb_erase_color)
+memtype_free, (no path to walk_system_ram_range)
+walk_system_ram_range, (no path to acpi_check_region)
+acpi_check_region, (no source for acpi_check_region or acpi_check_address_range)
+acpi_check_address_range, (no source for acpi_check_address_range or acpi_ut_check_address_range)
+acpi_ut_check_address_range, (no source for acpi_ut_check_address_range or acpi_ns_get_normalized_pathname)
+acpi_ut_check_address_range, (no source for acpi_ut_check_address_range or acpi_ut_get_region_name)
+walk_system_ram_range, (no source for walk_system_ram_range or kclist_add_private)
+walk_system_ram_range, (no source for walk_system_ram_range or pagerange_is_ram_callback)
+iounmap, (no path to remove_vm_area)
+remove_vm_area, (no path to __vunmap_range_noflush)
+__vunmap_range_noflush, (no path to pgd_clear_bad)
+__vunmap_range_noflush, vunmap_p4d_range
+vunmap_p4d_range, (no path to p4d_clear_bad)
+vunmap_p4d_range, p4d_clear_huge
+vunmap_p4d_range, (no path to pmd_clear_bad)
+vunmap_p4d_range, (no path to pmd_clear_huge)
+vunmap_p4d_range, (no path to pud_clear_bad)
+vunmap_p4d_range, (no path to pud_clear_huge)
+remove_vm_area, (no path to free_vmap_area_noflush)
+selinux_netlbl_sk_security_free, (no path to ipi_handler)
+selinux_netlbl_sk_security_free, (no path to ipi_mb)
+selinux_netlbl_sk_security_free, (no path to ipi_rseq)
+selinux_netlbl_sk_security_free, (no path to ipi_sync_core)
+selinux_netlbl_sk_security_free, (no path to ipi_sync_rq_state)
+selinux_netlbl_sk_security_free, (no path to keyring_free_object)
+keyring_free_object, key_put
+selinux_netlbl_sk_security_free, (no path to kfree_const)
+selinux_netlbl_sk_security_free, (no path to kfree_link)
+selinux_netlbl_sk_security_free, (no path to kfree_sensitive)
+selinux_netlbl_sk_security_free, (no path to kmem_dump_obj)
+kmem_dump_obj, (no path to __kmem_obj_info)
+__kmem_obj_info, stack_depot_fetch
+selinux_netlbl_sk_security_free, (no path to kvfree)
+selinux_netlbl_sk_security_free, (no path to kvm_disable_host_haltpoll)
+selinux_netlbl_sk_security_free, (no path to kvm_enable_host_haltpoll)
+selinux_netlbl_sk_security_free, (no path to kvm_pv_guest_cpu_reboot)
+kvm_pv_guest_cpu_reboot, kvm_guest_cpu_offline
+kvm_guest_cpu_offline, (no path to __kvm_cpuid_base)
+kvm_guest_cpu_offline, (no path to swake_up_one)
+selinux_netlbl_sk_security_free, (no path to mark_tsc_unstable)
+selinux_netlbl_sk_security_free, (no path to mce_cpu_restart)
+mce_cpu_restart, __mcheck_cpu_init_clear_banks
+mce_cpu_restart, (no path to machine_check_poll)
+machine_check_poll, mce_gather_info
+mce_gather_info, mce_setup
+machine_check_poll, mce_gen_pool_add
+mce_gen_pool_add, filter_mce
+filter_mce, amd_filter_mce
+filter_mce, intel_filter_mce
+mce_gen_pool_add, (no path to gen_pool_alloc_algo_owner)
+gen_pool_alloc_algo_owner, (no path to gen_pool_best_fit)
+gen_pool_alloc_algo_owner, (no path to gen_pool_first_fit)
+gen_pool_alloc_algo_owner, (no path to gen_pool_first_fit_align)
+gen_pool_alloc_algo_owner, (no path to gen_pool_first_fit_order_align)
+gen_pool_alloc_algo_owner, (no path to gen_pool_fixed_alloc)
+gen_pool_fixed_alloc, (no path to bitmap_find_next_zero_area_off)
+bitmap_find_next_zero_area_off, (no path to _find_next_zero_bit)
+machine_check_poll, mce_rdmsrl
+machine_check_poll, mce_read_aux
+machine_check_poll, mce_severity
+mce_severity, mce_severity_amd
+mce_severity, mce_severity_intel
+mce_severity_intel, error_context
+error_context, ex_get_fixup_type
+ex_get_fixup_type, search_exception_tables
+search_exception_tables, (no source for search_exception_tables or search_extable)
+search_exception_tables, search_module_extables
+error_context, is_copy_from_user
+is_copy_from_user, fault_in_kernel_space
+is_copy_from_user, (no path to insn_decode)
+insn_decode, (no path to insn_get_immediate)
+is_copy_from_user, insn_get_addr_ref
+insn_get_addr_ref, (no path to get_eff_addr_modrm)
+insn_get_addr_ref, (no path to get_eff_addr_reg)
+insn_get_addr_ref, (no path to get_eff_addr_sib)
+get_eff_addr_sib, insn_get_sib
+insn_get_addr_ref, (no path to get_seg_base_limit)
+get_seg_base_limit, insn_get_seg_base
+insn_get_addr_ref, (no path to insn_get_displacement)
+insn_get_addr_ref, (no path to insn_get_modrm)
+insn_get_modrm, inat_get_group_attribute
+insn_get_addr_ref, insn_get_opcode
+insn_get_opcode, inat_get_avx_attribute
+insn_get_opcode, inat_get_escape_attribute
+insn_get_opcode, (no path to inat_get_last_prefix_id)
+insn_get_opcode, inat_get_opcode_attribute
+insn_get_opcode, insn_get_prefixes
+machine_check_poll, mce_wrmsrl
+mce_wrmsrl, msr_to_offset
+selinux_netlbl_sk_security_free, (no path to mce_disable_cmci)
+mce_disable_cmci, cmci_clear
+selinux_netlbl_sk_security_free, (no path to mce_enable_ce)
+mce_enable_ce, cmci_recheck
+cmci_recheck, mce_available
+mce_enable_ce, cmci_reenable
+selinux_netlbl_sk_security_free, (no path to mem_dump_obj)
+mem_dump_obj, (no path to __virt_addr_valid)
+mem_dump_obj, kmem_valid_obj
+mem_dump_obj, vmalloc_dump_obj
+selinux_netlbl_sk_security_free, (no path to memunmap)
+selinux_netlbl_sk_security_free, (no source for selinux_netlbl_sk_security_free or minstrel_ht_free)
+selinux_netlbl_sk_security_free, (no path to mon_text_ctor)
+selinux_netlbl_sk_security_free, (no path to mtrr_save_fixed_ranges)
+mtrr_save_fixed_ranges, get_fixed_ranges
+selinux_netlbl_sk_security_free, (no path to net_drop_ns)
+selinux_netlbl_sk_security_free, (no path to net_selftest_get_strings)
+selinux_netlbl_sk_security_free, (no path to nfs3_nlm_alloc_call)
+selinux_netlbl_sk_security_free, (no path to nfs3_nlm_release_call)
+selinux_netlbl_sk_security_free, (no path to nfs4_open_confirm_release)
+selinux_netlbl_sk_security_free, (no path to nfs4_open_release)
+nfs4_open_release, nfs4_close_state
+nfs4_close_state, __nfs4_close
+__nfs4_close, nfs4_do_close
+nfs4_do_close, nfs4_copy_open_stateid
+nfs4_do_close, (no path to nfs_alloc_seqid)
+nfs4_do_close, nfs_sb_active
+nfs4_open_release, nfs4_opendata_put
+nfs4_opendata_put, (no path to nfs4_put_state_owner)
+nfs4_opendata_put, (no path to nfs_fattr_free_names)
+nfs4_opendata_put, (no path to nfs_free_seqid)
+nfs_free_seqid, nfs_release_seqid, rpc_wake_up_queued_task
+nfs4_open_release, (no source for nfs4_open_release or nfs4_opendata_to_nfs4_state)
+nfs4_opendata_to_nfs4_state, (no source for nfs4_opendata_to_nfs4_state or _nfs4_opendata_to_nfs4_state)
+_nfs4_opendata_to_nfs4_state, (no source for _nfs4_opendata_to_nfs4_state or nfs4_get_open_state)
+_nfs4_opendata_to_nfs4_state, (no source for _nfs4_opendata_to_nfs4_state or nfs_fhget)
+nfs_fhget, (no source for nfs_fhget or clear_nlink)
+nfs_fhget, (no source for nfs_fhget or init_special_inode)
+nfs_fhget, (no source for nfs_fhget or inode_nohighmem)
+nfs_fhget, (no source for nfs_fhget or set_nlink)
+_nfs4_opendata_to_nfs4_state, (no source for _nfs4_opendata_to_nfs4_state or nfs_may_open)
+_nfs4_opendata_to_nfs4_state, (no source for _nfs4_opendata_to_nfs4_state or nfs_release_seqid)
+nfs4_opendata_to_nfs4_state, (no source for nfs4_opendata_to_nfs4_state or nfs41_wake_and_assign_slot)
+nfs41_wake_and_assign_slot, (no path to rpc_wake_up_first)
+nfs4_opendata_to_nfs4_state, (no source for nfs4_opendata_to_nfs4_state or nfs4_free_slot)
+nfs4_opendata_to_nfs4_state, (no source for nfs4_opendata_to_nfs4_state or nfs4_opendata_check_deleg)
+nfs4_opendata_check_deleg, (no source for nfs4_opendata_check_deleg or nfs_async_inode_return_delegation)
+nfs_async_inode_return_delegation, (no path to nfs4_match_stateid)
+nfs4_opendata_check_deleg, (no source for nfs4_opendata_check_deleg or nfs_inode_reclaim_delegation)
+nfs4_opendata_check_deleg, (no source for nfs4_opendata_check_deleg or nfs_inode_set_delegation)
+nfs_inode_set_delegation, (no path to cred_fscmp)
+nfs_inode_set_delegation, (no path to nfs4_proc_delegreturn)
+nfs4_proc_delegreturn, (no path to igrab)
+nfs4_proc_delegreturn, (no path to nfs4_bitmask_set)
+nfs_inode_set_delegation, (no path to nfs_clear_verifier_delegated)
+nfs4_opendata_to_nfs4_state, (no source for nfs4_opendata_to_nfs4_state or nfs_refresh_inode)
+nfs4_opendata_to_nfs4_state, (no source for nfs4_opendata_to_nfs4_state or update_open_stateid)
+update_open_stateid, (no path to nfs40_test_and_free_expired_stateid)
+update_open_stateid, nfs4_get_valid_delegation
+update_open_stateid, (no path to nfs4_state_mark_reclaim_nograce)
+update_open_stateid, nfs_mark_delegation_referenced
+selinux_netlbl_sk_security_free, (no path to nfs4_renew_release)
+nfs4_renew_release, (no source for nfs4_renew_release or nfs4_schedule_state_renewal)
+nfs4_schedule_state_renewal, (no source for nfs4_schedule_state_renewal or mod_delayed_work_on)
+mod_delayed_work_on, try_to_grab_pending
+try_to_grab_pending, pwq_dec_nr_in_flight
+selinux_netlbl_sk_security_free, (no path to nfs_async_rename_release)
+nfs_async_rename_release, nfs_force_lookup_revalidate
+selinux_netlbl_sk_security_free, (no path to nfs_async_unlink_release)
+nfs_async_unlink_release, (no path to __d_lookup_unhash_wake)
+nfs_async_unlink_release, (no path to __put_cred)
+nfs_async_unlink_release, (no path to up_read)
+up_read, (no path to rwsem_mark_wake)
+rwsem_mark_wake, wake_q_add
+rwsem_mark_wake, wake_q_add_safe
+selinux_netlbl_sk_security_free, (no path to nfs_commit_release)
+nfs_commit_release, (no path to mempool_free)
+nfs_commit_release, (no path to nfs_commit_release_pages)
+nfs_commit_release_pages, (no path to __set_page_dirty_nobuffers)
+__set_page_dirty_nobuffers, filemap_dirty_folio
+filemap_dirty_folio, __folio_mark_dirty
+__folio_mark_dirty, __xa_set_mark
+__set_page_dirty_nobuffers, (no path to folio_mapping)
+nfs_commit_release_pages, (no path to nfs_init_cinfo_from_dreq)
+nfs_commit_release_pages, nfs_mapping_set_error
+nfs_mapping_set_error, (no path to __filemap_set_wb_err)
+nfs_mapping_set_error, errseq_set
+nfs_mapping_set_error, (no path to nfs_set_cache_invalid)
+nfs_mapping_set_error, (no path to nfs_zap_mapping)
+nfs_zap_mapping, (no path to nfs3_have_delegation)
+nfs_zap_mapping, (no path to nfs4_have_delegation)
+nfs_zap_mapping, (no path to nfs_have_delegation)
+nfs_commit_release, (no path to nfs_direct_commit_complete)
+nfs_direct_commit_complete, (no path to bcmp)
+nfs_direct_commit_complete, nfs_commit_end
+nfs_commit_release, (no path to put_nfs_open_context)
+selinux_netlbl_sk_security_free, (no path to nfs_io_completion_commit)
+selinux_netlbl_sk_security_free, (no path to nfs_pgio_release)
+nfs_pgio_release, (no path to nfs_direct_read_completion)
+nfs_direct_read_completion, (no path to aio_complete_rw)
+nfs_direct_read_completion, (no path to lo_rw_aio_complete)
+nfs_direct_read_completion, (no path to sio_read_complete)
+nfs_direct_read_completion, (no path to sio_write_complete)
+sio_write_complete, (no path to __page_file_index)
+sio_write_complete, end_page_writeback
+end_page_writeback, folio_end_writeback
+folio_end_writeback, (no path to __acct_reclaim_writeback)
+__acct_reclaim_writeback, node_page_state
+folio_end_writeback, __folio_end_writeback
+__folio_end_writeback, (no path to __fprop_add_percpu_max)
+__fprop_add_percpu_max, (no path to fprop_reflect_period_percpu)
+fprop_reflect_period_percpu, (no path to __percpu_counter_sum)
+fprop_reflect_period_percpu, percpu_counter_set
+__folio_end_writeback, __xa_clear_mark
+__folio_end_writeback, sb_clear_inode_writeback
+folio_end_writeback, folio_rotate_reclaimable
+folio_end_writeback, (no path to folio_wake_bit)
+nfs_direct_read_completion, (no path to wake_up_bit)
+nfs_pgio_release, (no path to nfs_direct_write_completion)
+nfs_direct_write_completion, (no source for nfs_direct_write_completion or nfs_mark_request_commit)
+nfs_pgio_release, (no path to nfs_read_completion)
+nfs_read_completion, nfs_readpage_release, nfs_page_group_sync_on_bit
+nfs_read_completion, (no path to nfs_pgio_header_free)
+nfs_pgio_header_free, (no path to nfs_readhdr_free)
+nfs_pgio_header_free, (no path to nfs_writehdr_free)
+nfs_read_completion, nfs_readpage_release
+nfs_read_completion, (no path to zero_user_segments)
+selinux_netlbl_sk_security_free, (no path to nlm4svc_callback_release)
+nlm4svc_callback_release, nlmsvc_release_call
+selinux_netlbl_sk_security_free, (no path to nlmsvc_callback_release)
+selinux_netlbl_sk_security_free, (no path to nlmsvc_grant_release)
+selinux_netlbl_sk_security_free, (no path to nlmsvc_put_owner)
+nlmsvc_put_owner, (no path to nlmsvc_release_host)
+selinux_netlbl_sk_security_free, (no path to nohz_csd_func)
+selinux_netlbl_sk_security_free, (no path to page_frag_free)
+page_frag_free, (no path to free_unref_page)
+free_unref_page, free_unref_page_commit, free_pcppages_bulk, __free_one_page
+__free_one_page, (no path to __mod_zone_page_state)
+free_unref_page, (no path to free_pcp_prepare)
+free_unref_page, free_unref_page_commit
+free_unref_page_commit, free_pcppages_bulk
+selinux_netlbl_sk_security_free, (no path to page_put_link)
+selinux_netlbl_sk_security_free, (no path to param_free_charp)
+selinux_netlbl_sk_security_free, (no path to pci_unmap_biosrom)
+selinux_netlbl_sk_security_free, (no path to pcim_msi_release)
+pcim_msi_release, (no path to pci_disable_msi)
+pci_disable_msi, (no path to pci_msi_update_mask)
+pci_msi_update_mask, pci_write_config_dword
+pci_write_config_dword, (no source for pci_write_config_dword or pci_bus_write_config_dword)
+pcim_msi_release, (no path to pci_disable_msix)
+pci_disable_msix, (no path to msi_first_desc)
+pci_disable_msix, (no path to msi_next_desc)
+msi_next_desc, (no path to xa_find)
+msi_next_desc, (no path to xa_find_after)
+xa_find_after, xas_find
+xas_find, xas_load
+xa_find_after, xas_find_marked
+pci_disable_msix, (no path to pci_intx)
+pci_disable_msix, (no path to pci_read_config_word)
+pci_read_config_word, (no source for pci_read_config_word or pci_bus_read_config_word)
+pci_bus_read_config_word, (no source for pci_bus_read_config_word or pci_read)
+pci_read, (no path to pci_conf1_read)
+pci_read, (no path to pci_conf2_read)
+pci_read, (no path to pci_mmcfg_read)
+pci_bus_read_config_word, (no source for pci_bus_read_config_word or quirk_pcie_aspm_read)
+quirk_pcie_aspm_read, raw_pci_read
+pci_disable_msix, (no path to pci_write_config_word)
+pci_write_config_word, (no source for pci_write_config_word or pci_bus_write_config_word)
+pci_bus_write_config_word, (no source for pci_bus_write_config_word or pci_write)
+pci_write, (no path to pci_conf1_write)
+pci_write, (no path to pci_conf2_write)
+pci_write, (no path to pci_mmcfg_write)
+pci_mmcfg_write, (no path to pci_mmconfig_lookup)
+pci_bus_write_config_word, (no source for pci_bus_write_config_word or quirk_pcie_aspm_write)
+quirk_pcie_aspm_write, raw_pci_write
+selinux_netlbl_sk_security_free, (no path to ping)
+selinux_netlbl_sk_security_free, (no path to pm_runtime_disable_action)
+pm_runtime_disable_action, (no path to __pm_runtime_disable)
+__pm_runtime_disable, __pm_runtime_barrier
+__pm_runtime_barrier, cancel_work_sync
+selinux_netlbl_sk_security_free, (no path to proc_put_link)
+proc_put_link, (no path to complete)
+selinux_netlbl_sk_security_free, (no path to pt_buffer_free_aux)
+pt_buffer_free_aux, (no path to free_pages)
+selinux_netlbl_sk_security_free, (no source for selinux_netlbl_sk_security_free or radix_tree_node_ctor)
+selinux_netlbl_sk_security_free, (no path to regmap_parse_16_be_inplace)
+selinux_netlbl_sk_security_free, (no path to regmap_parse_16_le_inplace)
+selinux_netlbl_sk_security_free, (no path to regmap_parse_32_be_inplace)
+selinux_netlbl_sk_security_free, (no path to regmap_parse_32_le_inplace)
+selinux_netlbl_sk_security_free, (no path to regmap_parse_64_be_inplace)
+selinux_netlbl_sk_security_free, (no path to regmap_parse_64_le_inplace)
+selinux_netlbl_sk_security_free, (no path to regmap_parse_inplace_noop)
+selinux_netlbl_sk_security_free, (no path to retrigger_next_event)
+selinux_netlbl_sk_security_free, (no path to rpc_cb_add_xprt_release)
+rpc_cb_add_xprt_release, xprt_switch_put
+xprt_switch_put, (no path to rpc_sysfs_xprt_switch_destroy)
+rpc_sysfs_xprt_switch_destroy, kobject_del
+kobject_del, (no path to sysfs_remove_dir)
+kobject_del, (no path to sysfs_remove_groups)
+selinux_netlbl_sk_security_free, (no path to rpcb_map_release)
+rpcb_map_release, (no path to rpc_wake_up_status)
+rpcb_map_release, xprt_put
+xprt_put, (no path to xprt_destroy)
+selinux_netlbl_sk_security_free, (no path to scsi_kunmap_atomic_sg)
+selinux_netlbl_sk_security_free, (no path to selinux_free_mnt_opts)
+selinux_netlbl_sk_security_free, (no path to selinux_tun_dev_free_security)
+selinux_netlbl_sk_security_free, (no path to shmem_init_inode)
+selinux_netlbl_sk_security_free, (no path to shmem_put_link)
+shmem_put_link, folio_mark_accessed
+folio_mark_accessed, folio_activate
+folio_activate, (no path to folio_batch_move_lru)
+folio_batch_move_lru, (no path to folio_activate_fn)
+folio_batch_move_lru, lru_add_fn
+folio_batch_move_lru, (no path to lru_deactivate_file_fn)
+lru_deactivate_file_fn, folio_mapped
+folio_batch_move_lru, (no path to lru_deactivate_fn)
+folio_batch_move_lru, (no path to lru_lazyfree_fn)
+folio_batch_move_lru, (no path to lru_move_tail_fn)
+folio_batch_move_lru, (no path to release_pages)
+release_pages, (no path to PageHeadHuge)
+release_pages, (no path to __mod_node_page_state)
+release_pages, (no path to __page_cache_release)
+release_pages, free_unref_page_list
+release_pages, (no path to mod_zone_page_state)
+folio_mark_accessed, workingset_activation
+selinux_netlbl_sk_security_free, (no path to sighand_ctor)
+sighand_ctor, (no path to __init_waitqueue_head)
+selinux_netlbl_sk_security_free, (no path to symbol_put_addr)
+symbol_put_addr, core_kernel_text
+core_kernel_text, (no path to in_gate_area_no_mm)
+symbol_put_addr, (no path to mod_find)
+selinux_netlbl_sk_security_free, (no path to threshold_restart_bank)
+selinux_netlbl_sk_security_free, (no path to tlb_remove_table_smp_sync)
+selinux_netlbl_sk_security_free, (no path to trigger_card_free)
+trigger_card_free, (no path to put_device)
+trigger_card_free, (no path to wait_for_completion)
+wait_for_completion, (no source for wait_for_completion or wait_for_common)
+selinux_netlbl_sk_security_free, (no path to umwait_update_control_msr)
+selinux_netlbl_sk_security_free, (no path to update_stibp_msr)
+selinux_netlbl_sk_security_free, (no path to update_tfa_sched)
+update_tfa_sched, perf_pmu_resched
+perf_pmu_resched, ctx_resched
+ctx_resched, (no path to perf_pmu_nop_void)
+ctx_resched, (no path to uncore_pmu_disable)
+uncore_pmu_disable, (no path to adl_uncore_mmio_disable_box)
+uncore_pmu_disable, (no path to adl_uncore_msr_disable_box)
+uncore_pmu_disable, (no path to intel_generic_uncore_mmio_disable_box)
+uncore_pmu_disable, (no path to intel_generic_uncore_msr_disable_box)
+uncore_pmu_disable, (no path to intel_generic_uncore_pci_disable_box)
+uncore_pmu_disable, (no path to nhm_uncore_msr_disable_box)
+uncore_pmu_disable, (no path to nhmex_uncore_msr_disable_box)
+uncore_pmu_disable, (no path to snb_uncore_imc_disable_box)
+uncore_pmu_disable, (no path to snbep_uncore_msr_disable_box)
+uncore_pmu_disable, (no path to snbep_uncore_pci_disable_box)
+uncore_pmu_disable, (no path to snr_uncore_mmio_disable_box)
+ctx_resched, (no path to uncore_pmu_enable)
+uncore_pmu_enable, (no path to adl_uncore_mmio_enable_box)
+uncore_pmu_enable, (no path to adl_uncore_msr_enable_box)
+uncore_pmu_enable, (no path to intel_generic_uncore_mmio_enable_box)
+uncore_pmu_enable, (no path to intel_generic_uncore_msr_enable_box)
+uncore_pmu_enable, (no path to intel_generic_uncore_pci_enable_box)
+uncore_pmu_enable, (no path to knl_uncore_imc_enable_box)
+uncore_pmu_enable, (no path to nhm_uncore_msr_enable_box)
+uncore_pmu_enable, (no path to nhmex_uncore_msr_enable_box)
+uncore_pmu_enable, (no path to skl_uncore_msr_enable_box)
+uncore_pmu_enable, (no path to snb_uncore_imc_enable_box)
+uncore_pmu_enable, (no path to snb_uncore_msr_enable_box)
+uncore_pmu_enable, (no path to snbep_uncore_msr_enable_box)
+uncore_pmu_enable, (no path to snbep_uncore_pci_enable_box)
+snbep_uncore_pci_enable_box, pci_read_config_dword
+pci_read_config_dword, (no source for pci_read_config_dword or pci_bus_read_config_dword)
+uncore_pmu_enable, (no path to snr_uncore_mmio_enable_box)
+ctx_resched, (no path to x86_pmu_disable)
+update_tfa_sched, x86_get_pmu
+selinux_netlbl_sk_security_free, (no path to v1_tlb_flush_all)
+selinux_netlbl_sk_security_free, (no path to v2_tlb_flush_all)
+selinux_netlbl_sk_security_free, (no path to v9fs_inode_init_once)
+v9fs_inode_init_once, inode_init_once
+selinux_netlbl_sk_security_free, (no path to vmware_pv_guest_cpu_reboot)
+selinux_netlbl_sk_security_free, (no path to vunmap)
+selinux_netlbl_sk_security_free, (no path to wakeup_all_recovery_waiters)
+selinux_netlbl_sk_security_free, (no path to wakeup_mirrord)
+selinux_netlbl_sk_security_free, (no path to xhci_intel_unregister_pdev)
+xhci_intel_unregister_pdev, platform_device_unregister
+platform_device_unregister, (no path to release_resource)
+xs_data_ready, (no path to sk_clear_memalloc)
+xs_data_ready, (no path to sk_common_release)
+sk_common_release, (no path to xfrm_policy_delete)
+xfrm_policy_delete, xfrm_policy_kill
+xs_data_ready, (no path to sk_error_report)
+xs_data_ready, (no path to sk_send_sigurg)
+sk_send_sigurg, send_sigurg
+send_sigurg, pid_task
+send_sigurg, send_sigurg_to_task
+send_sigurg_to_task, do_send_sig_info
+send_sigurg_to_task, (no path to security_file_send_sigiotask)
+security_file_send_sigiotask, (no path to selinux_file_send_sigiotask)
+selinux_file_send_sigiotask, avc_has_perm
+xs_data_ready, (no path to sk_set_memalloc)
+sk_set_memalloc, (no path to static_key_slow_inc)
+xs_data_ready, (no path to sk_stream_kill_queues)
+sk_stream_kill_queues, (no path to __sk_mem_reclaim)
+xs_data_ready, (no path to sk_stream_write_space)
+xs_data_ready, (no path to sock_def_destruct)
+xs_data_ready, (no path to sock_def_error_report)
+xs_data_ready, (no path to sock_def_wakeup)
+xs_data_ready, (no path to sock_def_write_space)
+xs_data_ready, (no path to sock_enable_timestamps)
+sock_enable_timestamps, (no path to net_enable_timestamp)
+xs_data_ready, (no path to sock_gen_put)
+sock_gen_put, inet_twsk_free
+sock_gen_put, (no path to tcp_v4_reqsk_destructor)
+sock_gen_put, (no path to tcp_v6_reqsk_destructor)
+xs_data_ready, (no path to sock_no_linger)
+xs_data_ready, (no path to sock_set_keepalive)
+sock_set_keepalive, (no path to tcp_set_keepalive)
+xs_data_ready, (no path to sock_set_reuseaddr)
+xs_data_ready, (no path to sock_set_reuseport)
+xs_data_ready, (no path to sockopt_release_sock)
+xs_data_ready, (no path to svc_tcp_state_change)
+svc_tcp_state_change, svc_xprt_deferred_close
+xs_data_ready, (no path to svc_write_space)
+xs_data_ready, (no path to tcp_done)
+tcp_done, (no path to inet_sk_state_store)
+tcp_done, reqsk_fastopen_remove
+xs_data_ready, (no path to tcp_enter_cwr)
+tcp_enter_cwr, (no path to cubictcp_recalc_ssthresh)
+tcp_enter_cwr, (no path to tcp_reno_ssthresh)
+xs_data_ready, (no path to tcp_enter_memory_pressure)
+xs_data_ready, (no path to tcp_init_sock)
+tcp_init_sock, jiffies_to_usecs
+tcp_init_sock, tcp_assign_congestion_control
+tcp_assign_congestion_control, (no path to try_module_get)
+xs_data_ready, (no path to tcp_initialize_rcv_mss)
+xs_data_ready, (no path to tcp_leave_memory_pressure)
+tcp_leave_memory_pressure, jiffies_to_msecs
+xs_data_ready, (no path to tcp_mtup_init)
+xs_data_ready, (no path to tcp_rate_check_app_limited)
+xs_data_ready, (no path to tcp_release_cb)
+tcp_release_cb, tcp_tsq_write
+xs_data_ready, (no path to tcp_simple_retransmit)
+tcp_simple_retransmit, (no path to rb_first)
+tcp_simple_retransmit, (no path to rb_next)
+tcp_simple_retransmit, tcp_set_ca_state
+tcp_set_ca_state, (no path to cubictcp_state)
+tcp_simple_retransmit, tcp_xmit_retransmit_queue
+tcp_xmit_retransmit_queue, (no path to __tcp_retransmit_skb)
+__tcp_retransmit_skb, (no path to __pskb_copy_fclone)
+__tcp_retransmit_skb, (no path to __skb_unclone_keeptruesize)
+__skb_unclone_keeptruesize, pskb_expand_head
+__tcp_retransmit_skb, (no path to inet6_sk_rebuild_header)
+__tcp_retransmit_skb, (no path to inet_sk_rebuild_header)
+inet_sk_rebuild_header, (no path to inet_bhash2_update_saddr)
+inet_sk_rebuild_header, (no path to inet_hash)
+inet_sk_rebuild_header, (no path to ip_route_output_key_hash)
+inet_sk_rebuild_header, (no path to ping_hash)
+inet_sk_rebuild_header, (no path to raw_hash_sk)
+inet_sk_rebuild_header, (no source for inet_sk_rebuild_header or udp_lib_hash)
+__tcp_retransmit_skb, tcp_adjust_pcount
+__tcp_retransmit_skb, tcp_rate_skb_sent
+__tcp_retransmit_skb, (no source for __tcp_retransmit_skb or tcp_rtx_queue_unlink_and_free)
+__tcp_retransmit_skb, (no path to tcp_skb_shift)
+tcp_skb_shift, skb_shift
+__tcp_retransmit_skb, tcp_trim_head
+xs_data_ready, (no path to tcp_sock_set_nodelay)
+tcp_sock_set_nodelay, (no path to __tcp_push_pending_frames)
+__tcp_push_pending_frames, (no path to nsecs_to_jiffies)
+__tcp_push_pending_frames, tcp_write_xmit
+tcp_write_xmit, (no path to __pskb_trim_head)
+tcp_write_xmit, (no path to skb_copy_bits)
+tcp_write_xmit, (no path to skb_pull)
+tcp_write_xmit, (no path to skb_split)
+skb_split, skb_split_no_header
+skb_split, skb_zerocopy_clone
+tcp_write_xmit, tcp_event_new_data_sent
+tcp_event_new_data_sent, tcp_check_space
+tcp_event_new_data_sent, tcp_rearm_rto
+tcp_write_xmit, (no path to tcp_fragment)
+tcp_fragment, (no path to rb_last)
+tcp_fragment, (no path to tcp_rbtree_insert)
+tcp_rbtree_insert, rb_insert_color
+tcp_write_xmit, (no path to tcp_init_cwnd)
+tcp_write_xmit, tcp_schedule_loss_probe
+tcp_schedule_loss_probe, (no path to __usecs_to_jiffies)
+tcp_write_xmit, (no path to tcp_stream_alloc_skb)
+tcp_stream_alloc_skb, (no path to __sk_mem_schedule)
+__sk_mem_schedule, __sk_mem_raise_allocated
+tcp_stream_alloc_skb, sk_forced_mem_schedule
+tcp_sock_set_nodelay, (no path to tcp_current_mss)
+tcp_current_mss, (no path to tcp_v4_md5_lookup)
+tcp_current_mss, (no path to tcp_v6_md5_lookup)
+tcp_v6_md5_lookup, (no path to __tcp_md5_do_lookup)
+xs_data_ready, (no path to tcp_twsk_destructor)
+xs_data_ready, (no path to tcp_v4_destroy_sock)
+tcp_v4_destroy_sock, (no path to percpu_counter_add_batch)
+tcp_v4_destroy_sock, skb_rbtree_purge
+tcp_v4_destroy_sock, tcp_cleanup_congestion_control
+tcp_v4_destroy_sock, tcp_cleanup_ulp
+tcp_v4_destroy_sock, tcp_fastopen_active_disable_ofo_check
+tcp_v4_destroy_sock, tcp_fastopen_destroy_cipher
+tcp_v4_destroy_sock, tcp_free_fastopen_req
+tcp_v4_destroy_sock, tcp_write_queue_purge
+tcp_write_queue_purge, (no path to rb_erase)
+tcp_write_queue_purge, tcp_chrono_stop
+xs_data_ready, (no path to tcp_v4_mtu_reduced)
+tcp_v4_mtu_reduced, inet_csk_update_pmtu
+inet_csk_update_pmtu, __sk_dst_check
+inet_csk_update_pmtu, inet_csk_rebuild_route
+xs_data_ready, (no path to tcp_v6_destroy_sock)
+xs_data_ready, (no path to tcp_v6_mtu_reduced)
+tcp_v6_mtu_reduced, (no path to dst_blackhole_mtu)
+tcp_v6_mtu_reduced, inet6_csk_update_pmtu
+inet6_csk_update_pmtu, (no path to dst_blackhole_update_pmtu)
+inet6_csk_update_pmtu, inet6_csk_route_socket
+inet6_csk_route_socket, (no path to sk_setup_caps)
+inet6_csk_update_pmtu, (no path to ip6_rt_update_pmtu)
+ip6_rt_update_pmtu, __ip6_rt_update_pmtu
+__ip6_rt_update_pmtu, dst_release_immediate
+dst_release_immediate, dst_destroy
+dst_destroy, (no path to dst_cache_destroy)
+dst_destroy, (no path to ip6_dst_destroy)
+dst_destroy, (no path to ipv4_dst_destroy)
+dst_destroy, (no path to xfrm4_dst_destroy)
+xfrm4_dst_destroy, rt_del_uncached_list
+dst_destroy, (no path to xfrm6_dst_destroy)
+xfrm6_dst_destroy, (no path to __dst_destroy_metrics_generic)
+xfrm6_dst_destroy, (no path to __xfrm_state_destroy)
+__xfrm_state_destroy, ___xfrm_state_destroy
+___xfrm_state_destroy, (no path to ah6_destroy)
+___xfrm_state_destroy, (no path to esp6_destroy)
+xfrm6_dst_destroy, rt6_uncached_list_del
+xfrm6_dst_destroy, (no path to xfrm_policy_destroy)
+__ip6_rt_update_pmtu, (no path to fib6_nh_update_exception)
+__ip6_rt_update_pmtu, (no path to ip6_confirm_neigh)
+__ip6_rt_update_pmtu, ip6_rt_cache_alloc
+ip6_rt_cache_alloc, (no path to __ipv6_addr_type)
+ip6_rt_cache_alloc, ip6_rt_copy_init
+__ip6_rt_update_pmtu, (no path to ipv4_confirm_neigh)
+__ip6_rt_update_pmtu, nexthop_for_each_fib6_nh
+nexthop_for_each_fib6_nh, (no path to __rt6_nh_dev_match)
+__rt6_nh_dev_match, (no path to ipv6_chk_addr)
+ipv6_chk_addr, (no source for ipv6_chk_addr or __ipv6_chk_addr_and_flags)
+nexthop_for_each_fib6_nh, (no path to fib6_info_nh_uses_dev)
+nexthop_for_each_fib6_nh, (no path to fib6_nh_del_cached_rt)
+fib6_nh_del_cached_rt, ip6_del_cached_rt
+nexthop_for_each_fib6_nh, (no path to fib6_nh_drop_pcpu_from)
+nexthop_for_each_fib6_nh, (no path to fib6_nh_find_match)
+nexthop_for_each_fib6_nh, (no path to fib6_nh_mtu_change)
+fib6_nh_mtu_change, fib6_metric_set
+nexthop_for_each_fib6_nh, (no path to fib6_nh_redirect_match)
+fib6_nh_redirect_match, ip6_redirect_nh_match
+nexthop_for_each_fib6_nh, (no path to rt6_nh_age_exceptions)
+rt6_nh_age_exceptions, fib6_nh_age_exceptions
+nexthop_for_each_fib6_nh, (no path to rt6_nh_dump_exceptions)
+rt6_nh_dump_exceptions, rt6_fill_node
+rt6_fill_node, fib_add_nexthop
+rt6_fill_node, fib_nexthop_info
+rt6_fill_node, rtnetlink_put_metrics
+rtnetlink_put_metrics, tcp_ca_get_name_by_key
+rt6_fill_node, rtnl_put_cacheinfo
+nexthop_for_each_fib6_nh, (no path to rt6_nh_find_match)
+rt6_nh_find_match, (no path to rt6_score_route)
+nexthop_for_each_fib6_nh, (no path to rt6_nh_flush_exceptions)
+rt6_nh_flush_exceptions, fib6_nh_flush_exceptions
+nexthop_for_each_fib6_nh, (no path to rt6_nh_nlmsg_size)
+nexthop_for_each_fib6_nh, (no path to rt6_nh_remove_exception_rt)
+rt6_nh_remove_exception_rt, fib6_nh_remove_exception
+__ip6_rt_update_pmtu, rt6_insert_exception
+rt6_insert_exception, (no path to __siphash_unaligned)
+rt6_insert_exception, fib6_force_start_gc
+rt6_insert_exception, fib6_update_sernum
+rt6_insert_exception, rt6_remove_exception
+__ip6_rt_update_pmtu, (no path to xfrm_confirm_neigh)
+inet6_csk_update_pmtu, (no path to ip_rt_update_pmtu)
+ip_rt_update_pmtu, __ip_rt_update_pmtu
+__ip_rt_update_pmtu, (no path to __fib_lookup)
+__fib_lookup, fib_rules_lookup
+fib_rules_lookup, fib4_rule_action
+fib4_rule_action, fib_get_table
+fib_rules_lookup, (no path to fib4_rule_match)
+fib_rules_lookup, fib4_rule_suppress
+fib4_rule_suppress, (no path to free_fib_info)
+__ip_rt_update_pmtu, fib_select_path
+fib_select_path, (no path to fib_detect_death)
+fib_detect_death, (no path to neigh_destroy)
+fib_detect_death, neigh_lookup
+neigh_lookup, (no path to arp_hash)
+neigh_lookup, (no path to arp_key_eq)
+neigh_lookup, (no path to ndisc_hash)
+neigh_lookup, (no path to ndisc_key_eq)
+fib_select_path, fib_multipath_hash
+fib_multipath_hash, flow_hash_from_keys
+fib_multipath_hash, ip_multipath_l3_keys
+fib_select_path, fib_select_multipath
+fib_select_multipath, (no path to nexthop_select_path)
+fib_select_path, (no path to inet_select_addr)
+__ip_rt_update_pmtu, (no path to fib_table_lookup)
+__ip_rt_update_pmtu, update_or_create_fnhe
+update_or_create_fnhe, (no path to __do_once_done)
+__do_once_done, (no path to __module_get)
+update_or_create_fnhe, (no path to __do_once_start)
+update_or_create_fnhe, (no path to dst_dev_put)
+dst_dev_put, (no path to ip6_dst_ifdown)
+dst_dev_put, (no path to xfrm4_dst_ifdown)
+dst_dev_put, (no path to xfrm6_dst_ifdown)
+xfrm6_dst_ifdown, (no path to in6_dev_finish_destroy)
+xfrm6_dst_ifdown, xfrm_dst_ifdown
+update_or_create_fnhe, (no source for update_or_create_fnhe or get_random_u8)
+update_or_create_fnhe, (no path to kmalloc_large)
+update_or_create_fnhe, (no path to siphash_1u32)
+inet6_csk_update_pmtu, (no path to xfrm4_update_pmtu)
+inet6_csk_update_pmtu, (no path to xfrm6_update_pmtu)
+tcp_v6_mtu_reduced, (no path to ip6_mtu)
+tcp_v6_mtu_reduced, (no path to ipv4_mtu)
+tcp_v6_mtu_reduced, (no source for tcp_v6_mtu_reduced or sch_frag_dst_get_mtu)
+tcp_v6_mtu_reduced, tcp_mtu_to_mss
+tcp_v6_mtu_reduced, tcp_sync_mss
+tcp_v6_mtu_reduced, (no path to xfrm_mtu)
+xs_data_ready, (no path to udp_destroy_sock)
+xs_data_ready, (no path to udp_destruct_common)
+udp_destruct_common, (no path to __sk_mem_reduce_allocated)
+xs_data_ready, (no path to udp_destruct_sock)
+xs_data_ready, (no path to udp_flush_pending_frames)
+udp_flush_pending_frames, ip_flush_pending_frames
+xs_data_ready, (no path to udp_lib_unhash)
+xs_data_ready, (no path to udp_v4_rehash)
+xs_data_ready, (no path to udp_v6_rehash)
+udp_v6_rehash, (no source for udp_v6_rehash or ipv6_portaddr_hash)
+udp_v6_rehash, udp_lib_rehash
+xs_data_ready, (no path to udpv6_destroy_sock)
+udpv6_destroy_sock, udp_encap_disable
+xs_data_ready, (no path to udpv6_destruct_sock)
+xs_data_ready, (no path to unix_sock_destructor)
+unix_sock_destructor, skb_queue_purge
+xs_data_ready, (no path to unix_unhash)
+xs_data_ready, (no path to unix_write_space)
+xs_data_ready, (no path to xs_error_report)
+xs_data_ready, (no path to xs_local_state_change)
+xs_data_ready, (no path to xs_tcp_state_change)
+xs_data_ready, (no path to xs_tcp_write_space)
+xs_tcp_write_space, (no path to tcp_stream_memory_free)
+xs_data_ready, (no path to xs_udp_write_space)
+mqueue_flush_file, (no path to put_pid)
+put_pid, put_pid_ns
+put_pid_ns, (no path to idr_destroy)
+put_pid_ns, (no path to proc_free_inum)
+filp_close, (no source for filp_close or nfs4_file_flush)
+nfs4_file_flush, (no source for nfs4_file_flush or filemap_fdatawrite)
+filemap_fdatawrite, (no path to inode_to_bdi)
+inode_to_bdi, I_BDEV
+nfs4_file_flush, (no source for nfs4_file_flush or nfs4_delegation_flush_on_close)
+filp_close, (no source for filp_close or nfs_file_flush)
+nfs_file_flush, (no source for nfs_file_flush or errseq_check)
+nfs_file_flush, (no source for nfs_file_flush or errseq_sample)
+nfs_file_flush, (no source for nfs_file_flush or nfs_wb_all)
+nfs_wb_all, (no path to __nfs_commit_inode)
+__nfs_commit_inode, nfs_commit_end, wake_up_var, __var_waitqueue
+__nfs_commit_inode, (no path to finish_wait)
+__nfs_commit_inode, (no path to init_wait_var_entry)
+__nfs_commit_inode, nfs_generic_commit_list
+nfs_generic_commit_list, (no path to get_nfs_open_context)
+nfs_generic_commit_list, (no path to kmem_cache_alloc)
+kmem_cache_alloc, (no path to should_failslab)
+nfs_generic_commit_list, (no path to mempool_alloc)
+mempool_alloc, (no path to __ksize)
+mempool_alloc, io_schedule_timeout
+mempool_alloc, (no source for mempool_alloc or prepare_to_wait)
+nfs_generic_commit_list, (no path to nfs_fattr_init)
+nfs_generic_commit_list, (no path to nfs_initiate_commit)
+nfs_initiate_commit, (no path to nfs3_proc_commit_setup)
+nfs_initiate_commit, (no path to nfs4_proc_commit_setup)
+nfs_initiate_commit, (no source for nfs_initiate_commit or nfs_proc_commit_setup)
+nfs_initiate_commit, rpc_wait_for_completion_task
+rpc_wait_for_completion_task, out_of_line_wait_on_bit
+out_of_line_wait_on_bit, (no source for out_of_line_wait_on_bit or __wait_on_bit)
+__wait_on_bit, (no source for __wait_on_bit or bit_wait)
+__wait_on_bit, (no source for __wait_on_bit or bit_wait_io)
+bit_wait_io, io_schedule
+__wait_on_bit, (no source for __wait_on_bit or bit_wait_io_timeout)
+__wait_on_bit, (no source for __wait_on_bit or bit_wait_timeout)
+__wait_on_bit, (no source for __wait_on_bit or nfs_wait_bit_killable)
+__wait_on_bit, (no source for __wait_on_bit or rpc_wait_bit_killable)
+nfs_generic_commit_list, (no path to nfs_retry_commit)
+nfs_retry_commit, (no source for nfs_retry_commit or nfs_clear_page_commit)
+nfs_clear_page_commit, (no source for nfs_clear_page_commit or dec_node_page_state)
+nfs_retry_commit, (no source for nfs_retry_commit or nfs_mark_page_unstable)
+nfs_mark_page_unstable, (no source for nfs_mark_page_unstable or inc_node_page_state)
+nfs_mark_page_unstable, (no source for nfs_mark_page_unstable or swapcache_mapping)
+__nfs_commit_inode, (no source for __nfs_commit_inode or nfs_scan_commit_list)
+__nfs_commit_inode, (no path to prepare_to_wait_event)
+__nfs_commit_inode, nfs_commit_end, wake_up_var
