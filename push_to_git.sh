@@ -1,6 +1,6 @@
 #!/bin/bash
 
-branch="wensan"
+branch="wensan_2"
 url="git@github.com:Icegrave0391/cleanslate-kerntracer.git"
 
 if [ ! -d ".git" ]; then
