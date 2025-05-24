@@ -21,6 +21,8 @@ import os
 import sys
 import re
 
+from kfunc_filter import should_filter_function
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Compute differences between syscall profiles and a baseline"
@@ -47,41 +49,41 @@ def parse_args():
     )
     return parser.parse_args()
 
-def should_ign_func(name):
-    # syscall_ent / interrupts
-    hard_filter_set = ["syscall_exit_work", "raw_notifier_call_chain", "tick_sched_handle", "update_vsyscall", "update_wall_time",
-                       "tick_do_update_jiffies64", "timekeeping_advance", "trigger_load_balance",
-                       "timekeeping_update", "update_fast_timekeeper", "ntp_get_next_leap", "ntp_tick_length",
-                       "account_system_time", "account_system_index_time", "__acct_update_integrals",
-                       "__accumulate_pelt_segments", "__update_load_avg_cfs_rq", "__update_load_avg_se",
-                       "calc_global_load", "cpuacct_charge", "cpuacct_account_field",
-                        "cgroup_rstat_updated", "update_curr", "update_cfs_group"]
-    patterns = [
-            re.compile("idle"),
-            re.compile("irq"),
-            re.compile("lock"),
-            re.compile("mutex"),
-            re.compile("rcu"),
-            re.compile("kcompactd"),
-            re.compile("ktime"),
-            re.compile("timer"),
-            re.compile("tick"),
-            re.compile("apic"),
-            re.compile(r"account_.*time"),
-            re.compile("cputime"),
-            re.compile(r"acct_.*_.*time"),
-            re.compile(r"cpuacct_.*"),
-            re.compile(r"update.*_.*time.*"),
-            re.compile("audit"), # auditd
-        ]
+# def should_ign_func(name):
+#     # syscall_ent / interrupts
+#     hard_filter_set = ["syscall_exit_work", "raw_notifier_call_chain", "tick_sched_handle", "update_vsyscall", "update_wall_time",
+#                        "tick_do_update_jiffies64", "timekeeping_advance", "trigger_load_balance",
+#                        "timekeeping_update", "update_fast_timekeeper", "ntp_get_next_leap", "ntp_tick_length",
+#                        "account_system_time", "account_system_index_time", "__acct_update_integrals",
+#                        "__accumulate_pelt_segments", "__update_load_avg_cfs_rq", "__update_load_avg_se",
+#                        "calc_global_load", "cpuacct_charge", "cpuacct_account_field",
+#                         "cgroup_rstat_updated", "update_curr", "update_cfs_group"]
+#     patterns = [
+#             re.compile("idle"),
+#             re.compile("irq"),
+#             re.compile("lock"),
+#             re.compile("mutex"),
+#             re.compile("rcu"),
+#             re.compile("kcompactd"),
+#             re.compile("ktime"),
+#             re.compile("timer"),
+#             re.compile("tick"),
+#             re.compile("apic"),
+#             re.compile(r"account_.*time"),
+#             re.compile("cputime"),
+#             re.compile(r"acct_.*_.*time"),
+#             re.compile(r"cpuacct_.*"),
+#             re.compile(r"update.*_.*time.*"),
+#             re.compile("audit"), # auditd
+#         ]
     
-    if name in hard_filter_set:
-        return True
+#     if name in hard_filter_set:
+#         return True
 
-    if any(p.search(name) for p in patterns):
-        return True
+#     if any(p.search(name) for p in patterns):
+#         return True
     
-    return False    
+#     return False    
 
 def load_functions(filepath, should_filter=True):
     """Read all function names from a file, one per line."""
@@ -91,7 +93,7 @@ def load_functions(filepath, should_filter=True):
             for line in f:
                 name = line.strip()
                 if name:
-                    if should_filter and should_ign_func(name):
+                    if should_filter and should_filter_function(name):
                         continue
                     funcs.add(name)
     except IOError:

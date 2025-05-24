@@ -3,6 +3,11 @@
 # Example:
 #   ./benchmark-nginx.sh out-nginx "http://127.0.0.1:9000/10K.html"
 
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 <output-dir>"
+  exit 1
+fi
+
 OUTDIR=$1
 URL="http://127.0.0.1:9000/10K.html"
 REQUESTS=${REQUESTS:-10000}    # ab -n

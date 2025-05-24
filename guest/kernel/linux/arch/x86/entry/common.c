@@ -175,7 +175,7 @@ static __always_inline bool do_syscall_x64(struct pt_regs *regs, int nr)
 
 	if (likely(unr < NR_syscalls)) {
 		// profile: always PT trace all (start)
-#if (0) // disabled
+#if (1) // disabled
 		if (is_tracked_proc()) {
 			do_start_stop_pt(1, unr);
 		}
@@ -204,7 +204,7 @@ static __always_inline bool do_syscall_x64(struct pt_regs *regs, int nr)
 		  }
 
 		// profile: always PT trace all (stop)
-#if (0) // disabled
+#if (1) // disabled
 		if (is_tracked_proc()) {
 			do_start_stop_pt(0, unr);
 		}
