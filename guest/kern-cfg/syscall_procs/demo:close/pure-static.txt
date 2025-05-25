@@ -1,11 +1,11 @@
 Subgraph has 2205 nodes and 4871 edges.
 Markdown tree representation:
-- __x64_sys_close <profiled>
-  - close_fd <profiled>
-    - filp_close <profiled>
-      - dnotify_flush <profiled>
+- __x64_sys_close
+  - close_fd
+    - filp_close
+      - dnotify_flush
         - fsnotify_detach_mark
-        - fsnotify_find_mark <profiled>
+        - fsnotify_find_mark
           - refcount_warn_saturate
             - __warn_printk
         - fsnotify_free_mark
@@ -86,7 +86,7 @@ Markdown tree representation:
           - __fsnotify_recalc_mask
             - ihold
           - __fsnotify_update_child_dentry_flags
-      - fput <profiled>
+      - fput
         - llist_add_batch
         - queue_delayed_work_on
           - __queue_delayed_work

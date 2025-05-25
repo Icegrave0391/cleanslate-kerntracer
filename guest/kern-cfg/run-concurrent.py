@@ -8,7 +8,7 @@ import scipy
 from kfunc_filter import should_filter_function
 
 from tools import *
-from ollama import chat
+from ollama import Client
 from collections import defaultdict, deque
 
 
@@ -53,6 +53,7 @@ def LLM_hybrid_expand_profile(
     subgraph: nx.DiGraph,
     k_cg: nx.DiGraph,
     all_blocks: dict[str, str],
+    client: Client,
     N: int = 2,
     model: str = "qwen3:32b",
     role: str = "user",
@@ -131,7 +132,7 @@ def LLM_hybrid_expand_profile(
                             log_file.write(f"PROMPT (depth {depth}):\n{prompt_text + question_text}\n\n")
     
                             # Query LLM
-                            response = chat(
+                            response = client.chat(
                                 model=model,
                                 messages=[{'role': role, 'content': final_prompt}],
                                 options={'num_ctx': num_ctx}
@@ -190,30 +191,34 @@ if __name__ == "__main__":
     print(f"Loaded {len(all_blocks)} function source blocks from the_functions_all.txt.")
     
     # syscall candidates. Let's do some easy ones first.
-    syscall_candidates = [
-        "demo:close", "3:close", "9:mmap", "10:mproptect", "11:munmap", "12:brk", "13:rt_sigaction",
-        "14:rt_sigprocmask", "15:rt_sigreturn",
+    print("Starting concurrent syscall processing...Client0")
+    client0 = Client(host="http://localhost:11432")
+    print("Starting concurrent syscall processing...Client1")
+    client1 = Client(host="http://localhost:11433")
+    
+    client0_syscall_candidates = [
+        "demo:close", "3:close", "9:mmap", "10:mproptect", 
     ]
     
-    for syscall_info in syscall_candidates:
-        print(f"Processing syscall: {syscall_info}")
+    client1_syscall_candidates = ["11:munmap", "12:brk", "13:rt_sigaction", "14:rt_sigprocmask", "15:rt_sigreturn",]
+    
+    import concurrent.futures
+
+    def process_candidate(syscall_info, client):
+        print(f"Processing syscall: {syscall_info} using client at {client}")
         
         sys_id, syscall_name = syscall_info.split(":", 1)
-        
-        # Create output directory if it doesn't exist
         out_dir = f"{proc_directory}/{syscall_info}"
         os.makedirs(out_dir, exist_ok=True)
         
-        # Load profiled functions from the corresponding profile file
         profile_file = f"{src_directory}/{syscall_info}/nginx-ltp-redis"
         if not os.path.exists(profile_file):
-            print(f"Profile file {profile_file} does not exist. Skipping.")
-            continue
+            print(f"Profile file {profile_file} does not exist. Skipping {syscall_info}.")
+            return
         
         profiled_functions = extract_profiled_functions(profile_file)
         print(f"Extracted {len(profiled_functions)} profiled functions for {syscall_info}.")
         
-        # Dump some statistics of the profiled functions
         entry_name = ""
         if f"__x64_sys_{syscall_name}" in profiled_functions:
             entry_name = f"__x64_sys_{syscall_name}"
@@ -223,19 +228,75 @@ if __name__ == "__main__":
             print(f"Entry function for syscall {syscall_name} not found in profiled functions.")
         
         pure_static_subgraph = gen_subgraph(k_cg_acyc, sys_entry_function=entry_name, function_set=None)
-        profiled_static_subgraph = gen_subgraph(k_cg_acyc, sys_entry_function=entry_name, function_set=profiled_functions, hops=2)    
+        profiled_static_subgraph = gen_subgraph(
+            k_cg_acyc, sys_entry_function=entry_name, function_set=profiled_functions, hops=2
+        )
         dump_subgraph_statistics(pure_static_subgraph, os.path.join(out_dir, proc_pure_static_file))
         dump_subgraph_statistics(profiled_static_subgraph, os.path.join(out_dir, proc_profile_static_file))
         
-        # Start LLM!
         dyn_graph = gen_subgraph(k_cg_acyc, sys_entry_function=None, function_set=profiled_functions)
         LLM_hybrid_expand_profile(
             subgraph=dyn_graph,
             k_cg=k_cg_acyc,
             all_blocks=all_blocks,
+            client=client,
             N=2,
             model="qwen3:32b",
             role="user",
             num_ctx=32768,
             syscall_info=syscall_info,
         )
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        futures = []
+        for candidate in client0_syscall_candidates:
+            futures.append(executor.submit(process_candidate, candidate, client0))
+        for candidate in client1_syscall_candidates:
+            futures.append(executor.submit(process_candidate, candidate, client1))
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
+            
+    # for syscall_info in syscall_candidates:
+    #     print(f"Processing syscall: {syscall_info}")
+        
+    #     sys_id, syscall_name = syscall_info.split(":", 1)
+        
+    #     # Create output directory if it doesn't exist
+    #     out_dir = f"{proc_directory}/{syscall_info}"
+    #     os.makedirs(out_dir, exist_ok=True)
+        
+    #     # Load profiled functions from the corresponding profile file
+    #     profile_file = f"{src_directory}/{syscall_info}/nginx-ltp-redis"
+    #     if not os.path.exists(profile_file):
+    #         print(f"Profile file {profile_file} does not exist. Skipping.")
+    #         continue
+        
+    #     profiled_functions = extract_profiled_functions(profile_file)
+    #     print(f"Extracted {len(profiled_functions)} profiled functions for {syscall_info}.")
+        
+    #     # Dump some statistics of the profiled functions
+    #     entry_name = ""
+    #     if f"__x64_sys_{syscall_name}" in profiled_functions:
+    #         entry_name = f"__x64_sys_{syscall_name}"
+    #     elif f"__x64_{syscall_name}64" in profiled_functions:
+    #         entry_name = f"__x64_{syscall_name}64"
+    #     else:
+    #         print(f"Entry function for syscall {syscall_name} not found in profiled functions.")
+        
+    #     pure_static_subgraph = gen_subgraph(k_cg_acyc, sys_entry_function=entry_name, function_set=None)
+    #     profiled_static_subgraph = gen_subgraph(k_cg_acyc, sys_entry_function=entry_name, function_set=profiled_functions, hops=2)    
+    #     dump_subgraph_statistics(pure_static_subgraph, os.path.join(out_dir, proc_pure_static_file))
+    #     dump_subgraph_statistics(profiled_static_subgraph, os.path.join(out_dir, proc_profile_static_file))
+        
+    #     # Start LLM!
+    #     dyn_graph = gen_subgraph(k_cg_acyc, sys_entry_function=None, function_set=profiled_functions)
+    #     LLM_hybrid_expand_profile(
+    #         subgraph=dyn_graph,
+    #         k_cg=k_cg_acyc,
+    #         all_blocks=all_blocks,
+    #         N=2,
+    #         model="qwen3:32b",
+    #         role="user",
+    #         num_ctx=32768,
+    #         syscall_info=syscall_info,
+    #     )
