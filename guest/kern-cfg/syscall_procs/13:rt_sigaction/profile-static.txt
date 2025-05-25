@@ -1265,17 +1265,6 @@ Markdown tree representation:
           - redraw_screen
             - set_cursor
             - vgacon_set_palette
-- __default_send_IPI_dest_field <profiled>
-- __x64_sys_rt_sigaction <profiled>
-  - _copy_from_user
-  - _copy_to_user
-  - do_sigaction <profiled>
-    - dec_rlimit_put_ucounts
-    - kmem_cache_free <profiled>
-      - __slab_free <profiled>
-      - cache_from_obj
-        - __warn_printk
-    - sigaction_compat_abi <profiled>
 - try_to_wake_up <profiled>
   - __delayacct_blkio_end
   - _find_first_bit
@@ -1371,3 +1360,14 @@ Markdown tree representation:
   - wake_page_function
     - wake_up_state
   - woken_wake_function
+- __default_send_IPI_dest_field <profiled>
+- __x64_sys_rt_sigaction <profiled>
+  - _copy_from_user
+  - _copy_to_user
+  - do_sigaction <profiled>
+    - dec_rlimit_put_ucounts
+    - kmem_cache_free <profiled>
+      - __slab_free <profiled>
+      - cache_from_obj
+        - __warn_printk
+    - sigaction_compat_abi <profiled>

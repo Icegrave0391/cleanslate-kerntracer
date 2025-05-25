@@ -105,19 +105,22 @@ def LLM_hybrid_expand_profile(
                             queried.add((src, dst))
     
                             # Build prompt text
-                            prompt_text = (
-                                f"You are a Linux security expert analyzing kernel call-graph edges.\n"
-                                f"Historical dynamic call graph (from prior executions):\n{markdown_output}\n\n"
-                                f"Caller: {src}\nSource code:\n{function_sources.get(src)}\n\n"
-                                f"Callee candidate: {dst}\nSource code:\n{all_blocks.get(dst)}\n\n"
-                                f"Additional context (other functions):\n"
+                            prompt_historical = (
+                                f"Here are some Linux kernel function's source code:\n"
                             )
-                            
-                            context_text = ""
+                            # Chuqi: TODO: use backward slicing
                             for node, code in function_sources.items():
                                 # prompt_text += f"-- {node}:\n{code}\n"
-                                context_text += f"-- {node}:\n{code}\n"
-                                
+                                prompt_historical += f"-- {node}:\n{code}\n"
+                            
+                            prompt_text = (
+                                f"Please first read the above functions' source code.\n"
+                                f"You are a Linux security expert analyzing kernel call-graph edges.\n"
+                                f"Historical dynamic function call-graph (from prior executions):\n{markdown_output}\n\n"
+                                f"Caller: {src}\nSource code:\n{function_sources.get(src)}\n\n"
+                                f"Callee candidate: {dst}\nSource code:\n{all_blocks.get(dst)}\n\n"
+                            )
+                            
                             question_text = (
                                 f"\nFrom a security-enforcement standpoint, and given the historical execution contexts, "
                                 f"please predict is it semantically and functionally reasonable to expect that "
@@ -125,7 +128,7 @@ def LLM_hybrid_expand_profile(
                                 f"then a literal answer: '{{Your justification}}\nFINAL ANSWER -> YES/NO'"
                             )
     
-                            final_prompt = prompt_text + context_text + question_text
+                            final_prompt = prompt_historical + prompt_text + question_text
     
                             # Log prompt
                             # Chuqi: I don't log those long source code context blocks

@@ -1,12 +1,10 @@
-Subgraph has 23 nodes and 23 edges.
+Subgraph has 19 nodes and 19 edges.
 Markdown tree representation:
 - __x64_sys_close <profiled>
   - close_fd <profiled>
     - filp_close <profiled>
       - dnotify_flush <profiled>
         - fsnotify_find_mark <profiled>
-          - refcount_warn_saturate
-            - __warn_printk
         - fsnotify_detach_mark
         - fsnotify_free_mark
           - inotify_freeing_mark
@@ -17,9 +15,7 @@ Markdown tree representation:
         - queue_delayed_work_on
           - __queue_delayed_work
       - mqueue_flush_file
-        - put_pid
       - nfs4_file_flush
-        - errseq_sample
         - nfs4_delegation_flush_on_close
         - nfs_wb_all
       - nfs_file_flush
