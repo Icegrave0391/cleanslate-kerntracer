@@ -7,7 +7,8 @@ def should_filter_function(name):
                        "account_system_time", "account_system_index_time", "__acct_update_integrals",
                        "__accumulate_pelt_segments", "__update_load_avg_cfs_rq", "__update_load_avg_se",
                        "calc_global_load", "cpuacct_charge", "cpuacct_account_field", "__queue_work", "kick_process",
-                        "cgroup_rstat_updated", "update_curr", "update_cfs_group", "task_work_add"]
+                        "cgroup_rstat_updated", "update_curr", "update_cfs_group", "task_work_add", "try_to_wake_up",
+                        "__smp_call_single_queue"]
     patterns = [
             re.compile("idle"),
             re.compile("irq"),
@@ -23,6 +24,10 @@ def should_filter_function(name):
             re.compile(r"account_.*time"),
             re.compile("cputime"),
             re.compile(r"acct_.*_.*time"),
+            re.compile(r".*_.*ipi"),
+            re.compile(r".*_.*IPI"),
+            re.compile(r".*_.*IPI_.*"),
+            re.compile(r".*_.*ipi_.*"),
             re.compile(r"cpuacct_.*"),
             re.compile(r"update.*_.*time.*"),
             re.compile("audit"), # auditd

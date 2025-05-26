@@ -14,7 +14,7 @@ Markdown tree representation:
                   - stack_depot_print
                     - stack_trace_print
               - free_large_kmalloc
-                - mod_node_page_state <profiled>
+                - mod_node_page_state
       - __split_vma
         - __vma_adjust
           - anon_vma_clone
@@ -35,21 +35,21 @@ Markdown tree representation:
                   - wake_q_add
                   - wake_q_add_safe
                 - rwsem_spin_on_owner
-            - kmem_cache_alloc <profiled>
-              - should_failslab <profiled>
+            - kmem_cache_alloc
+              - should_failslab
             - unlink_anon_vmas
               - __put_anon_vma
                 - up_write
               - anon_vma_interval_tree_remove
                 - __rb_erase_color
                 - rb_next
-          - fput <profiled>
+          - fput
             - llist_add_batch
             - queue_delayed_work_on
               - __queue_delayed_work
           - mas_destroy
             - mas_alloc_nodes
-              - kmem_cache_alloc_bulk <profiled>
+              - kmem_cache_alloc_bulk
             - mas_ascend
             - mas_leaf_max_gap
             - mas_replace
@@ -107,7 +107,7 @@ Markdown tree representation:
               - check_move_unevictable_pages
                 - check_move_unevictable_folios
               - kvfree
-                - is_vmalloc_addr <profiled>
+                - is_vmalloc_addr
               - mark_page_accessed
                 - folio_mark_accessed
                   - folio_activate
@@ -184,7 +184,7 @@ Markdown tree representation:
                                           - rethook_find_ret_addr
                                       - stack_type_name
                                       - unwind_get_return_address_ptr
-                            - __kmem_cache_alloc_node <profiled>
+                            - __kmem_cache_alloc_node
                           - acpi_error
                             - acpi_os_printf
                               - vsprintf
@@ -193,7 +193,7 @@ Markdown tree representation:
                         - acpi_ut_get_region_name
                         - acpi_warning
                   - kclist_add_private
-                    - kmalloc_trace <profiled>
+                    - kmalloc_trace
                   - pagerange_is_ram_callback
           - drm_gem_vm_close
             - drm_gem_shmem_object_free
@@ -201,10 +201,10 @@ Markdown tree representation:
                 - dma_unmap_sg_attrs
                   - dma_direct_unmap_sg
                     - sg_next
-                    - swiotlb_sync_single_for_cpu <profiled>
-                      - swiotlb_bounce <profiled>
+                    - swiotlb_sync_single_for_cpu
+                      - swiotlb_bounce
                         - dev_driver_string
-                    - swiotlb_tbl_unmap_single <profiled>
+                    - swiotlb_tbl_unmap_single
                   - iommu_dma_unmap_sg
                     - __iommu_dma_unmap
                       - amd_iommu_iotlb_sync
@@ -275,9 +275,9 @@ Markdown tree representation:
               - virtio_gpu_notify
                 - virtqueue_kick_prepare
                 - virtqueue_notify
-                  - virtqueue_enable_cb <profiled>
+                  - virtqueue_enable_cb
                   - virtqueue_enable_cb_delayed
-                  - virtqueue_is_broken <profiled>
+                  - virtqueue_is_broken
                   - virtqueue_kick
                     - vp_notify
                       - iowrite16
@@ -304,9 +304,9 @@ Markdown tree representation:
                       - vmemmap_restore_pte
                 - alloc_buddy_huge_page
                 - free_contig_range
-                  - free_unref_page <profiled>
-                    - free_pcp_prepare <profiled>
-                    - free_unref_page_commit <profiled>
+                  - free_unref_page
+                    - free_pcp_prepare
+                    - free_unref_page_commit
             - apply_policy_zone
               - __bitmap_intersects
             - cpuset_nodemask_valid_mems_allowed
@@ -368,7 +368,7 @@ Markdown tree representation:
           - shm_open
             - __shm_open
               - ipc_obtain_object_idr
-              - put_pid <profiled>
+              - put_pid
                 - put_pid_ns
                   - idr_destroy
                   - proc_free_inum
@@ -398,7 +398,7 @@ Markdown tree representation:
                 - ipc_kht_remove
                   - __rht_bucket_nested
                   - local_bh_enable
-                    - __local_bh_enable_ip <profiled>
+                    - __local_bh_enable_ip
           - snd_pcm_mmap_data_close
           - special_mapping_close
           - ttm_bo_vm_close
@@ -477,14 +477,14 @@ Markdown tree representation:
                               - __guc_context_sched_disable
                                 - intel_guc_ct_send
                                   - __tasklet_hi_schedule
-                                    - __tasklet_schedule_common <profiled>
+                                    - __tasklet_schedule_common
                                   - _dev_err
                                   - ct_write
                                     - intel_guc_write_barrier
                                       - i915_gem_object_is_lmem
                                   - intel_guc_notify
                                   - msleep_interruptible
-                                    - __msecs_to_jiffies <profiled>
+                                    - __msecs_to_jiffies
                                     - jiffies_to_msecs
                                   - usleep_range_state
                                     - schedule_hrtimeout_range
@@ -611,8 +611,8 @@ Markdown tree representation:
                       - dma_resv_reserve_fences
                         - dma_fence_array_signaled
                         - i915_fence_signaled
-                        - ksize <profiled>
-                          - __ksize <profiled>
+                        - ksize
+                          - __ksize
                         - virtio_gpu_fence_signaled
                       - i915_sw_fence_await_active
                         - await_active
@@ -678,8 +678,8 @@ Markdown tree representation:
                           - cpuset_mem_spread_node
                             - __find_nth_bit
                             - __get_random_u32_below
-                              - get_random_u32 <profiled>
-                                - crng_make_state <profiled>
+                              - get_random_u32
+                                - crng_make_state
                                   - extract_entropy
                                     - blake2s_final
                                     - blake2s_update
@@ -766,7 +766,7 @@ Markdown tree representation:
                                             - filenametr_destroy
                                             - get_classes_callback
                                               - kstrdup
-                                                - __kmalloc_node_track_caller <profiled>
+                                                - __kmalloc_node_track_caller
                                             - get_permissions_callback
                                             - perm_destroy
                                             - perm_write
@@ -925,9 +925,9 @@ Markdown tree representation:
                           - dma_map_sgtable
                             - __dma_map_sg_attrs
                               - dma_direct_map_sg
-                                - is_swiotlb_active <profiled>
-                                - swiotlb_map <profiled>
-                                  - swiotlb_tbl_map_single <profiled>
+                                - is_swiotlb_active
+                                - swiotlb_map
+                                  - swiotlb_tbl_map_single
                               - dma_dummy_map_sg
                               - iommu_dma_map_sg
                                 - __finalise_sg
@@ -1061,7 +1061,7 @@ Markdown tree representation:
                                         - dma_common_find_pages
                                           - find_vm_area
                                         - dma_common_free_remap
-                                  - dma_unmap_page_attrs <profiled>
+                                  - dma_unmap_page_attrs
                                     - iommu_dma_unmap_page
                                   - set_pages_wb
                           - ttm_bo_wait

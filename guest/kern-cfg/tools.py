@@ -3,8 +3,20 @@
 ###########################################
 from kfunc_filter import should_filter_function
 import re
+import matplotlib.pyplot as plt
 import networkx as nx
 from tqdm import tqdm
+
+def draw_subgraph(graph, graph_name):
+    plt.figure(figsize=(12, 8))
+    pos = nx.spring_layout(graph)  # Use the graph layout
+    in_degree_zero_nodes = [node for node in graph if graph.in_degree(node) == 0]
+    node_colors = ['red' if node in in_degree_zero_nodes else 'lightblue' for node in graph.nodes]
+    nx.draw(graph, pos, with_labels=True, node_size=500, font_size=10, node_color=node_colors, edge_color='black')
+    print(f"Subgraph number of nodes: {len(graph.nodes())}, number of edges: {len(graph.edges())}")
+    plt.title(f"Subgraph: {graph_name}")
+    plt.show()
+    plt.savefig(f"{graph_name}.png", format='png', dpi=300)
 
 def gen_subgraph(static_graph, sys_entry_function=None, function_set=None, hops=2):
     """
@@ -55,6 +67,29 @@ def gen_subgraph(static_graph, sys_entry_function=None, function_set=None, hops=
     # Create the subgraph with the filtered nodes
     subgraph = static_graph.subgraph(subgraph_nodes).copy()
     return subgraph
+
+def backward_slice(graph, node):
+    """
+    Traverse the graph in reverse order starting from `node`, and include all nodes up to the root nodes.
+    A root node is defined as a node with an in-degree of 0.
+    
+    Returns a subgraph containing all collected nodes.
+    """
+    backward_nodes = set()
+    stack = [node]
+    
+    while stack:
+        current = stack.pop()
+        if current in backward_nodes:
+            continue
+        backward_nodes.add(current)
+        if graph.in_degree(current) == 0:
+            continue
+        for predecessor in graph.predecessors(current):
+            if predecessor not in backward_nodes:
+                stack.append(predecessor)
+    
+    return graph.subgraph(backward_nodes).copy()
 
 def outedges_callgraph(graph, function_name, do_filter=True):
     """ 
