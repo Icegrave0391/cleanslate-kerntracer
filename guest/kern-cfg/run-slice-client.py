@@ -61,15 +61,19 @@ def LLM_hybrid_expand_profile(
     model: str = "qwen3:32b",
     role: str = "user",
     num_ctx: int = 14336,
-    syscall_info: str = "3:close") -> nx.DiGraph:
+    syscall_info: str = "3:close",
+    nothink: bool = True) -> nx.DiGraph:
     """
     Proof-of-concept: iteratively expand `subgraph` by querying LLM for
     semantically valid static edges, up to N hops per dynamic start node.
     """
     
+    mode = "nothink" if nothink else "think"
+    
     out_dir = f"{proc_directory}/{syscall_info}"
     profile_info_output = f"{out_dir}/profiled_info.txt"
-    the_output = f"{out_dir}/llm_logs.txt"
+    
+    the_output = f"{out_dir}/llm_logs_{mode}.txt"
     
     with open(profile_info_output, 'w', encoding='utf-8') as f:
         f.write(f"Profiled functions: {len(subgraph.nodes)} nodes and {len(subgraph.edges)} edges.\n")
@@ -173,7 +177,8 @@ def LLM_hybrid_expand_profile(
                         # log the query and time to the console
                         print(f"[Expanding {syscall_info}] Querying LLM for edge {src} -> {dst} at depth {depth}...")
                         s_time = time.time()
-                        response = client.chat(
+                        llm_chat = client.chat if client else chat
+                        response = llm_chat(
                             model=model,
                             messages=[{'role': role, 'content': final_prompt}],
                             options={'num_ctx': num_ctx}
@@ -201,16 +206,18 @@ def LLM_hybrid_expand_profile(
                 print(f"[Expanding {syscall_info}] {counter}/{len(dynamic_order)} nodes processed.")
     
     # Dump statistics of final subgraph
-    dump_subgraph_statistics(subgraph, os.path.join(out_dir, "result.txt"))
+    dump_subgraph_statistics(subgraph, os.path.join(out_dir, f"result_{mode}.txt"))
     # Dump the expanded subgraph to a file
-    nx.write_graphml(subgraph, os.path.join(out_dir, "expanded_subgraph.graphml"))
+    nx.write_graphml(subgraph, os.path.join(out_dir, f"expanded_subgraph_{mode}.graphml"))
     return subgraph
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the slice client with a custom port for the client connection.")
-    parser.add_argument("--port", type=int, default=11434, help="Port number for client connection")
+    parser.add_argument("--port", type=int, default=0, help="Port number for client connection")
     parser.add_argument("--syscalls", nargs="+", default=[], help="List of syscalls in format sys_id:syscall (e.g., 3:close 9:mmap).")
+    parser.add_argument("--nothink", action="store_true", help="Enable nothink mode; if provided, nothink is True")
+    
     args = parser.parse_args()
 
     if not args.syscalls:
@@ -223,6 +230,12 @@ if __name__ == "__main__":
     if not os.path.exists(kernel_cg_acyc_path):
         print(f"Callgraph acyclic file {kernel_cg_acyc_path} does not exist. Please generate it first.")
         exit(1)
+        
+    if args.nothink:
+        print("Running in Qwen nothink mode.")
+    
+    if not args.port:
+        print("No port specified. Using default Ollama client connection.")
     
     # Load the call graph and acyclic call graph
     k_cg = nx.read_graphml(kernel_cg_path)
@@ -252,10 +265,17 @@ if __name__ == "__main__":
         exit(1)
         
     # Start ollama client
-    client = Client(host=f"http://localhost:{args.port}")
-    respond = client.chat(
+    if args.port:
+        client = Client(host=f"http://localhost:{args.port}")
+        llm_chat = client.chat
+    else:
+        client = None
+        llm_chat = chat
+    
+    nothink_prompt = "\\nothink" if args.nothink else ""
+    respond = llm_chat(
         model="qwen3:32b",
-        messages=[{"role": "user", "content": "Warm up. Just say {{MF}}!"}],
+        messages=[{"role": "user", "content": "Warm up. Just say {{MF}}!" + nothink_prompt}],
         options={"num_ctx": 32768}
     )
     print(f"Ollama client connected. Response: {respond.message.content}")
@@ -295,6 +315,8 @@ if __name__ == "__main__":
         # Start LLM!
         dyn_graph = gen_subgraph(k_cg_acyc, sys_entry_function=None, function_set=profiled_functions)
         
+        thinkmode = "nothink" if args.nothink else "think"
+        
         # profile the time taken
         start_time = time.time()
         LLM_hybrid_expand_profile(
@@ -307,9 +329,10 @@ if __name__ == "__main__":
             role="user",
             num_ctx=32768,
             syscall_info=syscall_info,
+            nothink=args.nothink,
         )
         end_time = time.time()
         elapsed_time = end_time - start_time
         # write time taken to a output file 
-        with open(os.path.join(out_dir, "time_taken.txt"), "w") as f:
+        with open(os.path.join(out_dir, f"time_taken_{thinkmode}.txt"), "w") as f:
             f.write(f"Time taken for LLM expansion of {syscall_info}: {elapsed_time:.2f} seconds\n")

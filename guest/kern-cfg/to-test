@@ -18,41 +18,11 @@
 
 Chuqi Doing (card0):
 
-43:accept
-54:setsockopt
-56:clone
-74:fsync
-82:rename
-202:futex
-232:epoll_wait
-233:epoll_ctl
-293:pipe2
-20:writev
-40:sendfile64
-45:recvfrom
-288:accept4
-231:exit_group
-257:openat
-262:newfstatat
-302:prlimit64
-318:getrandom
+43:accept 54:setsockopt 56:clone 74:fsync 82:rename 202:futex 232:epoll_wait 233:epoll_ctl 293:pipe2 20:writev 40:sendfile 45:recvfrom 288:accept4 231:exit_group 257:openat 262:newfstatat 302:prlimit64 318:getrandom
 
 Chuqi Doing (card1):
 
-99:sysinfo
-100:times
-80:chdir
-186:gettid
-234:tgkill
-46:sendmsg
-52:getpeername
-230:clock_nanosleep
-16:ioctl
-41:socket
-42:connect
-63:newuname
-79:getcwd
-89:readlink
+99:sysinfo 100:times 80:chdir 186:gettid 234:tgkill 46:sendmsg 52:getpeername 230:clock_nanosleep 16:ioctl 41:socket 42:connect 63:newuname 79:getcwd 89:readlink
 92:chown
 128:rt_sigtimedwait
 204:sched_getaffinity
