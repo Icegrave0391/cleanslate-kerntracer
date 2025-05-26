@@ -87,6 +87,7 @@ def backward_slice(graph, node):
             continue
         for predecessor in graph.predecessors(current):
             if predecessor not in backward_nodes:
+                # print(f"src: {current} adding  predecessor: {predecessor}")
                 stack.append(predecessor)
     
     return graph.subgraph(backward_nodes).copy()

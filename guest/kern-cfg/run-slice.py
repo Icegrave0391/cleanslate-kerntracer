@@ -173,7 +173,7 @@ def LLM_hybrid_expand_profile(
                         # log the query and time to the console
                         print(f"[Expanding {syscall_info}] Querying LLM for edge {src} -> {dst} at depth {depth}...")
                         s_time = time.time()
-                        response = client.chat(
+                        response = chat(
                             model=model,
                             messages=[{'role': role, 'content': final_prompt}],
                             options={'num_ctx': num_ctx}
@@ -181,7 +181,7 @@ def LLM_hybrid_expand_profile(
                         #log the query time
                         e_time = time.time()
                         print(f"=> Query time: {e_time - s_time:.2f} seconds\n")
-
+        
                         resp = regex_think.sub('', response.message.content).strip()
                         resp = regex_whitespace.sub('', resp)
         
@@ -208,8 +208,7 @@ def LLM_hybrid_expand_profile(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run the slice client with a custom port for the client connection.")
-    parser.add_argument("--port", type=int, default=11434, help="Port number for client connection")
+    parser = argparse.ArgumentParser(description="Run!")
     parser.add_argument("--syscalls", nargs="+", default=[], help="List of syscalls in format sys_id:syscall (e.g., 3:close 9:mmap).")
     args = parser.parse_args()
 
@@ -252,13 +251,13 @@ if __name__ == "__main__":
         exit(1)
         
     # Start ollama client
-    client = Client(host=f"http://localhost:{args.port}")
-    respond = client.chat(
-        model="qwen3:32b",
-        messages=[{"role": "user", "content": "Warm up. Just say {{MF}}!"}],
-        options={"num_ctx": 32768}
-    )
-    print(f"Ollama client connected. Response: {respond.message.content}")
+    # client = Client(host=f"http://localhost:{args.port}")
+    # respond = client.chat(
+    #     model="qwen3:32b",
+    #     messages=[{"role": "user", "content": "Warm up. Just say {{MF}}!"}],
+    #     options={"num_ctx": 32768}
+    # )
+    # print(f"Ollama client connected. Response: {respond.message.content}")
     
     for syscall_info in syscall_candidates:
         print(f"Processing syscall: {syscall_info}")
@@ -301,7 +300,7 @@ if __name__ == "__main__":
             subgraph=dyn_graph,
             k_cg=k_cg_acyc,
             all_blocks=all_blocks,
-            client=client,
+            client=None,
             N=2,
             model="qwen3:32b",
             role="user",
