@@ -1,7 +1,5 @@
 0:read
 1:write
-3:close
-9:mmap
 10:mprotect
 17:pread64
 21:access
@@ -22,11 +20,7 @@ Chuqi Doing (card0):
 
 Chuqi Doing (card1):
 
-99:sysinfo 100:times 80:chdir 186:gettid 234:tgkill 46:sendmsg 52:getpeername 230:clock_nanosleep 16:ioctl 41:socket 42:connect 63:newuname 79:getcwd 89:readlink
-92:chown
-128:rt_sigtimedwait
-204:sched_getaffinity
-217:getdents64
+99:sysinfo 100:times 80:chdir 186:gettid 234:tgkill 46:sendmsg 52:getpeername 230:clock_nanosleep 16:ioctl 41:socket 42:connect 63:newuname 79:getcwd 89:readlink 92:chown 128:rt_sigtimedwait 204:sched_getaffinity 217:getdents64 3:close 9:mmap
 
 Chuqi Down:
 11:munmap
