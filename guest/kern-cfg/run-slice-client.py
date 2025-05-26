@@ -232,7 +232,9 @@ if __name__ == "__main__":
         exit(1)
         
     if args.nothink:
-        print("Running in Qwen nothink mode.")
+        print("Running in Qwen NO-THINK mode.")
+    else:
+        print("Running in Qwen THINK mode.")
     
     if not args.port:
         print("No port specified. Using default Ollama client connection.")
