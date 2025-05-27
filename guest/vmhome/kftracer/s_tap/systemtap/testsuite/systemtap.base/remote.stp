@@ -1,8 +1,0 @@
-probe begin, end {
-    println(pp(), remote_id(), ":", remote_uri())
-}
-
-probe timer.s(30) {
-    println("timeout!")
-    exit()
-}

@@ -1,3 +1,0 @@
-#! stap -gp1
-
-probe oneshot { @kderef(4, ptr) }

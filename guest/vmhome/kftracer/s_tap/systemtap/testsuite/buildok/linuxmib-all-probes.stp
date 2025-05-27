@@ -1,5 +1,0 @@
-#! stap -u -p4
-
-// Tests if all probes in the linuxmib tapset are resolvable.
-
-probe linuxmib.* {}

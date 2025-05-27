@@ -1,1 +1,0 @@
-probe ap1.process = process("ap1").function("main") {}

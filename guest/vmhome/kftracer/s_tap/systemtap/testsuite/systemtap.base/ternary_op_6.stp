@@ -1,4 +1,0 @@
-probe oneshot {
-    a = 3;
-    printf("%d\n", a > 0 ? b = 3 : (c = 4));
-}

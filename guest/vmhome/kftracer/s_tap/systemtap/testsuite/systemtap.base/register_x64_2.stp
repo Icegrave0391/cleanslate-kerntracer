@@ -1,8 +1,0 @@
-probe process.function("foo").return {
-    printf("rbx = %#x\n", register("rbx"));
-    printf("u rbx = %#x\n\n", u_register("rbx"));
-
-    printf("ebx = %#x\n", register("ebx"));
-    printf("u ebx = %#x\n", u_register("ebx"));
-    exit()
-}

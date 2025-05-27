@@ -1,3 +1,0 @@
-probe process(@1).begin {
-  println("process begin")
-}

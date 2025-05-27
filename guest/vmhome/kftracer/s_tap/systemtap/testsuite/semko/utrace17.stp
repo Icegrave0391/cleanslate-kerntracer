@@ -1,4 +1,0 @@
-#! stap -p2
-
-# treat $argN as an array
-probe process("/bin/cat").syscall { print($arg1[0]) }

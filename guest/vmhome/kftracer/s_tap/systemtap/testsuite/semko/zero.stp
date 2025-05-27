@@ -1,6 +1,0 @@
-#! stap -p2
-
-probe begin {
-  print (1 = a)
-  print (a+1 = 4)
-}

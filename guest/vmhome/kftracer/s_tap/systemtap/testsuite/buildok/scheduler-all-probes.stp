@@ -1,5 +1,0 @@
-#! stap -u -wp4
-
-// Tests if all probes in the scheduler tapset are resolvable.
-
-probe scheduler.* {}

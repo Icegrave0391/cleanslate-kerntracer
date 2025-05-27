@@ -1,3 +1,0 @@
-probe process.function("foo") {
-    print_ustack(ubacktrace());
-}

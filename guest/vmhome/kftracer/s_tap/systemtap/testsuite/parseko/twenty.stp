@@ -1,8 +1,0 @@
-#! stap -p1
-
-# 'return' in probe context
-
-probe begin
-{
-    return
-}

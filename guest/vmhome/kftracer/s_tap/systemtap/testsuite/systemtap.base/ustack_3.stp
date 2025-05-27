@@ -1,5 +1,0 @@
-probe process.function("mark") {
-    s = sprint_ubacktrace();
-    s = sprintf("bt: %s", s)
-    printf("%s", s);
-}

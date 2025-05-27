@@ -1,4 +1,0 @@
-probe process("const_value_func.exe").mark("constvalues")
-{
-  printf("f: %s\n", usymname($f));
-}

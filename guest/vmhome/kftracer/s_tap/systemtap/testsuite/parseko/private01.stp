@@ -1,4 +1,0 @@
-#! stap -p1
-
-global globalvar
-private globalvar

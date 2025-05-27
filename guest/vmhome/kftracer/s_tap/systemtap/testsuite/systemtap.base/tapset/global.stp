@@ -1,4 +1,0 @@
-global test_global = 1
-probe begin {
-  println("included global")
-}

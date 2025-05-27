@@ -1,8 +1,0 @@
-#! stap -p4
-
-// build-test the loadavg tapset functions
-
-probe begin {
-      print(get_loadavg_index(0))
-      print(sprint_loadavg())
-}

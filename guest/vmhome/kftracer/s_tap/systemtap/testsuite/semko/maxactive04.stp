@@ -1,5 +1,0 @@
-#! stap -p2
-
-probe kernel.function("vfs_read").return.maxactive(-4)
-{
-}

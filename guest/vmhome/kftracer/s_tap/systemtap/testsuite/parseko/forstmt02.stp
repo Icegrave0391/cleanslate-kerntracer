@@ -1,9 +1,0 @@
-#! stap -p1
-
-# no ';' following for initialization
-
-function decl()
-{
-    for (i = 0)
-        j = i
-}

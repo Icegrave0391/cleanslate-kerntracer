@@ -1,5 +1,0 @@
-#! stap -p4
-
-probe begin {
-	print(ctime(0))
-}

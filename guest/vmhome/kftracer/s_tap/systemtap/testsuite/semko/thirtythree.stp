@@ -1,5 +1,0 @@
-#! stap -u -p2
-
-// should fail since all these functions are blocklisted
-probe kernel.function("do_IRQ") {} 
-probe kernel.function("*@*/kprobes.c") {} 

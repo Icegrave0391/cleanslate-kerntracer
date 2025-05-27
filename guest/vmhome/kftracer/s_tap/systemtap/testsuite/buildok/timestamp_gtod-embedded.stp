@@ -1,8 +1,0 @@
-#! stap -p4
-
-probe begin {
-  println(gettimeofday_ns())
-  println(gettimeofday_us())
-  println(gettimeofday_ms())
-  println(gettimeofday_s())
-}

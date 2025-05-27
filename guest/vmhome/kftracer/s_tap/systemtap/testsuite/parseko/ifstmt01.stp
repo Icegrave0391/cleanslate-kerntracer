@@ -1,8 +1,0 @@
-#! stap -p1
-
-# missing parens after if statment
-
-function decl()
-{
-    if a == b
-}

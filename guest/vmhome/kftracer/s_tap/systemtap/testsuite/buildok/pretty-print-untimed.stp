@@ -1,3 +1,0 @@
-#! stap -g --suppress-time-limits -p4
-
-probe kernel.function("vfs_open") { printf("%s(path: %s)\n", ppfunc(), $path$) ; exit() }

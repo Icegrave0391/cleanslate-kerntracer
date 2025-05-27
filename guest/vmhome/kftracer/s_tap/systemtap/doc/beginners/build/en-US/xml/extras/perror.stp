@@ -1,2 +1,0 @@
-probe vfs.read
-probe vfs.write

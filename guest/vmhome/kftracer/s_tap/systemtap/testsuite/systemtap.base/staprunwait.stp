@@ -1,3 +1,0 @@
-#! /usr/bin/env stap
-
-probe timer.s(10) { println(ctime()) }

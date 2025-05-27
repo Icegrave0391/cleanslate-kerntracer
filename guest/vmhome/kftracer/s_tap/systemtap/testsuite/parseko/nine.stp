@@ -1,4 +1,0 @@
-#! stap -p1
-probe foo {
-  /*/ 0
-}

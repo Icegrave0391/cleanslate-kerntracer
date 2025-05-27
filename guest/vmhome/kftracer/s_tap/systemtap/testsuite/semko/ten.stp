@@ -1,5 +1,0 @@
-#! stap -p2
-
-global foo
-probe begin { foo = 1 }
-probe end { if (4 in foo) { } }

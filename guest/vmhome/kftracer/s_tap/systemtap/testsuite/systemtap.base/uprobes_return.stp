@@ -1,2 +1,0 @@
-#! stap -p4
-probe process("./jennie").function("main").return { printf("%s %s\n",pp(),$$return) }

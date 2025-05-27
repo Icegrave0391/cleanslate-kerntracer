@@ -1,1 +1,0 @@
-../Tapset_Reference_Guide/publicanize.sh

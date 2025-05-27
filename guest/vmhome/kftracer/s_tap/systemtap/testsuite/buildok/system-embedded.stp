@@ -1,6 +1,0 @@
-#! stap -p4
-
-probe begin
-{
-    system("ls")
-}

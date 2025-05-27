@@ -1,9 +1,0 @@
-probe kernel.data(0x$^ADDR_a).length(4).write {
-    if (pid() == target()) {
-        println("Hit");
-    }
-}
-
-probe timer.s(5) {
-    exit();
-}

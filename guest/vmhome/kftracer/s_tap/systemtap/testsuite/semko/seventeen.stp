@@ -1,3 +1,0 @@
-#! stap -u -p2
-
-probe module("no_such_module").function("*") { }

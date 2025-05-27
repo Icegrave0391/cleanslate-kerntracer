@@ -1,4 +1,0 @@
-#! stap -p2
-
-# treat $syscall as a pointer
-probe process("/bin/cat").syscall { print($syscall->foo) }

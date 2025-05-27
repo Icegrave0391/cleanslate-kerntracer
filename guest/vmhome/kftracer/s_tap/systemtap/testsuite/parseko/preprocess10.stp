@@ -1,4 +1,0 @@
-#! stap -p1
-
-# expected number as right value in comparison
-%( $# != "2" %? probe begin { } %)

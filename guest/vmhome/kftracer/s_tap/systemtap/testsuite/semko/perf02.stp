@@ -1,5 +1,0 @@
-#! stap -p2
-
-# missing perf probe counter component name
-global x
-probe perf.hw.cpu_cycles.process("/bin/ls").counter("") {}

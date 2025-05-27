@@ -1,7 +1,0 @@
-#! stap -p1
-
-%{ /* embedded code not permitted since -g not supplied */ %}
-
-probe begin
-{
-}

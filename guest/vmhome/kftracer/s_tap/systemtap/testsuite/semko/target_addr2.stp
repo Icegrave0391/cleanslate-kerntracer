@@ -1,6 +1,0 @@
-#! stap -p2
-
-// can't take the address of register parameters
-probe kernel.function("do_sys_open") {
-    println(& $dfd)
-}

@@ -1,8 +1,0 @@
-function foo(a) {
-    println(usymdata(a));
-}
-
-probe oneshot {
-    foo(0xdeadbeef);
-    println("hey");
-}

@@ -1,8 +1,0 @@
-#! stap -p2
-
-# missing global declaration
-probe begin
-{
-    a <<< 1
-    println(@count(a))
-}

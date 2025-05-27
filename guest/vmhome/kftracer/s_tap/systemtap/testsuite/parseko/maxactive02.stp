@@ -1,9 +1,0 @@
-#! stap -p1
-
-# maxactive with a non-number argument
-
-global N = 2
-
-probe kernel.function("*").return.maxactive(N)
-{
-}

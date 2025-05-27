@@ -1,3 +1,0 @@
-#! stap -p1
-
-probe {a,b}.{c,{d,e}}.f! {}

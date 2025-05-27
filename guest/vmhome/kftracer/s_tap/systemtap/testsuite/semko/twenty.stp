@@ -1,7 +1,0 @@
-#! stap -p2
-
-function a:string () { }
-
-probe begin {
-  print (a() + 1)
-}

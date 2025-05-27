@@ -1,1 +1,0 @@
-probe begin { log("hello world") print_backtrace() exit() }

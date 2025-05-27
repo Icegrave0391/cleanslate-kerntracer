@@ -1,5 +1,0 @@
-#! stap -u -p4
-
-// Tests if all probes in the tcpmib tapset are resolvable.
-
-probe tcpmib.* {}

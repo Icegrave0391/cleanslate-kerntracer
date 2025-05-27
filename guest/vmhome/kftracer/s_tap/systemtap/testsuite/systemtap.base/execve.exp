@@ -1,4 +1,0 @@
-set test "execve"
-set ::result_string {"/bin/true"}
-
-stap_run2 $srcdir/$subdir/$test.stp -c /bin/true
