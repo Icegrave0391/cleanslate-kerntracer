@@ -31,13 +31,26 @@ def gen_subgraph(static_graph, sys_entry_function=None, function_set=None, hops=
         Generate a subgraph containing the nodes in function_set, and also bfs traverse the nodes in N `hops`
         from each node in function_set.
     """
+    if not sys_entry_function and not function_set:
+        # return an empty graph
+        print("Both sys_entry_function and function_set are None, returning an empty graph.")
+        return nx.DiGraph()
+    
     if not function_set:
         # If function_set is empty, use all reachable nodes from the sys_entry_function
-        subgraph_nodes = nx.descendants(static_graph, sys_entry_function)
-        subgraph_nodes.add(sys_entry_function)  # Include the entry function itself
+        if sys_entry_function in static_graph.nodes:
+            subgraph_nodes = nx.descendants(static_graph, sys_entry_function)
+            subgraph_nodes.add(sys_entry_function)  # Include the entry function itself
+        else:   
+            print(f"sys_entry_function {sys_entry_function} is not in the static graph, returning an empty graph.")
+            subgraph_nodes = set()
     else:
         # Filter nodes to include only those in the function_set
         function_set = [f for f in function_set if not should_filter_function(f)]
+        for f in function_set:
+            if f not in static_graph.nodes:
+                print(f"Function {f} is not in the static graph, skipping it.")
+        function_set = [f for f in function_set if f in static_graph.nodes]
         subgraph_nodes = set(function_set)
 
     if sys_entry_function is not None and function_set is not None:

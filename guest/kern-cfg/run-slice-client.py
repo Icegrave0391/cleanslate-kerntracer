@@ -130,9 +130,9 @@ def LLM_hybrid_expand_profile(
                     back_slice_grh = backward_slice(subgraph, src)
                     markdown_output = graph_to_markdown_tree(back_slice_grh)
                     
-                    if src == "free_unref_page_list":
-                        import IPython; IPython.embed()
-                        exit(0)
+                    # if src == "free_unref_page_list":
+                    #     import IPython; IPython.embed()
+                    #     exit(0)
                         
                     for _, dst in k_cg.out_edges(src):
                         if subgraph.has_edge(src, dst) or (src, dst) in queried:
