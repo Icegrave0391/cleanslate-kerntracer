@@ -185,19 +185,21 @@ def LLM_hybrid_expand_profile(
                         )
                         #log the query time
                         e_time = time.time()
-                        print(f"=> Query time: {e_time - s_time:.2f} seconds\n")
+                        query_yes = "NO"
 
                         resp = regex_think.sub('', response.message.content).strip()
                         resp = regex_whitespace.sub('', resp)
         
                         # Log response
                         log_file.write(f"RESPONSE:\n{resp}\n\n")
-        
                         if 'FINAL ANSWER -> YES' in resp.upper():
+                            query_yes = "YES"
                             subgraph.add_node(dst)
                             subgraph.add_edge(src, dst, inferred=True)
                             next_frontier.append(dst)
                             log_file.write(f"Added edge: {src} -> {dst}\n")
+        
+                        print(f"=> Query time: {e_time - s_time:.2f} seconds. res: f{"query_yes"}\n")
         
                 frontier = next_frontier
             
