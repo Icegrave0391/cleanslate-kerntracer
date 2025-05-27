@@ -1,0 +1,1182 @@
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- __request_module
+  - kstrdup
+    - __kmalloc_node_track_caller
+- __x64_sys_socket
+  - __sys_socket
+    - __sock_create
+      - security_socket_post_create
+        - selinux_socket_post_create
+          - selinux_netlbl_socket_post_create
+            - selinux_netlbl_sock_genattr
+              - security_netlbl_sid_to_secattr
+                - kstrdup
+                  - __kmalloc_node_track_caller
+
+Caller: __kmalloc_node_track_caller
+Source code:
+void *__kmalloc_node_track_caller(size_t size, gfp_t gfp,
+					int node, unsigned long caller)
+{
+	return __do_kmalloc_node(size, gfp, node, caller);
+}
+
+
+Callee candidate: __kmalloc_large_node
+Source code:
+static void *__kmalloc_large_node(size_t size, gfp_t flags, int node)
+{
+	struct page *page;
+	void *ptr = NULL;
+	unsigned int order = get_order(size);
+
+	if (unlikely(flags & GFP_SLAB_BUG_MASK))
+		flags = kmalloc_fix_flags(flags);
+
+	flags |= __GFP_COMP;
+	page = alloc_pages_node(node, flags, order);
+	if (page) {
+		ptr = page_address(page);
+		mod_lruvec_page_state(page, NR_SLAB_UNRECLAIMABLE_B,
+				      PAGE_SIZE << order);
+	}
+
+	ptr = kasan_kmalloc_large(ptr, size, flags);
+	/* As ptr might get tagged, call kmemleak hook after KASAN. */
+	kmemleak_alloc(ptr, size, 1, flags);
+	kmsan_kmalloc_large(ptr, size, flags);
+
+	return ptr;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of __kmalloc_node_track_caller will reach __kmalloc_large_node? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+The function `__kmalloc_node_track_caller` serves as a wrapper for `__do_kmalloc_node`, which in turn delegates to different allocation paths depending on the size of the requested memory. Specifically, `__do_kmalloc_node` will call `__kmalloc_large_node` when the requested size exceeds the slab-based allocation thresholds, i.e., for large allocations that require multiple pages.
+
+Given that `__kmalloc_node_track_caller` is invoked in the context of `kstrdup`, which internally calls `kmalloc_track_caller` to allocate memory for string duplication, it is semantically and functionally reasonable to expect that under certain allocation sizes (e.g., large strings), the allocation path will transition to `__kmalloc_large_node`.
+
+FINAL ANSWER -> YES
+
+Added edge: __kmalloc_node_track_caller -> __kmalloc_large_node
+PROMPT (depth 1):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- __request_module
+  - kstrdup
+    - __kmalloc_node_track_caller
+      - __kmalloc_large_node
+- __x64_sys_socket
+  - __sys_socket
+    - __sock_create
+      - security_socket_post_create
+        - selinux_socket_post_create
+          - selinux_netlbl_socket_post_create
+            - selinux_netlbl_sock_genattr
+              - security_netlbl_sid_to_secattr
+                - kstrdup
+                  - __kmalloc_node_track_caller
+                    - __kmalloc_large_node
+
+Caller: __kmalloc_large_node
+Source code:
+static void *__kmalloc_large_node(size_t size, gfp_t flags, int node)
+{
+	struct page *page;
+	void *ptr = NULL;
+	unsigned int order = get_order(size);
+
+	if (unlikely(flags & GFP_SLAB_BUG_MASK))
+		flags = kmalloc_fix_flags(flags);
+
+	flags |= __GFP_COMP;
+	page = alloc_pages_node(node, flags, order);
+	if (page) {
+		ptr = page_address(page);
+		mod_lruvec_page_state(page, NR_SLAB_UNRECLAIMABLE_B,
+				      PAGE_SIZE << order);
+	}
+
+	ptr = kasan_kmalloc_large(ptr, size, flags);
+	/* As ptr might get tagged, call kmemleak hook after KASAN. */
+	kmemleak_alloc(ptr, size, 1, flags);
+	kmsan_kmalloc_large(ptr, size, flags);
+
+	return ptr;
+}
+
+
+Callee candidate: dump_stack
+Source code:
+asmlinkage __visible void dump_stack(void)
+{
+	dump_stack_lvl(KERN_DEFAULT);
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of __kmalloc_large_node will reach dump_stack? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+{The function `__kmalloc_large_node` is responsible for allocating large contiguous blocks of memory in the kernel. It does not contain any logic or conditions that would cause it to invoke `dump_stack`, which is typically used for debugging and stack trace dumping. The historical call graph also does not show any path from `__kmalloc_large_node` to `dump_stack`. Therefore, it is not semantically or functionally reasonable to expect that execution of `__kmalloc_large_node` will reach `dump_stack` under normal operation or enforcement contexts.
+FINAL ANSWER -> NO}
+
+PROMPT (depth 1):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- __request_module
+  - kstrdup
+    - __kmalloc_node_track_caller
+      - __kmalloc_large_node
+- __x64_sys_socket
+  - __sys_socket
+    - __sock_create
+      - security_socket_post_create
+        - selinux_socket_post_create
+          - selinux_netlbl_socket_post_create
+            - selinux_netlbl_sock_genattr
+              - security_netlbl_sid_to_secattr
+                - kstrdup
+                  - __kmalloc_node_track_caller
+                    - __kmalloc_large_node
+
+Caller: __kmalloc_large_node
+Source code:
+static void *__kmalloc_large_node(size_t size, gfp_t flags, int node)
+{
+	struct page *page;
+	void *ptr = NULL;
+	unsigned int order = get_order(size);
+
+	if (unlikely(flags & GFP_SLAB_BUG_MASK))
+		flags = kmalloc_fix_flags(flags);
+
+	flags |= __GFP_COMP;
+	page = alloc_pages_node(node, flags, order);
+	if (page) {
+		ptr = page_address(page);
+		mod_lruvec_page_state(page, NR_SLAB_UNRECLAIMABLE_B,
+				      PAGE_SIZE << order);
+	}
+
+	ptr = kasan_kmalloc_large(ptr, size, flags);
+	/* As ptr might get tagged, call kmemleak hook after KASAN. */
+	kmemleak_alloc(ptr, size, 1, flags);
+	kmsan_kmalloc_large(ptr, size, flags);
+
+	return ptr;
+}
+
+
+Callee candidate: mod_node_page_state
+Source code:
+void mod_node_page_state(struct pglist_data *pgdat, enum node_stat_item item,
+					long delta)
+{
+	mod_node_state(pgdat, item, delta, 0);
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of __kmalloc_large_node will reach mod_node_page_state? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+In the provided code, `__kmalloc_large_node` calls `mod_lruvec_page_state`, not `mod_node_page_state`. The function `mod_node_page_state` is a separate function that takes a `struct pglist_data *pgdat` and an `enum node_stat_item` as arguments, and it is not invoked in the control flow of `__kmalloc_large_node`. Therefore, based on the source code and the historical execution path, it is not semantically or functionally reasonable to expect that execution of `__kmalloc_large_node` will reach `mod_node_page_state`.
+
+{In the given code, `__kmalloc_large_node` calls `mod_lruvec_page_state`, not `mod_node_page_state`. The latter is not part of the call graph from `__kmalloc_large_node`.}
+FINAL ANSWER -> NO
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- __x64_sys_socket
+  - __sys_socket
+    - __sock_create
+      - security_socket_create
+        - selinux_socket_create
+          - security_transition_sid
+      - security_socket_post_create
+        - selinux_socket_post_create
+    - sock_alloc_file
+      - alloc_file_pseudo
+        - d_instantiate
+          - security_d_instantiate
+            - selinux_d_instantiate
+              - inode_doinit_with_dentry
+
+Caller: security_transition_sid
+Source code:
+int security_transition_sid(struct selinux_state *state,
+			    u32 ssid, u32 tsid, u16 tclass,
+			    const struct qstr *qstr, u32 *out_sid)
+{
+	return security_compute_sid(state, ssid, tsid, tclass,
+				    AVTAB_TRANSITION,
+				    qstr ? qstr->name : NULL, out_sid, true);
+}
+
+
+Callee candidate: security_compute_sid
+Source code:
+static int security_compute_sid(struct selinux_state *state,
+				u32 ssid,
+				u32 tsid,
+				u16 orig_tclass,
+				u32 specified,
+				const char *objname,
+				u32 *out_sid,
+				bool kern)
+{
+	struct selinux_policy *policy;
+	struct policydb *policydb;
+	struct sidtab *sidtab;
+	struct class_datum *cladatum;
+	struct context *scontext, *tcontext, newcontext;
+	struct sidtab_entry *sentry, *tentry;
+	struct avtab_key avkey;
+	struct avtab_datum *avdatum;
+	struct avtab_node *node;
+	u16 tclass;
+	int rc = 0;
+	bool sock;
+
+	if (!selinux_initialized(state)) {
+		switch (orig_tclass) {
+		case SECCLASS_PROCESS: /* kernel value */
+			*out_sid = ssid;
+			break;
+		default:
+			*out_sid = tsid;
+			break;
+		}
+		goto out;
+	}
+
+retry:
+	cladatum = NULL;
+	context_init(&newcontext);
+
+	rcu_read_lock();
+
+	policy = rcu_dereference(state->policy);
+
+	if (kern) {
+		tclass = unmap_class(&policy->map, orig_tclass);
+		sock = security_is_socket_class(orig_tclass);
+	} else {
+		tclass = orig_tclass;
+		sock = security_is_socket_class(map_class(&policy->map,
+							  tclass));
+	}
+
+	policydb = &policy->policydb;
+	sidtab = policy->sidtab;
+
+	sentry = sidtab_search_entry(sidtab, ssid);
+	if (!sentry) {
+		pr_err("SELinux: %s:  unrecognized SID %d\n",
+		       __func__, ssid);
+		rc = -EINVAL;
+		goto out_unlock;
+	}
+	tentry = sidtab_search_entry(sidtab, tsid);
+	if (!tentry) {
+		pr_err("SELinux: %s:  unrecognized SID %d\n",
+		       __func__, tsid);
+		rc = -EINVAL;
+		goto out_unlock;
+	}
+
+	scontext = &sentry->context;
+	tcontext = &tentry->context;
+
+	if (tclass && tclass <= policydb->p_classes.nprim)
+		cladatum = policydb->class_val_to_struct[tclass - 1];
+
+	/* Set the user identity. */
+	switch (specified) {
+	case AVTAB_TRANSITION:
+	case AVTAB_CHANGE:
+		if (cladatum && cladatum->default_user == DEFAULT_TARGET) {
+			newcontext.user = tcontext->user;
+		} else {
+			/* notice this gets both DEFAULT_SOURCE and unset */
+			/* Use the process user identity. */
+			newcontext.user = scontext->user;
+		}
+		break;
+	case AVTAB_MEMBER:
+		/* Use the related object owner. */
+		newcontext.user = tcontext->user;
+		break;
+	}
+
+	/* Set the role to default values. */
+	if (cladatum && cladatum->default_role == DEFAULT_SOURCE) {
+		newcontext.role = scontext->role;
+	} else if (cladatum && cladatum->default_role == DEFAULT_TARGET) {
+		newcontext.role = tcontext->role;
+	} else {
+		if ((tclass == policydb->process_class) || sock)
+			newcontext.role = scontext->role;
+		else
+			newcontext.role = OBJECT_R_VAL;
+	}
+
+	/* Set the type to default values. */
+	if (cladatum && cladatum->default_type == DEFAULT_SOURCE) {
+		newcontext.type = scontext->type;
+	} else if (cladatum && cladatum->default_type == DEFAULT_TARGET) {
+		newcontext.type = tcontext->type;
+	} else {
+		if ((tclass == policydb->process_class) || sock) {
+			/* Use the type of process. */
+			newcontext.type = scontext->type;
+		} else {
+			/* Use the type of the related object. */
+			newcontext.type = tcontext->type;
+		}
+	}
+
+	/* Look for a type transition/member/change rule. */
+	avkey.source_type = scontext->type;
+	avkey.target_type = tcontext->type;
+	avkey.target_class = tclass;
+	avkey.specified = specified;
+	avdatum = avtab_search(&policydb->te_avtab, &avkey);
+
+	/* If no permanent rule, also check for enabled conditional rules */
+	if (!avdatum) {
+		node = avtab_search_node(&policydb->te_cond_avtab, &avkey);
+		for (; node; node = avtab_search_node_next(node, specified)) {
+			if (node->key.specified & AVTAB_ENABLED) {
+				avdatum = &node->datum;
+				break;
+			}
+		}
+	}
+
+	if (avdatum) {
+		/* Use the type from the type transition/member/change rule. */
+		newcontext.type = avdatum->u.data;
+	}
+
+	/* if we have a objname this is a file trans check so check those rules */
+	if (objname)
+		filename_compute_type(policydb, &newcontext, scontext->type,
+				      tcontext->type, tclass, objname);
+
+	/* Check for class-specific changes. */
+	if (specified & AVTAB_TRANSITION) {
+		/* Look for a role transition rule. */
+		struct role_trans_datum *rtd;
+		struct role_trans_key rtk = {
+			.role = scontext->role,
+			.type = tcontext->type,
+			.tclass = tclass,
+		};
+
+		rtd = policydb_roletr_search(policydb, &rtk);
+		if (rtd)
+			newcontext.role = rtd->new_role;
+	}
+
+	/* Set the MLS attributes.
+	   This is done last because it may allocate memory. */
+	rc = mls_compute_sid(policydb, scontext, tcontext, tclass, specified,
+			     &newcontext, sock);
+	if (rc)
+		goto out_unlock;
+
+	/* Check the validity of the context. */
+	if (!policydb_context_isvalid(policydb, &newcontext)) {
+		rc = compute_sid_handle_invalid_context(state, policy, sentry,
+							tentry, tclass,
+							&newcontext);
+		if (rc)
+			goto out_unlock;
+	}
+	/* Obtain the sid for the context. */
+	rc = sidtab_context_to_sid(sidtab, &newcontext, out_sid);
+	if (rc == -ESTALE) {
+		rcu_read_unlock();
+		context_destroy(&newcontext);
+		goto retry;
+	}
+out_unlock:
+	rcu_read_unlock();
+	context_destroy(&newcontext);
+out:
+	return rc;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of security_transition_sid will reach security_compute_sid? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+**Justification:**
+The function `security_transition_sid` directly calls `security_compute_sid` as its final return statement. This is a direct static call, and the parameters passed are compatible with `security_compute_sid`'s expectations. Since this call is unconditional and part of the normal execution path, it is semantically and functionally reasonable to expect that `security_transition_sid` will reach `security_compute_sid` during execution.
+
+**FINAL ANSWER -> YES**
+
+Added edge: security_transition_sid -> security_compute_sid
+PROMPT (depth 1):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- __x64_sys_socket
+  - __sys_socket
+    - __sock_create
+      - security_socket_create
+        - selinux_socket_create
+          - security_transition_sid
+            - security_compute_sid
+      - security_socket_post_create
+        - selinux_socket_post_create
+    - sock_alloc_file
+      - alloc_file_pseudo
+        - d_instantiate
+          - security_d_instantiate
+            - selinux_d_instantiate
+              - inode_doinit_with_dentry
+
+Caller: security_compute_sid
+Source code:
+static int security_compute_sid(struct selinux_state *state,
+				u32 ssid,
+				u32 tsid,
+				u16 orig_tclass,
+				u32 specified,
+				const char *objname,
+				u32 *out_sid,
+				bool kern)
+{
+	struct selinux_policy *policy;
+	struct policydb *policydb;
+	struct sidtab *sidtab;
+	struct class_datum *cladatum;
+	struct context *scontext, *tcontext, newcontext;
+	struct sidtab_entry *sentry, *tentry;
+	struct avtab_key avkey;
+	struct avtab_datum *avdatum;
+	struct avtab_node *node;
+	u16 tclass;
+	int rc = 0;
+	bool sock;
+
+	if (!selinux_initialized(state)) {
+		switch (orig_tclass) {
+		case SECCLASS_PROCESS: /* kernel value */
+			*out_sid = ssid;
+			break;
+		default:
+			*out_sid = tsid;
+			break;
+		}
+		goto out;
+	}
+
+retry:
+	cladatum = NULL;
+	context_init(&newcontext);
+
+	rcu_read_lock();
+
+	policy = rcu_dereference(state->policy);
+
+	if (kern) {
+		tclass = unmap_class(&policy->map, orig_tclass);
+		sock = security_is_socket_class(orig_tclass);
+	} else {
+		tclass = orig_tclass;
+		sock = security_is_socket_class(map_class(&policy->map,
+							  tclass));
+	}
+
+	policydb = &policy->policydb;
+	sidtab = policy->sidtab;
+
+	sentry = sidtab_search_entry(sidtab, ssid);
+	if (!sentry) {
+		pr_err("SELinux: %s:  unrecognized SID %d\n",
+		       __func__, ssid);
+		rc = -EINVAL;
+		goto out_unlock;
+	}
+	tentry = sidtab_search_entry(sidtab, tsid);
+	if (!tentry) {
+		pr_err("SELinux: %s:  unrecognized SID %d\n",
+		       __func__, tsid);
+		rc = -EINVAL;
+		goto out_unlock;
+	}
+
+	scontext = &sentry->context;
+	tcontext = &tentry->context;
+
+	if (tclass && tclass <= policydb->p_classes.nprim)
+		cladatum = policydb->class_val_to_struct[tclass - 1];
+
+	/* Set the user identity. */
+	switch (specified) {
+	case AVTAB_TRANSITION:
+	case AVTAB_CHANGE:
+		if (cladatum && cladatum->default_user == DEFAULT_TARGET) {
+			newcontext.user = tcontext->user;
+		} else {
+			/* notice this gets both DEFAULT_SOURCE and unset */
+			/* Use the process user identity. */
+			newcontext.user = scontext->user;
+		}
+		break;
+	case AVTAB_MEMBER:
+		/* Use the related object owner. */
+		newcontext.user = tcontext->user;
+		break;
+	}
+
+	/* Set the role to default values. */
+	if (cladatum && cladatum->default_role == DEFAULT_SOURCE) {
+		newcontext.role = scontext->role;
+	} else if (cladatum && cladatum->default_role == DEFAULT_TARGET) {
+		newcontext.role = tcontext->role;
+	} else {
+		if ((tclass == policydb->process_class) || sock)
+			newcontext.role = scontext->role;
+		else
+			newcontext.role = OBJECT_R_VAL;
+	}
+
+	/* Set the type to default values. */
+	if (cladatum && cladatum->default_type == DEFAULT_SOURCE) {
+		newcontext.type = scontext->type;
+	} else if (cladatum && cladatum->default_type == DEFAULT_TARGET) {
+		newcontext.type = tcontext->type;
+	} else {
+		if ((tclass == policydb->process_class) || sock) {
+			/* Use the type of process. */
+			newcontext.type = scontext->type;
+		} else {
+			/* Use the type of the related object. */
+			newcontext.type = tcontext->type;
+		}
+	}
+
+	/* Look for a type transition/member/change rule. */
+	avkey.source_type = scontext->type;
+	avkey.target_type = tcontext->type;
+	avkey.target_class = tclass;
+	avkey.specified = specified;
+	avdatum = avtab_search(&policydb->te_avtab, &avkey);
+
+	/* If no permanent rule, also check for enabled conditional rules */
+	if (!avdatum) {
+		node = avtab_search_node(&policydb->te_cond_avtab, &avkey);
+		for (; node; node = avtab_search_node_next(node, specified)) {
+			if (node->key.specified & AVTAB_ENABLED) {
+				avdatum = &node->datum;
+				break;
+			}
+		}
+	}
+
+	if (avdatum) {
+		/* Use the type from the type transition/member/change rule. */
+		newcontext.type = avdatum->u.data;
+	}
+
+	/* if we have a objname this is a file trans check so check those rules */
+	if (objname)
+		filename_compute_type(policydb, &newcontext, scontext->type,
+				      tcontext->type, tclass, objname);
+
+	/* Check for class-specific changes. */
+	if (specified & AVTAB_TRANSITION) {
+		/* Look for a role transition rule. */
+		struct role_trans_datum *rtd;
+		struct role_trans_key rtk = {
+			.role = scontext->role,
+			.type = tcontext->type,
+			.tclass = tclass,
+		};
+
+		rtd = policydb_roletr_search(policydb, &rtk);
+		if (rtd)
+			newcontext.role = rtd->new_role;
+	}
+
+	/* Set the MLS attributes.
+	   This is done last because it may allocate memory. */
+	rc = mls_compute_sid(policydb, scontext, tcontext, tclass, specified,
+			     &newcontext, sock);
+	if (rc)
+		goto out_unlock;
+
+	/* Check the validity of the context. */
+	if (!policydb_context_isvalid(policydb, &newcontext)) {
+		rc = compute_sid_handle_invalid_context(state, policy, sentry,
+							tentry, tclass,
+							&newcontext);
+		if (rc)
+			goto out_unlock;
+	}
+	/* Obtain the sid for the context. */
+	rc = sidtab_context_to_sid(sidtab, &newcontext, out_sid);
+	if (rc == -ESTALE) {
+		rcu_read_unlock();
+		context_destroy(&newcontext);
+		goto retry;
+	}
+out_unlock:
+	rcu_read_unlock();
+	context_destroy(&newcontext);
+out:
+	return rc;
+}
+
+
+Callee candidate: avtab_search
+Source code:
+struct avtab_datum *avtab_search(struct avtab *h, const struct avtab_key *key)
+{
+	int hvalue;
+	struct avtab_node *cur;
+	u16 specified = key->specified & ~(AVTAB_ENABLED|AVTAB_ENABLED_OLD);
+
+	if (!h || !h->nslot)
+		return NULL;
+
+	hvalue = avtab_hash(key, h->mask);
+	for (cur = h->htable[hvalue]; cur;
+	     cur = cur->next) {
+		if (key->source_type == cur->key.source_type &&
+		    key->target_type == cur->key.target_type &&
+		    key->target_class == cur->key.target_class &&
+		    (specified & cur->key.specified))
+			return &cur->datum;
+
+		if (key->source_type < cur->key.source_type)
+			break;
+		if (key->source_type == cur->key.source_type &&
+		    key->target_type < cur->key.target_type)
+			break;
+		if (key->source_type == cur->key.source_type &&
+		    key->target_type == cur->key.target_type &&
+		    key->target_class < cur->key.target_class)
+			break;
+	}
+
+	return NULL;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of security_compute_sid will reach avtab_search? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+In the provided execution context, `security_compute_sid` is called during a socket creation path from `selinux_socket_create` and `selinux_socket_post_create`. The function constructs an `avtab_key` using the source and target security contexts, along with the object class and `specified` flags (such as `AVTAB_TRANSITION`). It then calls `avtab_search` to find matching access vector table (AVTAB) entries, which are essential for determining the correct security context transition.
+
+Given that the purpose of `security_compute_sid` is to compute a new security identifier (SID) based on policy rules, and that it explicitly constructs and passes a key to `avtab_search`, it is semantically and functionally reasonable to expect that the execution will reach `avtab_search`.
+
+FINAL ANSWER -> YES
+
+Added edge: security_compute_sid -> avtab_search
+PROMPT (depth 1):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- __x64_sys_socket
+  - __sys_socket
+    - __sock_create
+      - security_socket_create
+        - selinux_socket_create
+          - security_transition_sid
+            - security_compute_sid
+      - security_socket_post_create
+        - selinux_socket_post_create
+    - sock_alloc_file
+      - alloc_file_pseudo
+        - d_instantiate
+          - security_d_instantiate
+            - selinux_d_instantiate
+              - inode_doinit_with_dentry
+
+Caller: security_compute_sid
+Source code:
+static int security_compute_sid(struct selinux_state *state,
+				u32 ssid,
+				u32 tsid,
+				u16 orig_tclass,
+				u32 specified,
+				const char *objname,
+				u32 *out_sid,
+				bool kern)
+{
+	struct selinux_policy *policy;
+	struct policydb *policydb;
+	struct sidtab *sidtab;
+	struct class_datum *cladatum;
+	struct context *scontext, *tcontext, newcontext;
+	struct sidtab_entry *sentry, *tentry;
+	struct avtab_key avkey;
+	struct avtab_datum *avdatum;
+	struct avtab_node *node;
+	u16 tclass;
+	int rc = 0;
+	bool sock;
+
+	if (!selinux_initialized(state)) {
+		switch (orig_tclass) {
+		case SECCLASS_PROCESS: /* kernel value */
+			*out_sid = ssid;
+			break;
+		default:
+			*out_sid = tsid;
+			break;
+		}
+		goto out;
+	}
+
+retry:
+	cladatum = NULL;
+	context_init(&newcontext);
+
+	rcu_read_lock();
+
+	policy = rcu_dereference(state->policy);
+
+	if (kern) {
+		tclass = unmap_class(&policy->map, orig_tclass);
+		sock = security_is_socket_class(orig_tclass);
+	} else {
+		tclass = orig_tclass;
+		sock = security_is_socket_class(map_class(&policy->map,
+							  tclass));
+	}
+
+	policydb = &policy->policydb;
+	sidtab = policy->sidtab;
+
+	sentry = sidtab_search_entry(sidtab, ssid);
+	if (!sentry) {
+		pr_err("SELinux: %s:  unrecognized SID %d\n",
+		       __func__, ssid);
+		rc = -EINVAL;
+		goto out_unlock;
+	}
+	tentry = sidtab_search_entry(sidtab, tsid);
+	if (!tentry) {
+		pr_err("SELinux: %s:  unrecognized SID %d\n",
+		       __func__, tsid);
+		rc = -EINVAL;
+		goto out_unlock;
+	}
+
+	scontext = &sentry->context;
+	tcontext = &tentry->context;
+
+	if (tclass && tclass <= policydb->p_classes.nprim)
+		cladatum = policydb->class_val_to_struct[tclass - 1];
+
+	/* Set the user identity. */
+	switch (specified) {
+	case AVTAB_TRANSITION:
+	case AVTAB_CHANGE:
+		if (cladatum && cladatum->default_user == DEFAULT_TARGET) {
+			newcontext.user = tcontext->user;
+		} else {
+			/* notice this gets both DEFAULT_SOURCE and unset */
+			/* Use the process user identity. */
+			newcontext.user = scontext->user;
+		}
+		break;
+	case AVTAB_MEMBER:
+		/* Use the related object owner. */
+		newcontext.user = tcontext->user;
+		break;
+	}
+
+	/* Set the role to default values. */
+	if (cladatum && cladatum->default_role == DEFAULT_SOURCE) {
+		newcontext.role = scontext->role;
+	} else if (cladatum && cladatum->default_role == DEFAULT_TARGET) {
+		newcontext.role = tcontext->role;
+	} else {
+		if ((tclass == policydb->process_class) || sock)
+			newcontext.role = scontext->role;
+		else
+			newcontext.role = OBJECT_R_VAL;
+	}
+
+	/* Set the type to default values. */
+	if (cladatum && cladatum->default_type == DEFAULT_SOURCE) {
+		newcontext.type = scontext->type;
+	} else if (cladatum && cladatum->default_type == DEFAULT_TARGET) {
+		newcontext.type = tcontext->type;
+	} else {
+		if ((tclass == policydb->process_class) || sock) {
+			/* Use the type of process. */
+			newcontext.type = scontext->type;
+		} else {
+			/* Use the type of the related object. */
+			newcontext.type = tcontext->type;
+		}
+	}
+
+	/* Look for a type transition/member/change rule. */
+	avkey.source_type = scontext->type;
+	avkey.target_type = tcontext->type;
+	avkey.target_class = tclass;
+	avkey.specified = specified;
+	avdatum = avtab_search(&policydb->te_avtab, &avkey);
+
+	/* If no permanent rule, also check for enabled conditional rules */
+	if (!avdatum) {
+		node = avtab_search_node(&policydb->te_cond_avtab, &avkey);
+		for (; node; node = avtab_search_node_next(node, specified)) {
+			if (node->key.specified & AVTAB_ENABLED) {
+				avdatum = &node->datum;
+				break;
+			}
+		}
+	}
+
+	if (avdatum) {
+		/* Use the type from the type transition/member/change rule. */
+		newcontext.type = avdatum->u.data;
+	}
+
+	/* if we have a objname this is a file trans check so check those rules */
+	if (objname)
+		filename_compute_type(policydb, &newcontext, scontext->type,
+				      tcontext->type, tclass, objname);
+
+	/* Check for class-specific changes. */
+	if (specified & AVTAB_TRANSITION) {
+		/* Look for a role transition rule. */
+		struct role_trans_datum *rtd;
+		struct role_trans_key rtk = {
+			.role = scontext->role,
+			.type = tcontext->type,
+			.tclass = tclass,
+		};
+
+		rtd = policydb_roletr_search(policydb, &rtk);
+		if (rtd)
+			newcontext.role = rtd->new_role;
+	}
+
+	/* Set the MLS attributes.
+	   This is done last because it may allocate memory. */
+	rc = mls_compute_sid(policydb, scontext, tcontext, tclass, specified,
+			     &newcontext, sock);
+	if (rc)
+		goto out_unlock;
+
+	/* Check the validity of the context. */
+	if (!policydb_context_isvalid(policydb, &newcontext)) {
+		rc = compute_sid_handle_invalid_context(state, policy, sentry,
+							tentry, tclass,
+							&newcontext);
+		if (rc)
+			goto out_unlock;
+	}
+	/* Obtain the sid for the context. */
+	rc = sidtab_context_to_sid(sidtab, &newcontext, out_sid);
+	if (rc == -ESTALE) {
+		rcu_read_unlock();
+		context_destroy(&newcontext);
+		goto retry;
+	}
+out_unlock:
+	rcu_read_unlock();
+	context_destroy(&newcontext);
+out:
+	return rc;
+}
+
+
+Callee candidate: avtab_search_node
+Source code:
+struct avtab_node *avtab_search_node(struct avtab *h,
+				     const struct avtab_key *key)
+{
+	int hvalue;
+	struct avtab_node *cur;
+	u16 specified = key->specified & ~(AVTAB_ENABLED|AVTAB_ENABLED_OLD);
+
+	if (!h || !h->nslot)
+		return NULL;
+
+	hvalue = avtab_hash(key, h->mask);
+	for (cur = h->htable[hvalue]; cur;
+	     cur = cur->next) {
+		if (key->source_type == cur->key.source_type &&
+		    key->target_type == cur->key.target_type &&
+		    key->target_class == cur->key.target_class &&
+		    (specified & cur->key.specified))
+			return cur;
+
+		if (key->source_type < cur->key.source_type)
+			break;
+		if (key->source_type == cur->key.source_type &&
+		    key->target_type < cur->key.target_type)
+			break;
+		if (key->source_type == cur->key.source_type &&
+		    key->target_type == cur->key.target_type &&
+		    key->target_class < cur->key.target_class)
+			break;
+	}
+	return NULL;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of security_compute_sid will reach avtab_search_node? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+**Justification**:
+
+In `security_compute_sid`, the function checks for an AVTAB rule using `avtab_search`. If no permanent rule is found, it proceeds to search for **conditional** rules using `avtab_search_node` on the `te_cond_avtab` table. This is done **only if the specified AVTAB rule type matches and the rule is marked as enabled**. Since the historical execution trace includes a call to `avtab_search_node` from `security_compute_sid`, and the logic supports this path, it is semantically and functionally reasonable to expect that `security_compute_sid` will reach `avtab_search_node`.
+
+**FINAL ANSWER -> YES**
+
+Added edge: security_compute_sid -> avtab_search_node
+PROMPT (depth 1):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- __x64_sys_socket
+  - __sys_socket
+    - __sock_create
+      - security_socket_create
+        - selinux_socket_create
+          - security_transition_sid
+            - security_compute_sid
+      - security_socket_post_create
+        - selinux_socket_post_create
+    - sock_alloc_file
+      - alloc_file_pseudo
+        - d_instantiate
+          - security_d_instantiate
+            - selinux_d_instantiate
+              - inode_doinit_with_dentry
+
+Caller: security_compute_sid
+Source code:
+static int security_compute_sid(struct selinux_state *state,
+				u32 ssid,
+				u32 tsid,
+				u16 orig_tclass,
+				u32 specified,
+				const char *objname,
+				u32 *out_sid,
+				bool kern)
+{
+	struct selinux_policy *policy;
+	struct policydb *policydb;
+	struct sidtab *sidtab;
+	struct class_datum *cladatum;
+	struct context *scontext, *tcontext, newcontext;
+	struct sidtab_entry *sentry, *tentry;
+	struct avtab_key avkey;
+	struct avtab_datum *avdatum;
+	struct avtab_node *node;
+	u16 tclass;
+	int rc = 0;
+	bool sock;
+
+	if (!selinux_initialized(state)) {
+		switch (orig_tclass) {
+		case SECCLASS_PROCESS: /* kernel value */
+			*out_sid = ssid;
+			break;
+		default:
+			*out_sid = tsid;
+			break;
+		}
+		goto out;
+	}
+
+retry:
+	cladatum = NULL;
+	context_init(&newcontext);
+
+	rcu_read_lock();
+
+	policy = rcu_dereference(state->policy);
+
+	if (kern) {
+		tclass = unmap_class(&policy->map, orig_tclass);
+		sock = security_is_socket_class(orig_tclass);
+	} else {
+		tclass = orig_tclass;
+		sock = security_is_socket_class(map_class(&policy->map,
+							  tclass));
+	}
+
+	policydb = &policy->policydb;
+	sidtab = policy->sidtab;
+
+	sentry = sidtab_search_entry(sidtab, ssid);
+	if (!sentry) {
+		pr_err("SELinux: %s:  unrecognized SID %d\n",
+		       __func__, ssid);
+		rc = -EINVAL;
+		goto out_unlock;
+	}
+	tentry = sidtab_search_entry(sidtab, tsid);
+	if (!tentry) {
+		pr_err("SELinux: %s:  unrecognized SID %d\n",
+		       __func__, tsid);
+		rc = -EINVAL;
+		goto out_unlock;
+	}
+
+	scontext = &sentry->context;
+	tcontext = &tentry->context;
+
+	if (tclass && tclass <= policydb->p_classes.nprim)
+		cladatum = policydb->class_val_to_struct[tclass - 1];
+
+	/* Set the user identity. */
+	switch (specified) {
+	case AVTAB_TRANSITION:
+	case AVTAB_CHANGE:
+		if (cladatum && cladatum->default_user == DEFAULT_TARGET) {
+			newcontext.user = tcontext->user;
+		} else {
+			/* notice this gets both DEFAULT_SOURCE and unset */
+			/* Use the process user identity. */
+			newcontext.user = scontext->user;
+		}
+		break;
+	case AVTAB_MEMBER:
+		/* Use the related object owner. */
+		newcontext.user = tcontext->user;
+		break;
+	}
+
+	/* Set the role to default values. */
+	if (cladatum && cladatum->default_role == DEFAULT_SOURCE) {
+		newcontext.role = scontext->role;
+	} else if (cladatum && cladatum->default_role == DEFAULT_TARGET) {
+		newcontext.role = tcontext->role;
+	} else {
+		if ((tclass == policydb->process_class) || sock)
+			newcontext.role = scontext->role;
+		else
+			newcontext.role = OBJECT_R_VAL;
+	}
+
+	/* Set the type to default values. */
+	if (cladatum && cladatum->default_type == DEFAULT_SOURCE) {
+		newcontext.type = scontext->type;
+	} else if (cladatum && cladatum->default_type == DEFAULT_TARGET) {
+		newcontext.type = tcontext->type;
+	} else {
+		if ((tclass == policydb->process_class) || sock) {
+			/* Use the type of process. */
+			newcontext.type = scontext->type;
+		} else {
+			/* Use the type of the related object. */
+			newcontext.type = tcontext->type;
+		}
+	}
+
+	/* Look for a type transition/member/change rule. */
+	avkey.source_type = scontext->type;
+	avkey.target_type = tcontext->type;
+	avkey.target_class = tclass;
+	avkey.specified = specified;
+	avdatum = avtab_search(&policydb->te_avtab, &avkey);
+
+	/* If no permanent rule, also check for enabled conditional rules */
+	if (!avdatum) {
+		node = avtab_search_node(&policydb->te_cond_avtab, &avkey);
+		for (; node; node = avtab_search_node_next(node, specified)) {
+			if (node->key.specified & AVTAB_ENABLED) {
+				avdatum = &node->datum;
+				break;
+			}
+		}
+	}
+
+	if (avdatum) {
+		/* Use the type from the type transition/member/change rule. */
+		newcontext.type = avdatum->u.data;
+	}
+
+	/* if we have a objname this is a file trans check so check those rules */
+	if (objname)
+		filename_compute_type(policydb, &newcontext, scontext->type,
+				      tcontext->type, tclass, objname);
+
+	/* Check for class-specific changes. */
+	if (specified & AVTAB_TRANSITION) {
+		/* Look for a role transition rule. */
+		struct role_trans_datum *rtd;
+		struct role_trans_key rtk = {
+			.role = scontext->role,
+			.type = tcontext->type,
+			.tclass = tclass,
+		};
+
+		rtd = policydb_roletr_search(policydb, &rtk);
+		if (rtd)
+			newcontext.role = rtd->new_role;
+	}
+
+	/* Set the MLS attributes.
+	   This is done last because it may allocate memory. */
+	rc = mls_compute_sid(policydb, scontext, tcontext, tclass, specified,
+			     &newcontext, sock);
+	if (rc)
+		goto out_unlock;
+
+	/* Check the validity of the context. */
+	if (!policydb_context_isvalid(policydb, &newcontext)) {
+		rc = compute_sid_handle_invalid_context(state, policy, sentry,
+							tentry, tclass,
+							&newcontext);
+		if (rc)
+			goto out_unlock;
+	}
+	/* Obtain the sid for the context. */
+	rc = sidtab_context_to_sid(sidtab, &newcontext, out_sid);
+	if (rc == -ESTALE) {
+		rcu_read_unlock();
+		context_destroy(&newcontext);
+		goto retry;
+	}
+out_unlock:
+	rcu_read_unlock();
+	context_destroy(&newcontext);
+out:
+	return rc;
+}
+
+
+Callee candidate: avtab_search_node_next
+Source code:
+None
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of security_compute_sid will reach avtab_search_node_next? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+

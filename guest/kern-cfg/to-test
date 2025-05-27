@@ -20,7 +20,7 @@ Chuqi Doing (card0):
 
 Chuqi Doing (card1):
 
-234:tgkill 46:sendmsg 52:getpeername 230:clock_nanosleep 16:ioctl 41:socket 42:connect 63:newuname 79:getcwd 89:readlink 92:chown 128:rt_sigtimedwait 204:sched_getaffinity 217:getdents64 3:close 9:mmap
+16:ioctl 41:socket 42:connect 63:newuname 79:getcwd 89:readlink 92:chown 128:rt_sigtimedwait 204:sched_getaffinity 217:getdents64 3:close 9:mmap
 
 Chuqi Down:
 11:munmap
@@ -31,6 +31,10 @@ Chuqi Down:
 43:accept
 54:setsockopt
 56:clone
+234:tgkill 
+46:sendmsg 
+52:getpeername 
+230:clock_nanosleep
 
 80:chdir
 99:sysinfo

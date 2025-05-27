@@ -32,15 +32,6 @@ proc_pure_static_file = "pure-static.txt"
 # statistics derived from static CFG based-on profiling information
 proc_profile_static_file = "profile-static.txt"
 
-def extract_profiled_functions(profile_file):
-    profiled_functions = set()
-    with open(profile_file, "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            func_name = line.strip()
-            if func_name in kall_functions and not should_filter_function(func_name):
-                profiled_functions.add(func_name)
-    return profiled_functions
 
 # dump statistics (include numbers of nodes/edges, and its markdown tree) of the subgraph
 def dump_subgraph_statistics(subgraph, file_name):
@@ -299,7 +290,7 @@ if __name__ == "__main__":
             print(f"Profile file {profile_file} does not exist. Skipping.")
             continue
         
-        profiled_functions = extract_profiled_functions(profile_file)
+        profiled_functions = extract_profiled_functions(kall_functions, profile_file)
         print(f"Extracted {len(profiled_functions)} profiled functions for {syscall_info}.")
         
         # Dump some statistics of the profiled functions

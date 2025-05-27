@@ -45500,3 +45500,618 @@ static long pc_nvram_initialize(void)
 From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach pc_nvram_initialize? Provide a concise justification, then a literal answer: '{Your justification}
 FINAL ANSWER -> YES/NO'\nothink
 
+RESPONSE:
+The function `do_nanosleep` is responsible for putting the current task to sleep for a specified amount of time, using high-resolution timers. It interacts with scheduling primitives such as `schedule()` and `hrtimer_sleeper_start_expires`, and it is primarily concerned with handling sleep interruptions and restarting system calls if necessary.
+
+The function `pc_nvram_initialize`, on the other hand, is a static function that initializes NVRAM by writing zeroes and setting a checksum. It uses a spinlock to ensure thread safety and is likely called during system initialization or device setup.
+
+There is **no direct or indirect control flow** from `do_nanosleep` to `pc_nvram_initialize`. The two functions serve entirely different purposes and operate in distinct contexts (scheduling vs. hardware initialization). Additionally, `pc_nvram_initialize` is declared as `static`, meaning it is not accessible outside its compilation unit.
+
+{Your justification}
+FINAL ANSWER -> NO
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: pc_nvram_set_checksum
+Source code:
+static long pc_nvram_set_checksum(void)
+{
+	spin_lock_irq(&rtc_lock);
+	__nvram_set_checksum();
+	spin_unlock_irq(&rtc_lock);
+	return 0;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach pc_nvram_set_checksum? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+The function `do_nanosleep` is responsible for putting the current task to sleep for a high-resolution time interval, and it interacts with hrtimers and scheduling mechanisms. The function `pc_nvram_set_checksum`, on the other hand, is a low-level utility function for setting a checksum in NVRAM, typically used in hardware-related contexts such as real-time clock (RTC) operations.
+
+There is no visible functional or logical path in the provided `do_nanosleep` code that would lead to a call to `pc_nvram_set_checksum`. The two functions operate in entirely different domains—sleep scheduling versus hardware state management. Without a visible or implied control-flow or data-flow dependency, and given the historical context of the call graph, it is not semantically or functionally reasonable to expect that `do_nanosleep` will reach `pc_nvram_set_checksum`.
+
+FINAL ANSWER -> NO
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: random_get_entropy_fallback
+Source code:
+unsigned long random_get_entropy_fallback(void)
+{
+	struct tk_read_base *tkr = &tk_core.timekeeper.tkr_mono;
+	struct clocksource *clock = READ_ONCE(tkr->clock);
+
+	if (unlikely(timekeeping_suspended || !clock))
+		return 0;
+	return clock->read(clock);
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach random_get_entropy_fallback? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+do_nanosleep is a function responsible for handling nanosleep system calls, putting the current task to sleep until a certain time or until interrupted by a signal. It uses hrtimers and interacts with scheduling and signal handling mechanisms. On the other hand, random_get_entropy_fallback is a function involved in entropy collection for the random number generator subsystem. These functions operate in different subsystems (scheduling vs. entropy/random number generation) and there is no direct or indirect control flow path between them in the provided code or based on standard Linux kernel execution paths.
+
+FINAL ANSWER -> NO
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: si_mem_available
+Source code:
+long si_mem_available(void)
+{
+	long available;
+	unsigned long pagecache;
+	unsigned long wmark_low = 0;
+	unsigned long pages[NR_LRU_LISTS];
+	unsigned long reclaimable;
+	struct zone *zone;
+	int lru;
+
+	for (lru = LRU_BASE; lru < NR_LRU_LISTS; lru++)
+		pages[lru] = global_node_page_state(NR_LRU_BASE + lru);
+
+	for_each_zone(zone)
+		wmark_low += low_wmark_pages(zone);
+
+	/*
+	 */
+	available = global_zone_page_state(NR_FREE_PAGES) - totalreserve_pages;
+
+	/*
+	 */
+	pagecache = pages[LRU_ACTIVE_FILE] + pages[LRU_INACTIVE_FILE];
+	pagecache -= min(pagecache / 2, wmark_low);
+	available += pagecache;
+
+	/*
+	 */
+	reclaimable = global_node_page_state_pages(NR_SLAB_RECLAIMABLE_B) +
+		global_node_page_state(NR_KERNEL_MISC_RECLAIMABLE);
+	available += reclaimable - min(reclaimable / 2, wmark_low);
+
+	if (available < 0)
+		available = 0;
+	return available;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach si_mem_available? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+**Your justification**
+The function `do_nanosleep` is primarily concerned with handling sleep operations using high-resolution timers, and it does not interact with memory management or perform any checks related to available memory. The function `si_mem_available`, on the other hand, is used to calculate the amount of available memory in the system, typically for memory pressure monitoring or resource allocation decisions. There is no control flow or functional dependency between `do_nanosleep` and `si_mem_available` in the given code, and no indication that `do_nanosleep` would ever call or reach `si_mem_available` during normal or exceptional execution paths.
+
+**FINAL ANSWER -> NO**
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: spec_ctrl_current
+Source code:
+u64 spec_ctrl_current(void)
+{
+	return this_cpu_read(x86_spec_ctrl_current);
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach spec_ctrl_current? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+**Your justification**
+The `do_nanosleep` function is responsible for handling nanosecond-level sleep operations in the Linux kernel, involving scheduling and timer management. The `spec_ctrl_current` function, on the other hand, is used to access per-CPU speculative execution control settings, typically relevant for mitigating CPU vulnerabilities like Spectre. There is no functional or semantic overlap or dependency between these two functions in the context of sleep and scheduling. The execution paths and purposes are unrelated, and no analysis of `do_nanosleep` suggests a call to `spec_ctrl_current` under normal or historical execution.
+
+**FINAL ANSWER -> NO**
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: vm_memory_committed
+Source code:
+unsigned long vm_memory_committed(void)
+{
+	return percpu_counter_sum_positive(&vm_committed_as);
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach vm_memory_committed? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+The function `do_nanosleep` is responsible for suspending the execution of a process for a specified amount of time, using high-resolution timers. It primarily deals with scheduling decisions, signal handling, and timer management. On the other hand, `vm_memory_committed` is a function related to memory accounting, specifically for returning the total amount of memory committed by the system.
+
+There is no logical or functional connection between the execution path of `do_nanosleep` and the invocation of `vm_memory_committed`. The two functions operate in entirely different domains (scheduling vs. memory management), and no control flow or function call in `do_nanosleep` leads to `vm_memory_committed`.
+
+{Execution of do_nanosleep does not involve memory accounting or the vm_committed_as counter. There is no function call or conditional path that leads to vm_memory_committed.}
+FINAL ANSWER -> NO
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: vmware_get_tsc_khz
+Source code:
+static unsigned long vmware_get_tsc_khz(void)
+{
+	return vmware_tsc_khz;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach vmware_get_tsc_khz? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+The function `do_nanosleep` is responsible for putting the current task to sleep for a specified amount of time, using high-resolution timers. It involves setting the task state, scheduling, and handling signals or restart blocks. On the other hand, `vmware_get_tsc_khz` is a static helper function that simply returns a precomputed TSC frequency value, typically used for timekeeping in VMware environments.
+
+There is no direct or indirect control flow from `do_nanosleep` to `vmware_get_tsc_khz` in the provided code or through standard execution paths. The two functions operate in different contexts and are not functionally related in the call graph presented.
+
+{There is no functional or semantic path from `do_nanosleep` to `vmware_get_tsc_khz` based on the provided source code and execution context.}
+FINAL ANSWER -> NO
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: x86_default_get_root_pointer
+Source code:
+u64 x86_default_get_root_pointer(void)
+{
+	return boot_params.acpi_rsdp_addr;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach x86_default_get_root_pointer? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+The function `do_nanosleep` is responsible for implementing the `nanosleep` system call, which puts the current process to sleep for a given duration. It uses high-resolution timers and scheduling mechanisms to manage the sleep. On the other hand, `x86_default_get_root_pointer` is a function that retrieves an ACPI RSDP address from the boot parameters, which is used during early boot for initializing hardware-related data structures.
+
+There is no logical or functional connection between the two functions. The execution path of `do_nanosleep` does not involve hardware initialization, ACPI, or boot parameters. Therefore, it is not semantically or functionally reasonable to expect that `do_nanosleep` would ever reach `x86_default_get_root_pointer`.
+
+FINAL ANSWER -> NO
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: xstate_get_guest_group_perm
+Source code:
+u64 xstate_get_guest_group_perm(void)
+{
+	return xstate_get_group_perm(true);
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach xstate_get_guest_group_perm? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+The function `do_nanosleep` is responsible for handling high-resolution sleep operations, using hrtimers and scheduling the current task to sleep until a specified time. It primarily deals with task state transitions, signal checks, and timer management.
+
+The function `xstate_get_guest_group_perm` is related to CPU extended state management, specifically for retrieving group permissions for a guest (likely in the context of virtualization or secure computing environments). It is not related to task scheduling, timers, or signal handling.
+
+Given the typical execution flow and purpose of `do_nanosleep`, there is no semantic or functional reason for it to invoke or reach `xstate_get_guest_group_perm`. These functions operate in distinct subsystems of the kernel and serve unrelated purposes.
+
+FINAL ANSWER -> NO
+
+PROMPT (depth 0):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- do_nanosleep
+
+Caller: do_nanosleep
+Source code:
+static int __sched do_nanosleep(struct hrtimer_sleeper *t, enum hrtimer_mode mode)
+{
+	struct restart_block *restart;
+
+	do {
+		set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		hrtimer_sleeper_start_expires(t, mode);
+
+		if (likely(t->task))
+			schedule();
+
+		hrtimer_cancel(&t->timer);
+		mode = HRTIMER_MODE_ABS;
+
+	} while (t->task && !signal_pending(current));
+
+	__set_current_state(TASK_RUNNING);
+
+	if (!t->task)
+		return 0;
+
+	restart = &current->restart_block;
+	if (restart->nanosleep.type != TT_NONE) {
+		ktime_t rem = hrtimer_expires_remaining(&t->timer);
+		struct timespec64 rmt;
+
+		if (rem <= 0)
+			return 0;
+		rmt = ktime_to_timespec64(rem);
+
+		return nanosleep_copyout(restart, &rmt);
+	}
+	return -ERESTART_RESTARTBLOCK;
+}
+
+
+Callee candidate: zstd_dctx_workspace_bound
+Source code:
+size_t zstd_dctx_workspace_bound(void)
+{
+	return ZSTD_estimateDCtxSize();
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of do_nanosleep will reach zstd_dctx_workspace_bound? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+do_nanosleep is a kernel function responsible for handling nanosecond-level sleep operations, primarily through hrtimer and scheduling mechanisms. It is not related to compression or decompression logic. On the other hand, zstd_dctx_workspace_bound is a user-space or library function related to the Zstandard compression algorithm, used to estimate the memory required for a decompression context. These functions operate in entirely different domains and have no semantic or functional connection in the Linux kernel's execution flow.
+
+FINAL ANSWER -> NO
+

@@ -7,6 +7,16 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from tqdm import tqdm
 
+def extract_profiled_functions(kall_functions, profile_file):
+    profiled_functions = set()
+    with open(profile_file, "r") as f:
+        lines = f.readlines()
+        for line in lines:
+            func_name = line.strip()
+            if func_name in kall_functions and not should_filter_function(func_name):
+                profiled_functions.add(func_name)
+    return profiled_functions
+
 def draw_subgraph(graph, graph_name):
     plt.figure(figsize=(12, 8))
     pos = nx.spring_layout(graph)  # Use the graph layout
