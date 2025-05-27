@@ -199,7 +199,7 @@ def LLM_hybrid_expand_profile(
                             next_frontier.append(dst)
                             log_file.write(f"Added edge: {src} -> {dst}\n")
         
-                        print(f"=> Query time: {e_time - s_time:.2f} seconds. res: f{"query_yes"}\n")
+                        print(f"=> Query time: {e_time - s_time:.2f} seconds. res: {query_yes}\n")
         
                 frontier = next_frontier
             

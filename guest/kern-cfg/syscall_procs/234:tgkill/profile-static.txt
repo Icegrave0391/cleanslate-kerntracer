@@ -1,101 +1,10 @@
 Subgraph has 1390 nodes and 11696 edges.
 Markdown tree representation:
-- serial8250_interrupt <profiled>
-  - byt_get_mctrl
-    - serial8250_do_get_mctrl
-      - __pm_runtime_suspend
-        - _dev_warn
-  - serial8250_do_startup
-    - _dev_err
-    - _dev_info
-    - default_serial_dl_read
-      - hub6_serial_in
-      - io_serial_in <profiled>
-      - kt_serial_in
-      - mem16_serial_in
-      - mem32_serial_in
-      - mem32be_serial_in
-        - ioread32be
-          - __warn_printk
-      - mem_serial_in
-    - f815xxa_mem_serial_out
-    - hub6_serial_out
-    - io_serial_out <profiled>
-    - mem16_serial_out
-    - mem32_serial_out
-    - mem32be_serial_out
-      - iowrite32be
-    - mem_serial_out
-    - pci_oxsemi_tornado_set_mctrl
-    - serial8250_break_ctl
-    - serial8250_clear_and_reinit_fifos
-    - serial8250_em485_destroy
-    - serial8250_em485_start_tx
-    - serial8250_em485_stop_tx
-    - serial8250_init_port
-    - serial8250_request_dma
-    - serial8250_rpm_get
-    - serial8250_rpm_get_tx
-    - serial8250_rpm_put
-    - serial8250_rpm_put_tx <profiled>
-    - serial8250_rx_dma
-      - serial8250_rx_dma_flush
-      - serial8250_set_defaults
-      - serial8250_tx_chars <profiled>
-        - serial8250_stop_tx
-        - uart_write_wakeup <profiled>
-          - tty_port_tty_wakeup <profiled>
-            - tty_port_default_wakeup <profiled>
-              - refcount_warn_saturate
-              - tty_kref_put <profiled>
-                - queue_work_on <profiled>
-              - tty_wakeup <profiled>
-                - n_tty_write_wakeup
-                  - kill_fasync
-                - tty_ldisc_deref
-                  - ldsem_up_read
-                - tty_ldisc_ref
-        - uart_xchar_out
-      - xr17v35x_unregister_gpio
-    - serial8250_set_mctrl
-      - univ8250_config_port
-        - __request_region
-          - kmalloc_trace
-    - serial8250_tx_dma
-  - serial8250_get_mctrl
-    - serial8250_request_port
-      - serial8250_request_std_resource
-    - serial8250_tx_empty
-    - univ8250_request_port
-      - serial8250_release_port
-      - univ8250_release_port
-    - xr17v35x_startup
-  - serial8250_startup
-  - uart_get_rs485_mode
-    - device_property_present
-    - device_property_read_u32_array
-    - uart_sanitize_serial_rs485_delays
-- note_interrupt <profiled>
-- siginfo_layout <profiled>
 - signal_wake_up_state <profiled>
   - wake_up_state <profiled>
-- __x64_sys_tgkill <profiled>
-  - __task_pid_nr_ns <profiled>
-  - do_send_specific <profiled>
-    - check_kill_permission <profiled>
-      - ns_capable
-      - security_task_kill <profiled>
-        - selinux_task_kill <profiled>
-          - avc_has_perm <profiled>
-    - do_send_sig_info <profiled>
-    - find_task_by_vpid <profiled>
-      - idr_find
-        - radix_tree_lookup
-- prepare_signal <profiled>
-  - dec_rlimit_put_ucounts <profiled>
-  - ptrace_trap_notify
-    - wake_up_state <profiled>
-  - wake_up_bit
+- wake_up_process <profiled>
+- kthread_is_per_cpu <profiled>
+- get_ucounts <profiled>
 - resched_curr <profiled>
   - add_interrupt_randomness <profiled>
   - agp_free_key
@@ -1450,20 +1359,16 @@ Markdown tree representation:
       - serial8250_tx_dma
   - uart_handle_dcd_change
     - tty_hangup
-- put_ucounts <profiled>
-- __common_interrupt <profiled>
-  - ___ratelimit
-    - _printk_deferred
-  - _printk
-    - vprintk
-  - debug_smp_processor_id
-- __sigqueue_alloc <profiled>
-  - dec_rlimit_put_ucounts <profiled>
-  - inc_rlimit_get_ucounts <profiled>
-  - kmem_cache_alloc <profiled>
-    - should_failslab <profiled>
-- task_active_pid_ns <profiled>
-- kthread_is_per_cpu <profiled>
+- select_task_rq_fair <profiled>
+  - __bitmap_and
+  - __bitmap_intersects
+  - __bitmap_weight
+  - _find_first_bit
+  - _find_next_and_bit
+  - _find_next_bit
+  - wake_affine
+    - cpus_share_cache
+- siginfo_layout <profiled>
 - enqueue_task_fair <profiled>
   - enqueue_entity
     - __update_stats_enqueue_sleeper
@@ -1473,6 +1378,7 @@ Markdown tree representation:
     - update_load_avg
       - attach_entity_load_avg
       - detach_entity_load_avg
+- task_active_pid_ns <profiled>
 - __wake_up <profiled>
   - aio_poll_wake
     - iocb_put
@@ -1520,18 +1426,112 @@ Markdown tree representation:
   - wake_page_function
     - wake_up_state <profiled>
   - woken_wake_function
-- get_ucounts <profiled>
-- wake_up_process <profiled>
-- select_task_rq_fair <profiled>
-  - __bitmap_and
-  - __bitmap_intersects
-  - __bitmap_weight
-  - _find_first_bit
-  - _find_next_and_bit
-  - _find_next_bit
-  - wake_affine
-    - cpus_share_cache
+- prepare_signal <profiled>
+  - dec_rlimit_put_ucounts <profiled>
+  - ptrace_trap_notify
+    - wake_up_state <profiled>
+  - wake_up_bit
+- __sigqueue_alloc <profiled>
+  - dec_rlimit_put_ucounts <profiled>
+  - inc_rlimit_get_ucounts <profiled>
+  - kmem_cache_alloc <profiled>
+    - should_failslab <profiled>
+- __common_interrupt <profiled>
+  - ___ratelimit
+    - _printk_deferred
+  - _printk
+    - vprintk
+  - debug_smp_processor_id
 - complete_signal <profiled>
   - task_curr
   - wake_up_bit
   - wake_up_state <profiled>
+- note_interrupt <profiled>
+- put_ucounts <profiled>
+- serial8250_interrupt <profiled>
+  - byt_get_mctrl
+    - serial8250_do_get_mctrl
+      - __pm_runtime_suspend
+        - _dev_warn
+  - serial8250_do_startup
+    - _dev_err
+    - _dev_info
+    - default_serial_dl_read
+      - hub6_serial_in
+      - io_serial_in <profiled>
+      - kt_serial_in
+      - mem16_serial_in
+      - mem32_serial_in
+      - mem32be_serial_in
+        - ioread32be
+          - __warn_printk
+      - mem_serial_in
+    - f815xxa_mem_serial_out
+    - hub6_serial_out
+    - io_serial_out <profiled>
+    - mem16_serial_out
+    - mem32_serial_out
+    - mem32be_serial_out
+      - iowrite32be
+    - mem_serial_out
+    - pci_oxsemi_tornado_set_mctrl
+    - serial8250_break_ctl
+    - serial8250_clear_and_reinit_fifos
+    - serial8250_em485_destroy
+    - serial8250_em485_start_tx
+    - serial8250_em485_stop_tx
+    - serial8250_init_port
+    - serial8250_request_dma
+    - serial8250_rpm_get
+    - serial8250_rpm_get_tx
+    - serial8250_rpm_put
+    - serial8250_rpm_put_tx <profiled>
+    - serial8250_rx_dma
+      - serial8250_rx_dma_flush
+      - serial8250_set_defaults
+      - serial8250_tx_chars <profiled>
+        - serial8250_stop_tx
+        - uart_write_wakeup <profiled>
+          - tty_port_tty_wakeup <profiled>
+            - tty_port_default_wakeup <profiled>
+              - refcount_warn_saturate
+              - tty_kref_put <profiled>
+                - queue_work_on <profiled>
+              - tty_wakeup <profiled>
+                - n_tty_write_wakeup
+                  - kill_fasync
+                - tty_ldisc_deref
+                  - ldsem_up_read
+                - tty_ldisc_ref
+        - uart_xchar_out
+      - xr17v35x_unregister_gpio
+    - serial8250_set_mctrl
+      - univ8250_config_port
+        - __request_region
+          - kmalloc_trace
+    - serial8250_tx_dma
+  - serial8250_get_mctrl
+    - serial8250_request_port
+      - serial8250_request_std_resource
+    - serial8250_tx_empty
+    - univ8250_request_port
+      - serial8250_release_port
+      - univ8250_release_port
+    - xr17v35x_startup
+  - serial8250_startup
+  - uart_get_rs485_mode
+    - device_property_present
+    - device_property_read_u32_array
+    - uart_sanitize_serial_rs485_delays
+- __x64_sys_tgkill <profiled>
+  - __task_pid_nr_ns <profiled>
+  - do_send_specific <profiled>
+    - check_kill_permission <profiled>
+      - ns_capable
+      - security_task_kill <profiled>
+        - selinux_task_kill <profiled>
+          - avc_has_perm <profiled>
+    - do_send_sig_info <profiled>
+    - find_task_by_vpid <profiled>
+      - idr_find
+        - radix_tree_lookup
