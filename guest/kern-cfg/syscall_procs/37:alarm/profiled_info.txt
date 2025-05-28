@@ -1,0 +1,14 @@
+Profiled functions: 12 nodes and 3 edges.
+Profiled (filtered) functions:
+resched_curr
+select_task_rq_fair
+enqueue_task_fair
+cpus_share_cache
+__x64_sys_alarm
+default_wake_function
+wake_up_process
+ns_to_timespec64
+__wake_up
+autoremove_wake_function
+kthread_is_per_cpu
+__note_gp_changes

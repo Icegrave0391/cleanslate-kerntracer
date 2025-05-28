@@ -1,0 +1,40 @@
+Subgraph has 38 nodes and 29 edges.
+Markdown tree representation:
+- resched_curr <profiled>
+  - native_smp_send_reschedule
+    - __warn_printk
+- select_task_rq_fair <profiled>
+  - __bitmap_weight
+  - _find_first_bit
+  - _find_next_and_bit
+  - _find_next_bit
+  - wake_affine
+- enqueue_task_fair <profiled>
+  - enqueue_entity
+    - __update_stats_enqueue_sleeper
+    - rb_insert_color
+  - reweight_entity
+  - update_load_avg
+    - attach_entity_load_avg
+    - detach_entity_load_avg
+- cpus_share_cache <profiled>
+- __x64_sys_alarm <profiled>
+- wake_up_process <profiled>
+- ns_to_timespec64 <profiled>
+- __wake_up <profiled>
+  - autoremove_wake_function <profiled>
+    - default_wake_function <profiled>
+  - aio_poll_wake
+    - iocb_put
+    - queue_work_on
+  - cwt_wakefn
+  - ep_poll_callback
+    - __pm_stay_awake
+  - i915_sw_fence_wake
+  - io_wake_function
+  - iocg_wake_fn
+  - p9_pollwake
+  - wake_page_function
+    - wake_up_state
+- kthread_is_per_cpu <profiled>
+- __note_gp_changes <profiled>

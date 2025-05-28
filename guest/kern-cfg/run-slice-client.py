@@ -271,7 +271,7 @@ if __name__ == "__main__":
     respond = llm_chat(
         model="qwen3:32b",
         messages=[{"role": "user", "content": "Warm up. Just say {{MF}}!" + nothink_prompt}],
-        options={"num_ctx": 32768}
+        options={"num_ctx": 14336}
     )
     print(f"Ollama client connected. Response: {respond.message.content}")
     
@@ -322,7 +322,7 @@ if __name__ == "__main__":
             N=2,
             model="qwen3:32b",
             role="user",
-            num_ctx=32768,
+            num_ctx=14336,
             syscall_info=syscall_info,
             nothink=args.nothink,
         )

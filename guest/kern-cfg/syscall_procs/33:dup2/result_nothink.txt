@@ -1,0 +1,80 @@
+Subgraph has 76 nodes and 67 edges.
+Markdown tree representation:
+- swake_up_one <profiled>
+- __wake_up <profiled>
+  - autoremove_wake_function <profiled>
+    - default_wake_function <profiled>
+  - aio_poll_wake
+    - iocb_put
+  - ep_autoremove_wake_function
+  - i915_sw_fence_wake
+  - io_wake_function
+  - io_wqe_hash_wake
+    - io_wqe_activate_free_worker
+  - iocg_wake_fn
+  - kyber_domain_wake
+    - sbitmap_del_wait_queue
+  - percpu_rwsem_wake_function
+  - synchronous_wake_function
+  - wake_bit_function
+  - wake_page_function
+    - wake_up_state
+- kthread_is_per_cpu <profiled>
+- filp_close <profiled>
+  - dnotify_flush <profiled>
+    - fsnotify_detach_mark
+    - fsnotify_find_mark
+    - fsnotify_free_mark
+      - inotify_freeing_mark
+  - fput <profiled>
+    - queue_delayed_work_on
+      - __queue_delayed_work
+  - mqueue_flush_file
+  - nfs4_file_flush
+    - errseq_sample
+    - nfs_wb_all
+  - nfs_file_flush
+- kvmalloc_node <profiled>
+  - __kmalloc_node <profiled>
+    - __kmem_cache_alloc_node <profiled>
+      - should_failslab <profiled>
+    - __kmalloc_large_node
+  - __vmalloc_node_range
+    - __get_vm_area_node
+    - __vmap_pages_range_noflush
+    - alloc_pages_bulk_array_mempolicy
+    - schedule_timeout_uninterruptible
+    - warn_alloc
+- __x64_sys_dup2 <profiled>
+  - ksys_dup3 <profiled>
+    - do_dup2 <profiled>
+    - expand_files <profiled>
+      - alloc_fdtable <profiled>
+        - kmalloc_trace <profiled>
+          - __kmem_cache_alloc_node <profiled>
+            - should_failslab <profiled>
+        - kvfree
+          - is_vmalloc_addr
+      - finish_wait
+      - init_wait_entry
+      - prepare_to_wait_event
+- kmalloc_slab <profiled>
+- __note_gp_changes <profiled>
+- select_task_rq_fair <profiled>
+  - __bitmap_weight
+  - _find_first_bit
+  - _find_next_and_bit
+- wake_up_process <profiled>
+- __cond_resched <profiled>
+  - __schedule
+    - __delayacct_blkio_start
+    - dequeue_task_dl
+    - dequeue_task_fair
+    - enter_lazy_tlb
+    - finish_task_switch
+    - pick_next_task_fair
+    - put_prev_task_dl
+    - put_prev_task_fair
+    - set_next_task_dl
+    - set_next_task_fair
+    - set_next_task_rt
