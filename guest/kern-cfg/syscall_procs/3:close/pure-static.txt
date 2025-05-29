@@ -1,11 +1,11 @@
-Subgraph has 2205 nodes and 4871 edges.
+Subgraph has 2201 nodes and 4867 edges.
 Markdown tree representation:
-- __x64_sys_close <profiled>
-  - close_fd <profiled>
-    - filp_close <profiled>
-      - dnotify_flush <profiled>
+- __x64_sys_close
+  - close_fd
+    - filp_close
+      - dnotify_flush
         - fsnotify_detach_mark
-        - fsnotify_find_mark <profiled>
+        - fsnotify_find_mark
           - refcount_warn_saturate
             - __warn_printk
         - fsnotify_free_mark
@@ -25,8 +25,8 @@ Markdown tree representation:
                           - print_stop_info
                           - print_tainted
                           - print_worker_info
-                            - copy_from_kernel_nofault
-                              - copy_from_kernel_nofault_allowed
+                            - copy_from_kernel_nofault <profiled>
+                              - copy_from_kernel_nofault_allowed <profiled>
                             - kthread_probe_data
                             - strcmp
                           - strcspn
@@ -58,21 +58,21 @@ Markdown tree representation:
                                 - rethook_find_ret_addr
                             - stack_type_name
                             - unwind_get_return_address_ptr
-                    - mod_node_page_state
-                  - __kmem_cache_alloc_node
-                    - should_failslab
+                    - mod_node_page_state <profiled>
+                  - __kmem_cache_alloc_node <profiled>
+                    - should_failslab <profiled>
                 - fsnotify_destroy_event
                   - inotify_free_event
                 - fsnotify_insert_event
                   - inotify_merge
                   - kill_fasync
                     - send_sigio
-                      - pid_task
+                      - pid_task <profiled>
                       - send_sigio_to_task
-                        - do_send_sig_info
+                        - do_send_sig_info <profiled>
                         - security_file_send_sigiotask
                           - selinux_file_send_sigiotask
-                            - avc_has_perm
+                            - avc_has_perm <profiled>
                 - strcpy
               - inotify_remove_from_idr
                 - fsnotify_get_mark
@@ -86,7 +86,7 @@ Markdown tree representation:
           - __fsnotify_recalc_mask
             - ihold
           - __fsnotify_update_child_dentry_flags
-      - fput <profiled>
+      - fput
         - llist_add_batch
         - queue_delayed_work_on
           - __queue_delayed_work
@@ -94,8 +94,8 @@ Markdown tree representation:
         - netlink_sendskb
           - netlink_data_ready
           - netlink_deliver_tap
-            - __alloc_skb
-              - __kmalloc_node_track_caller
+            - __alloc_skb <profiled>
+              - __kmalloc_node_track_caller <profiled>
               - gfp_pfmemalloc_allowed
               - kmem_cache_alloc_bulk
                 - kmem_cache_free_bulk
@@ -105,23 +105,23 @@ Markdown tree representation:
                         - stack_depot_print
                           - stack_trace_print
                     - free_large_kmalloc
-              - kmem_cache_alloc_node
-              - ksize
-                - __ksize
+              - kmem_cache_alloc_node <profiled>
+              - ksize <profiled>
+                - __ksize <profiled>
             - is_vmalloc_addr
-            - skb_clone
-              - __skb_clone
-                - __copy_skb_header
-              - kmem_cache_alloc
+            - skb_clone <profiled>
+              - __skb_clone <profiled>
+                - __copy_skb_header <profiled>
+              - kmem_cache_alloc <profiled>
               - skb_copy_ubufs
-            - skb_put
+            - skb_put <profiled>
               - skb_over_panic
                 - skb_panic
           - skb_queue_tail
-          - sock_def_readable
-            - __wake_up_sync_key
-              - autoremove_wake_function
-                - default_wake_function
+          - sock_def_readable <profiled>
+            - __wake_up_sync_key <profiled>
+              - autoremove_wake_function <profiled>
+                - default_wake_function <profiled>
               - barrier_wake
                 - i915_sw_fence_complete
               - child_wait_callback
@@ -166,7 +166,7 @@ Markdown tree representation:
                       - i965_disable_vblank
                       - ilk_disable_vblank
                 - intel_rps_boost
-                  - queue_work_on
+                  - queue_work_on <profiled>
               - ep_autoremove_wake_function
               - ep_poll_callback
                 - __pm_stay_awake
@@ -218,7 +218,7 @@ Markdown tree representation:
                 - sbitmap_del_wait_queue
               - p9_pollwake
               - percpu_rwsem_wake_function
-              - pollwake
+              - pollwake <profiled>
               - receiver_wake_function
               - rq_qos_wake_function
                 - iolat_acquire_inflight
@@ -228,8 +228,8 @@ Markdown tree representation:
               - var_wake_function
               - wake_bit_function
               - wake_page_function
-                - wake_up_state
-              - woken_wake_function
+                - wake_up_state <profiled>
+              - woken_wake_function <profiled>
             - sock_wake_async
           - svc_data_ready
             - svc_xprt_enqueue
@@ -238,27 +238,27 @@ Markdown tree representation:
               - svc_udp_has_wspace
           - svc_tcp_listen_data_ready
           - xs_data_ready
-            - cubictcp_init
+            - cubictcp_init <profiled>
             - inet6_cleanup_sock
-              - inet6_destroy_sock
-                - fl6_free_socklist
+              - inet6_destroy_sock <profiled>
+                - fl6_free_socklist <profiled>
                   - fl_release
-            - inet6_sock_destruct
-              - inet_sock_destruct
-                - __sk_mem_reclaim
-                  - __sk_mem_reduce_allocated
+            - inet6_sock_destruct <profiled>
+              - inet_sock_destruct <profiled>
+                - __sk_mem_reclaim <profiled>
+                  - __sk_mem_reduce_allocated <profiled>
                     - tcp_leave_memory_pressure
                       - jiffies_to_msecs
-                - dst_release
+                - dst_release <profiled>
                   - net_ratelimit
-            - inet_bhash2_reset_saddr
-              - __inet_bhash2_update_saddr
-                - inet_put_port
+            - inet_bhash2_reset_saddr <profiled>
+              - __inet_bhash2_update_saddr <profiled>
+                - inet_put_port <profiled>
                   - ipv6_portaddr_hash
                   - local_bh_enable
-                    - __local_bh_enable_ip
+                    - __local_bh_enable_ip <profiled>
             - inet_csk_prepare_forced_close
-            - inet_unhash
+            - inet_unhash <profiled>
               - reuseport_stop_listen_sock
                 - reuseport_detach_sock
             - ip6_datagram_release_cb
@@ -274,22 +274,22 @@ Markdown tree representation:
                         - ipv6_get_saddr_eval
                           - ipv6_addr_label
                 - ip6_sk_dst_store_flow
-                  - sk_setup_caps
-                - security_sk_classify_flow
-                  - selinux_sk_getsecid
+                  - sk_setup_caps <profiled>
+                - security_sk_classify_flow <profiled>
+                  - selinux_sk_getsecid <profiled>
                 - udp_v4_rehash
                   - udp_lib_rehash
                 - udp_v6_rehash
               - ip6_dst_check
-              - ipv4_dst_check
+              - ipv4_dst_check <profiled>
               - xfrm_dst_check
                 - dst_blackhole_cow_metrics
                 - dst_blackhole_mtu
                 - dst_cow_metrics_generic
-                  - kmalloc_trace
+                  - kmalloc_trace <profiled>
                 - ip6_mtu
                 - ipv4_cow_metrics
-                - ipv4_mtu
+                - ipv4_mtu <profiled>
                 - sch_frag_dst_get_mtu
                 - xfrm_mtu
                 - xfrm_state_mtu
@@ -306,8 +306,8 @@ Markdown tree representation:
                   - skb_trim
                 - rtnl_set_sk_err
                   - netlink_set_err
-                    - sk_error_report
-                      - sock_def_error_report
+                    - sk_error_report <profiled>
+                      - sock_def_error_report <profiled>
                       - xs_error_report
               - mroute_clean_tables
                 - ipmr_destroy_unres
@@ -363,7 +363,7 @@ Markdown tree representation:
                                       - ioremap_page_range
                                         - vmap_p4d_range
                                           - __p4d_alloc
-                                            - free_pages
+                                            - free_pages <profiled>
                                           - __pmd_alloc
                                           - __pte_alloc_kernel
                                             - __get_free_pages
@@ -455,17 +455,17 @@ Markdown tree representation:
                                 - crypto_larval_kill
                                   - complete_all
                                   - crypto_shoot_alg
-                                    - down_write
+                                    - down_write <profiled>
                                       - __down_write_common
                                         - rwsem_mark_wake
                                           - wake_q_add
                                           - wake_q_add_safe
                                         - rwsem_spin_on_owner
-                                    - up_write
+                                    - up_write <profiled>
                                   - crypto_unregister_alg
                                     - crypto_remove_spawns
-                                      - try_module_get
-                                - module_put
+                                      - try_module_get <profiled>
+                                - module_put <profiled>
                         - crypto_authenc_esn_free
                         - crypto_authenc_free
                         - crypto_ccm_free
@@ -485,7 +485,7 @@ Markdown tree representation:
                   - crypto_has_kpp
                   - crypto_has_shash
                   - crypto_has_skcipher
-                  - csum_partial
+                  - csum_partial <profiled>
                   - csum_partial_ext
                   - ip4_key_hashfn
                   - ip4_obj_hashfn
@@ -556,11 +556,11 @@ Markdown tree representation:
                               - ieee80211_send_delba
                                 - __netdev_alloc_skb
                                   - page_frag_alloc_align
-                                    - free_unref_page
+                                    - free_unref_page <profiled>
                                       - __free_one_page
-                                        - __mod_zone_page_state
-                                      - free_pcp_prepare
-                                      - free_unref_page_commit
+                                        - __mod_zone_page_state <profiled>
+                                      - free_pcp_prepare <profiled>
+                                      - free_unref_page_commit <profiled>
                                         - free_pcppages_bulk
                                   - page_frag_free
                             - cancel_work_sync
@@ -655,7 +655,7 @@ Markdown tree representation:
                         - ieee80211_mgd_setup_link
                           - get_random_bytes
                             - _get_random_bytes
-                              - crng_make_state
+                              - crng_make_state <profiled>
                                 - extract_entropy
                                   - blake2s_final
                                   - blake2s_update
@@ -694,10 +694,10 @@ Markdown tree representation:
                         - sysfs_remove_groups
                           - sysfs_remove_group
                             - kernfs_find_and_get_ns
-                              - down_read
+                              - down_read <profiled>
                                 - __down_read_common
                               - kernfs_find_ns
-                              - up_read
+                              - up_read <profiled>
                             - kernfs_get
                     - net_rx_queue_update_kobjects
                       - sysfs_create_group
@@ -739,10 +739,10 @@ Markdown tree representation:
                           - input_poller_attrs_visible
                           - intf_assoc_attrs_are_visible
                           - is_visible
-                            - __fdget
+                            - __fdget <profiled>
                               - __fget_files
-                            - __msecs_to_jiffies
-                            - __usecs_to_jiffies
+                            - __msecs_to_jiffies <profiled>
+                            - __usecs_to_jiffies <profiled>
                             - amd_pmu_event_map
                             - dma_fence_context_alloc
                             - hswep_cbox_filter_mask
@@ -901,7 +901,7 @@ Markdown tree representation:
                               - ipc_rmid
                                 - idr_get_next
                                 - ipc_kht_remove
-                              - put_pid
+                              - put_pid <profiled>
                                 - put_pid_ns
                                   - idr_destroy
                                   - proc_free_inum
@@ -918,7 +918,7 @@ Markdown tree representation:
                               - e1000_acquire_swflag_ich8lan
                               - e1000_get_hw_semaphore_82571
                                 - usleep_range_state
-                                  - schedule_hrtimeout_range
+                                  - schedule_hrtimeout_range <profiled>
                               - e1000_get_hw_semaphore_82574
                                 - e1000_get_hw_semaphore_82573
                               - e1000_put_hw_semaphore_82571
@@ -1107,11 +1107,11 @@ Markdown tree representation:
                                           - intel_iommu_tlb_sync
                                             - iommu_flush_iotlb_psi
                                             - put_pages_list
-                                              - PageHeadHuge
+                                              - PageHeadHuge <profiled>
                                               - __page_cache_release
-                                                - __mod_node_page_state
+                                                - __mod_node_page_state <profiled>
                                                 - mod_zone_page_state
-                                              - free_unref_page_list
+                                              - free_unref_page_list <profiled>
                                           - iommu_v1_unmap_pages
                                             - fetch_pte
                                           - iommu_v2_unmap_pages
@@ -1432,8 +1432,8 @@ Markdown tree representation:
               - ip_flush_pending_frames
             - raw_unhash_sk
             - reuseport_has_conns_set
-            - selinux_sk_free_security
-              - selinux_netlbl_sk_security_free
+            - selinux_sk_free_security <profiled>
+              - selinux_netlbl_sk_security_free <profiled>
                 - __blk_mq_complete_request_remote
                 - __cpa_flush_all
                   - __flush_tlb_all
@@ -1442,7 +1442,7 @@ Markdown tree representation:
                   - msr_set_bit
                 - __i915_request_ctor
                   - __i915_sw_fence_init
-                    - __init_waitqueue_head
+                    - __init_waitqueue_head <profiled>
                   - i915_sched_node_init
                 - __profile_flip_buffers
                 - __rdmsr_on_cpu
@@ -1570,7 +1570,7 @@ Markdown tree representation:
                     - sparse_keymap_report_event
                       - sparse_keymap_report_entry
                 - anon_vma_ctor
-                  - __init_rwsem
+                  - __init_rwsem <profiled>
                 - boost_set_msr_each
                 - bts_buffer_free_aux
                 - cmci_rediscover_work_func
@@ -1589,10 +1589,6 @@ Markdown tree representation:
                     - set_secondary_fwnode
                     - software_node_notify_remove
                       - sysfs_remove_link
-                - devm_mipi_dsi_detach
-                  - gen11_dsi_host_detach
-                  - intel_dsi_host_detach
-                - devm_mipi_dsi_device_unregister
                 - devm_nvmem_unregister
                 - devm_pci_alloc_host_bridge_release
                   - put_device
@@ -1623,7 +1619,7 @@ Markdown tree representation:
                 - error
                 - event_callback
                 - ext4_free_link
-                  - __brelse
+                  - __brelse <profiled>
                 - flip_smm_bit
                   - msr_clear_bit
                 - flush_ldt
@@ -1668,7 +1664,7 @@ Markdown tree representation:
                 - kvm_pv_guest_cpu_reboot
                   - kvm_guest_cpu_offline
                     - __kvm_cpuid_base
-                    - swake_up_one
+                    - swake_up_one <profiled>
                 - mark_tsc_unstable
                 - mce_cpu_restart
                   - __mcheck_cpu_init_clear_banks
@@ -1694,7 +1690,7 @@ Markdown tree representation:
                       - mce_severity_amd
                         - error_context
                           - ex_get_fixup_type
-                            - search_exception_tables
+                            - search_exception_tables <profiled>
                               - search_extable
                               - search_module_extables
                           - is_copy_from_user
@@ -1812,10 +1808,10 @@ Markdown tree representation:
                         - __folio_mark_dirty
                           - __page_file_index
                           - __xa_set_mark
-                          - inode_to_bdi
+                          - inode_to_bdi <profiled>
                             - I_BDEV
                           - percpu_counter_add_batch
-                      - folio_mapping
+                      - folio_mapping <profiled>
                     - nfs_clear_page_commit
                       - dec_node_page_state
                       - swapcache_mapping
@@ -1864,17 +1860,17 @@ Markdown tree representation:
                             - __xa_clear_mark
                             - sb_clear_inode_writeback
                           - folio_rotate_reclaimable
-                            - folio_batch_move_lru
+                            - folio_batch_move_lru <profiled>
                               - folio_activate_fn
-                              - lru_add_fn
+                              - lru_add_fn <profiled>
                               - lru_deactivate_file_fn
                                 - folio_mapped
                               - lru_deactivate_fn
                               - lru_lazyfree_fn
                               - lru_move_tail_fn
-                              - release_pages
+                              - release_pages <profiled>
                           - folio_wake_bit
-                    - wake_up_bit
+                    - wake_up_bit <profiled>
                   - nfs_direct_write_completion
                   - nfs_read_completion
                     - nfs_page_group_sync_on_bit
@@ -1924,7 +1920,7 @@ Markdown tree representation:
                 - selinux_tun_dev_free_security
                 - shmem_init_inode
                 - shmem_put_link
-                  - folio_mark_accessed
+                  - folio_mark_accessed <profiled>
                     - folio_activate
                     - workingset_activation
                 - sighand_ctor
@@ -1981,14 +1977,14 @@ Markdown tree representation:
             - sk_clear_memalloc
             - sk_common_release
               - tcp_v4_destroy_sock
-                - skb_rbtree_purge
+                - skb_rbtree_purge <profiled>
                 - tcp_cleanup_congestion_control
                 - tcp_cleanup_ulp
-                - tcp_fastopen_active_disable_ofo_check
+                - tcp_fastopen_active_disable_ofo_check <profiled>
                 - tcp_fastopen_destroy_cipher
                 - tcp_free_fastopen_req
-                - tcp_write_queue_purge
-                  - tcp_chrono_stop
+                - tcp_write_queue_purge <profiled>
+                  - tcp_chrono_stop <profiled>
               - tcp_v6_destroy_sock
               - udp_destroy_sock
                 - sk_send_sigurg
@@ -2000,15 +1996,15 @@ Markdown tree representation:
                 - sk_stream_write_space
                   - tcp_stream_memory_free
                 - sock_def_destruct
-                - sock_def_wakeup
+                - sock_def_wakeup <profiled>
                 - sock_def_write_space
                 - sock_enable_timestamps
                   - net_enable_timestamp
-                  - tcp_release_cb
+                  - tcp_release_cb <profiled>
                     - tcp_tsq_write
                       - tcp_current_mss
-                        - tcp_sync_mss
-                        - tcp_v4_md5_lookup
+                        - tcp_sync_mss <profiled>
+                        - tcp_v4_md5_lookup <profiled>
                         - tcp_v6_md5_lookup
                           - __tcp_md5_do_lookup
                       - tcp_write_xmit
@@ -2018,42 +2014,42 @@ Markdown tree representation:
                           - skb_split_no_header
                           - skb_zerocopy_clone
                         - tcp_event_new_data_sent
-                          - tcp_check_space
+                          - tcp_check_space <profiled>
                             - svc_write_space
                             - unix_write_space
                             - xs_tcp_write_space
                             - xs_udp_write_space
-                          - tcp_rbtree_insert
+                          - tcp_rbtree_insert <profiled>
                           - tcp_rearm_rto
-                            - jiffies_to_usecs
-                            - nsecs_to_jiffies
+                            - jiffies_to_usecs <profiled>
+                            - nsecs_to_jiffies <profiled>
                         - tcp_fragment
                           - __skb_unclone_keeptruesize
                             - pskb_expand_head
                           - rb_last
                           - tcp_adjust_pcount
-                          - tcp_stream_alloc_skb
+                          - tcp_stream_alloc_skb <profiled>
                             - __sk_mem_schedule
                               - __sk_mem_raise_allocated
                                 - tcp_enter_memory_pressure
-                            - sk_forced_mem_schedule
+                            - sk_forced_mem_schedule <profiled>
                         - tcp_init_cwnd
-                        - tcp_schedule_loss_probe
+                        - tcp_schedule_loss_probe <profiled>
                       - tcp_xmit_retransmit_queue
                         - __tcp_retransmit_skb
                           - __pskb_copy_fclone
                           - inet6_sk_rebuild_header
-                            - __sk_dst_check
-                          - inet_sk_rebuild_header
-                            - inet_bhash2_update_saddr
+                            - __sk_dst_check <profiled>
+                          - inet_sk_rebuild_header <profiled>
+                            - inet_bhash2_update_saddr <profiled>
                             - inet_hash
-                            - ip_route_output_key_hash
+                            - ip_route_output_key_hash <profiled>
                             - ping_hash
                             - raw_hash_sk
                             - udp_lib_hash
                             - udp_lib_unhash
                             - unix_unhash
-                          - tcp_rate_skb_sent
+                          - tcp_rate_skb_sent <profiled>
                           - tcp_rtx_queue_unlink_and_free
                           - tcp_skb_shift
                             - skb_shift
@@ -2065,18 +2061,18 @@ Markdown tree representation:
                         - ip6_rt_update_pmtu
                           - __ip6_rt_update_pmtu
                             - dst_release_immediate
-                              - dst_destroy
+                              - dst_destroy <profiled>
                                 - dst_cache_destroy
                                 - ip6_dst_destroy
                                   - in6_dev_finish_destroy
-                                - ipv4_dst_destroy
+                                - ipv4_dst_destroy <profiled>
                                 - xfrm4_dst_destroy
                                   - __dst_destroy_metrics_generic
                                   - __xfrm_state_destroy
                                     - ___xfrm_state_destroy
                                       - ah6_destroy
                                       - esp6_destroy
-                                  - rt_del_uncached_list
+                                  - rt_del_uncached_list <profiled>
                                   - xfrm_policy_destroy
                                 - xfrm6_dst_destroy
                                   - rt6_uncached_list_del
@@ -2123,7 +2119,7 @@ Markdown tree representation:
                             - rt6_insert_exception
                               - fib6_force_start_gc
                               - fib6_update_sernum
-                              - get_random_u8
+                              - get_random_u8 <profiled>
                               - kmalloc_large
                             - xfrm_confirm_neigh
                         - ip_rt_update_pmtu
@@ -2132,7 +2128,7 @@ Markdown tree representation:
                               - fib_rules_lookup
                                 - fib4_rule_action
                                   - fib_get_table
-                                  - fib_table_lookup
+                                  - fib_table_lookup <profiled>
                                 - fib4_rule_match
                                 - fib4_rule_suppress
                                   - free_fib_info
@@ -2155,13 +2151,13 @@ Markdown tree representation:
                         - xfrm4_update_pmtu
                           - xfrm6_update_pmtu
                       - tcp_simple_retransmit
-                        - tcp_set_ca_state
-                          - cubictcp_state
+                        - tcp_set_ca_state <profiled>
+                          - cubictcp_state <profiled>
                     - tcp_v6_mtu_reduced
                       - inet6_csk_update_pmtu
                         - inet6_csk_route_socket
                       - tcp_mtu_to_mss
-                - sock_gen_put
+                - sock_gen_put <profiled>
                   - inet_twsk_free
                     - tcp_twsk_destructor
                   - tcp_v4_reqsk_destructor
@@ -2174,18 +2170,18 @@ Markdown tree representation:
                 - sockopt_release_sock
                 - svc_tcp_state_change
                   - svc_xprt_deferred_close
-                - tcp_done
-                  - inet_sk_state_store
+                - tcp_done <profiled>
+                  - inet_sk_state_store <profiled>
                   - reqsk_fastopen_remove
                   - xs_local_state_change
                   - xs_tcp_state_change
                 - tcp_enter_cwr
                   - cubictcp_recalc_ssthresh
                   - tcp_reno_ssthresh
-                - tcp_init_sock
-                  - tcp_assign_congestion_control
-                - tcp_initialize_rcv_mss
-                - tcp_mtup_init
+                - tcp_init_sock <profiled>
+                  - tcp_assign_congestion_control <profiled>
+                - tcp_initialize_rcv_mss <profiled>
+                - tcp_mtup_init <profiled>
                 - tcp_rate_check_app_limited
                 - tcp_sock_set_nodelay
                   - __tcp_push_pending_frames

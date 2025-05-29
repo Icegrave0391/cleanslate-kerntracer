@@ -88,7 +88,7 @@ for sys_name in SYS_NAMES:
     results[sys_name] = coverages
 
 # 绘图
-plt.figure(figsize=(8, 4))
+plt.figure(figsize=(9, 4))
 for sys_name, coverage in results.items():
     n = len(coverage)
     # 从 (0,0) 开始
