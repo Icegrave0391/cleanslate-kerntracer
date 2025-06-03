@@ -9,7 +9,8 @@ if [ $# -ne 1 ]; then
 fi
 
 OUTDIR=$1
-URL="http://127.0.0.1:9000/10K.html"
+#URL="http://127.0.0.1:9000/index.html"
+URL="http://127.0.0.1:9000/index.nginx-debian.html"
 REQUESTS=${REQUESTS:-10000}    # ab -n
 RUNS=${RUNS:-1}                # 重复次数
 clients=(1 2 4 8 16 24 32)      # 并发点列表

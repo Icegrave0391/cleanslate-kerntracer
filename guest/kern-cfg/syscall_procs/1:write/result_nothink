@@ -77,7 +77,10 @@ __ext4_mark_inode_dirty
 __ext4_std_error
 __ext4_warning
 __fdget_pos
+__fdget
+__fget
 __fget_files
+__fget_light
 __file_remove_privs
 __filemap_add_folio
 __filemap_get_folio
@@ -116,6 +119,7 @@ __ip_make_skb
 __ip_options_echo
 __ip_queue_xmit
 __ip_select_ident
+__inode_security_revalidate
 __ipv6_fixup_options
 __jbd2_journal_file_buffer
 __jbd2_journal_temp_unlink_buffer

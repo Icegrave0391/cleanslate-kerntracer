@@ -81,7 +81,10 @@ __ext4_std_error
 __ext4_warning
 __ext4_warning_inode
 __fdget_pos
+__fdget
+__fget
 __fget_files
+__fget_light
 __filemap_fdatawait_range
 __filemap_get_folio
 __filemap_remove_folio

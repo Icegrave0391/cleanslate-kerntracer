@@ -8,9 +8,9 @@ Usage:
     python generate_UD2.py -p <program> -i <program.txt> [--use-llm]
 
 Options:
-    -p         Specify the name of the program.
-    -i         Specify the input file name for executed syscalls.
-    --use-llm  If set, read profile data from syscall_procs/<sys_id>:<sys_name>/<program.txt>
+    -p         Specify the name of the <program>.
+    -i         Specify the input <file_name> for executed syscalls.
+    --use-llm  If set, read profile data from syscall_procs/<sys_id>:<sys_name>/<file_name>
                instead of syscall_profiles.
 
 Reads executed syscalls from:
@@ -158,7 +158,7 @@ def main():
     base_dir = 'syscall_profiles'
     
     # Paths for executed syscalls (always under syscall_profiles/executed_syscalls)
-    exec_file = os.path.join('syscall_profiles', 'executed_syscalls', input_fname)
+    exec_file = os.path.join('syscall_profiles', 'executed_syscalls', f"{prog}.txt")
     if not os.path.isfile(exec_file):
         print(f"Error: executed syscalls file not found: {exec_file}", file=sys.stderr)
         sys.exit(1)
@@ -267,6 +267,7 @@ def main():
         else:
             func_file = os.path.join('syscall_profiles', f'{sid}:{sname}', input_fname)
         if not os.path.isfile(func_file):
+            print(f"Warning: profile file not found for syscall {sid} ({sname}), skipping", file=sys.stderr)
             continue
 
         # get profiled functions

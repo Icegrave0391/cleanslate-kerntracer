@@ -4,7 +4,7 @@ import sys
 
 print(Path(__file__))
 print(Path(__file__).parent.parent)
-DEFAULT_TEMPLATE_DIR = Path(__file__).parent.parent/"guest"/"vmhome"/"kftracer"/"ftrace"/"out_UD2"
+DEFAULT_TEMPLATE_DIR = Path(__file__).parent.parent/"guest"/"vmhome"/"kftracer"/"out_UD2"
 
 # To be specific by our command line argument for a sensitive process
 # DEFAULT_WHOLE_PG_FILE = DEFAULT_TEMPLATE_DIR #/ "whole_page_code.txt"
