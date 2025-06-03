@@ -92,117 +92,118 @@ def LLM_validate(
     regex_think = re.compile(r'<think>.*?</think>', flags=re.DOTALL)
     regex_whitespace = re.compile(r'[ \t]+$', flags=re.MULTILINE)
     
-    f_res = open(result_file, 'w', encoding='utf-8')
-    f_res_noctx = open(result_file_noctx, 'w', encoding='utf-8')
+    # f_res = open(result_file, 'w', encoding='utf-8')
+    # f_res_noctx = open(result_file_noctx, 'w', encoding='utf-8')
     
     function_sources = {node: all_blocks.get(node) for node in subgraph.nodes}
-    
-    with open(the_output, 'a', encoding='utf-8') as log_file:
-        
-        # Gather all nodes in the subgraph that have outgoing edges
-        potential_src_nodes = {node for node in subgraph.nodes if subgraph.out_degree(node) > 0}
-        if len(potential_src_nodes) < 50:
-            thres = len(potential_src_nodes) // 2
-        else:
-            thres = vali_thres
-        
-        # Randomly select pairs of nodes and destinations
-        selected_pairs = random.sample(
-            [
-            (node, random.choice(list(subgraph.neighbors(node))))
-            for node in potential_src_nodes
-            ],
-            min(thres, len(potential_src_nodes))
-        )
-        
-        def __query_llm(prompt, src, dst, with_ctx: bool):
-                print(f"[{syscall_info}; ctx: {with_ctx}] Querying LLM for validation. {src} -> {dst}...")
-                s_time = time.time()
-                llm_chat = client.chat if client else chat
-                response = llm_chat(
-                    model=model,
-                    messages=[{'role': role, 'content': prompt}],
-                    options={'num_ctx': num_ctx}
-                )
-                #log the query time
-                e_time = time.time()
-                query_yes = "NO"
 
-                resp = regex_think.sub('', response.message.content).strip()
-                resp = regex_whitespace.sub('', resp)
-
-                # Log response
-                log_file.write(f"RESPONSE:\n{resp}\n\n")
-                if 'FINAL ANSWER -> YES' in resp.upper():
-                    query_yes = "YES"
-                    if with_ctx:
-                        f_res.write(f"[YES] {src} -> {dst}\n")
-                    else:
-                        f_res_noctx.write(f"[YES] {src} -> {dst}\n")
+    with open(result_file, 'w', encoding='utf-8') as f_res:
+        with open(result_file_noctx, 'w', encoding='utf-8') as f_res_noctx:
+            with open(the_output, 'a', encoding='utf-8') as log_file:
+                # Gather all nodes in the subgraph that have outgoing edges
+                potential_src_nodes = {node for node in subgraph.nodes if subgraph.out_degree(node) > 0}
+                if len(potential_src_nodes) < 50:
+                    thres = len(potential_src_nodes) // 2
                 else:
-                    if with_ctx:                    
-                        f_res.write(f"[NO] {src} -> {dst}\n")
-                    else:
-                        f_res_noctx.write(f"[NO] {src} -> {dst}\n")
-                print(f"RES: {query_yes} ({src}->{dst})")
-        
-        for src, dst in selected_pairs:
-            # use backward slicing to find historical traces that reach `src`
-            back_slice_grh = backward_slice(subgraph, src)
-            markdown_output = graph_to_markdown_tree(back_slice_grh)
+                    thres = vali_thres
                 
-        
-            # Build prompt text
-            historical_srccode = (
-                f"Here are some Linux kernel function's source code:\n"
-            )
-            # use backward slicing
-            for node in back_slice_grh.nodes:
-                code = function_sources.get(node, "")
-                if code:
-                    historical_srccode += f"-- {node}:\n{code}\n"
+                # Randomly select pairs of nodes and destinations
+                selected_pairs = random.sample(
+                    [
+                    (node, random.choice(list(subgraph.neighbors(node))))
+                    for node in potential_src_nodes
+                    ],
+                    min(thres, len(potential_src_nodes))
+                )
+                
+                def __query_llm(prompt, src, dst, with_ctx: bool):
+                    print(f"[{syscall_info}; ctx: {with_ctx}] Querying LLM for validation. {src} -> {dst}...")
+                    s_time = time.time()
+                    llm_chat = client.chat if client else chat
+                    response = llm_chat(
+                        model=model,
+                        messages=[{'role': role, 'content': prompt}],
+                        options={'num_ctx': num_ctx}
+                    )
+                    #log the query time
+                    e_time = time.time()
+                    query_yes = "NO"
 
-            # prompt with ctx
-            prompt_text = (
-                f"Please first read the above functions' source code.\n"
-                f"You are a Linux security expert analyzing kernel call-graph edges.\n"
-                f"Historical dynamic function call-graph (from prior executions):\n{markdown_output}\n\n"
-                f"Caller: {src}\nSource code:\n{function_sources.get(src)}\n\n"
-                f"Callee candidate: {dst}\nSource code:\n{all_blocks.get(dst)}\n\n"
-            )
+                    resp = regex_think.sub('', response.message.content).strip()
+                    resp = regex_whitespace.sub('', resp)
 
-            question_text = (
-                f"\nFrom a security-enforcement standpoint, and given the historical execution contexts, "
-                f"please predict is it semantically and functionally reasonable to expect that "
-                f"execution of {src} will reach {dst}? "
-                # f"Don't be too restrictive. Your justification can be a bit loose and optimistic. "
-                f"Provide a concise justification, "
-                f"then a literal answer: '{{Your justification}}\nFINAL ANSWER -> YES/NO'{nothink_prompt}"
-            )
+                    # Log response
+                    log_file.write(f"RESPONSE:\n{resp}\n\n")
+                    if 'FINAL ANSWER -> YES' in resp.upper():
+                        query_yes = "YES"
+                        if with_ctx:
+                            f_res.write(f"[YES] {src} -> {dst}\n")
+                        else:
+                            f_res_noctx.write(f"[YES] {src} -> {dst}\n")
+                    else:
+                        if with_ctx:                    
+                            f_res.write(f"[NO] {src} -> {dst}\n")
+                        else:
+                            f_res_noctx.write(f"[NO] {src} -> {dst}\n")
+                    print(f"RES: {query_yes} ({src}->{dst})")
+                
+                for src, dst in selected_pairs:
+                    # use backward slicing to find historical traces that reach `src`
+                    back_slice_grh = backward_slice(subgraph, src)
+                    markdown_output = graph_to_markdown_tree(back_slice_grh)
+                        
+                
+                    # Build prompt text
+                    historical_srccode = (
+                        f"Here are some Linux kernel function's source code:\n"
+                    )
+                    # use backward slicing
+                    for node in back_slice_grh.nodes:
+                        code = function_sources.get(node, "")
+                        if code:
+                            historical_srccode += f"-- {node}:\n{code}\n"
 
-            final_prompt = historical_srccode + prompt_text + question_text
-            # Log prompt (excluding long source context)
-            log_file.write(f"PROMPT (ctx: True):\n{prompt_text + question_text}\n\n")
-            __query_llm(final_prompt, src, dst, with_ctx=True)
-            
-            # prompt without ctx
-            final_prompt_text = (
-                f"You are a Linux security expert analyzing kernel call-graph edges.\n"
-                f"Caller: {src}\n\n"
-                f"Callee candidate: {dst}\n\n"
-                f"From a security-enforcement standpoint, "
-                f"please predict is it semantically and functionally reasonable to expect that "
-                f"execution of {src} will reach {dst}? "
-                # f"Don't be too restrictive. Your justification can be a bit loose and optimistic. "
-                f"Provide a concise justification, "
-                f"then a literal answer: '{{Your justification}}\nFINAL ANSWER -> YES/NO'\\nothink"
-            )
-            # Log prompt
-            log_file.write(f"PROMPT (ctx: False):\n{final_prompt_text}\n\n")
-            __query_llm(final_prompt_text, src, dst, with_ctx=False)
+                    # prompt with ctx
+                    prompt_text = (
+                        f"Please first read the above functions' source code.\n"
+                        f"You are a Linux security expert analyzing kernel call-graph edges.\n"
+                        f"Historical dynamic function call-graph (from prior executions):\n{markdown_output}\n\n"
+                        f"Caller: {src}\nSource code:\n{function_sources.get(src)}\n\n"
+                        f"Callee candidate: {dst}\nSource code:\n{all_blocks.get(dst)}\n\n"
+                    )
+
+                    question_text = (
+                        f"\nFrom a security-enforcement standpoint, and given the historical execution contexts, "
+                        f"please predict is it semantically and functionally reasonable to expect that "
+                        f"execution of {src} will reach {dst}? "
+                        # f"Don't be too restrictive. Your justification can be a bit loose and optimistic. "
+                        f"Provide a concise justification, "
+                        f"then a literal answer: '{{Your justification}}\nFINAL ANSWER -> YES/NO'{nothink_prompt}"
+                    )
+
+                    final_prompt = historical_srccode + prompt_text + question_text
+                    # Log prompt (excluding long source context)
+                    log_file.write(f"PROMPT (ctx: True):\n{prompt_text + question_text}\n\n")
+                    __query_llm(final_prompt, src, dst, with_ctx=True)
+                    
+                    # prompt without ctx
+                    final_prompt_text = (
+                        f"You are a Linux security expert analyzing kernel call-graph edges.\n"
+                        f"Caller: {src}\n\n"
+                        f"Callee candidate: {dst}\n\n"
+                        f"From a security-enforcement standpoint, "
+                        f"please predict is it semantically and functionally reasonable to expect that "
+                        f"execution of {src} will reach {dst}? "
+                        # f"Don't be too restrictive. Your justification can be a bit loose and optimistic. "
+                        f"Provide a concise justification, "
+                        f"then a literal answer: '{{Your justification}}\nFINAL ANSWER -> YES/NO'\\nothink"
+                    )
+                    # Log prompt
+                    log_file.write(f"PROMPT (ctx: False):\n{final_prompt_text}\n\n")
+                    __query_llm(final_prompt_text, src, dst, with_ctx=False)
        
-    f_res.close()
-    f_res_noctx.close()
+    # f_res.close()
+    # f_res_noctx.close()
     print(f"Validation results saved to {result_file} and {result_file_noctx}.")     
     return subgraph
 
