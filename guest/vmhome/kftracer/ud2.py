@@ -5,20 +5,28 @@ correctly handling functions that appear at multiple addresses (duplicate symbol
 ignoring pure text holes, and skipping pages before .rodata.
 
 Usage:
-    python generate_UD2.py <program>
+    python generate_UD2.py -p <program> -i <program.txt> [--use-llm]
+
+Options:
+    -p         Specify the name of the program.
+    -i         Specify the input file name for executed syscalls.
+    --use-llm  If set, read profile data from syscall_procs/<sys_id>:<sys_name>/<program.txt>
+               instead of syscall_profiles.
 
 Reads executed syscalls from:
-    syscall_profiles/executed_syscalls/<program>.txt
+    syscall_profiles/executed_syscalls/<program.txt>
 
 Outputs to out_UD2/<program>/:
  - whole_page_code.txt
  - ud2_sections.txt
  - <program>-syscall-kfuncs.txt (with header)
 """
+
 import sys
 import os
 import re
 from collections import defaultdict
+import argparse
 
 PAGE_SIZE = 0x1000
 
@@ -130,14 +138,35 @@ def addNonFentryFunctions(funcs, non_fentry_set, syms):
         if fn not in funcs:
             funcs.append(fn)
     return funcs
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Generate UD2 injection maps and list of executed kernel functions per syscall"
+    )
+    parser.add_argument('-p', required=True, help="Name of the program (e.g., myprog)")
+    parser.add_argument('-i', required=True, help="Input file name for executed syscalls (e.g., myprog.txt)")
+    parser.add_argument('--use-llm', action='store_true',
+                        help="If set, use profile data from syscall_procs/<sys_id>:<sys_name>/<program.txt> "
+                             "instead of syscall_profiles/<sys_id>:<sys_name>/<program>-all.txt")
+    return parser.parse_args()
     
 def main():
-    if len(sys.argv) != 2:
-        usage()
-    prog = sys.argv[1]
+    # if len(sys.argv) != 2:
+    #     usage()
+    # prog = sys.argv[1]
+    
+    args = parse_args()
+    prog = args.p
+    input_fname = args.i
 
     base_dir = 'syscall_profiles'
-    exec_file = os.path.join(base_dir, 'executed_syscalls', f'{prog}.txt')
+    
+    # Paths for executed syscalls (always under syscall_profiles/executed_syscalls)
+    exec_file = os.path.join('syscall_profiles', 'executed_syscalls', input_fname)
+    if not os.path.isfile(exec_file):
+        print(f"Error: executed syscalls file not found: {exec_file}", file=sys.stderr)
+        sys.exit(1)
+    
     kall_path = 'kallsyms'
     kobjdump_path = 'kobjdump'
     if not os.path.isfile(exec_file) or not os.path.isfile(kall_path) or not os.path.isfile(kobjdump_path):
@@ -229,9 +258,18 @@ def main():
     kfuncs_out = [''] * (max_id + 1)
 
     # Process each syscall
+    if args.use_llm:
+        print(f"Using LLM profiles under syscall_procs/sys<id:name>/{input_fname}")
+    else:
+        print(f"Using profiles under syscall_profiles/sys<id:name>/{input_fname}")
+    
     for sid in sorted(exec_sys):
         sname = exec_sys[sid]
-        func_file = os.path.join(base_dir, f'{sid}:{sname}', f'{prog}-all.txt')
+        
+        if args.use_llm:
+            func_file = os.path.join('syscall_procs', f'{sid}:{sname}', input_fname)
+        else:
+            func_file = os.path.join('syscall_profiles', f'{sid}:{sname}', input_fname)
         if not os.path.isfile(func_file):
             continue
 
