@@ -92,13 +92,13 @@ def LLM_validate(
     regex_think = re.compile(r'<think>.*?</think>', flags=re.DOTALL)
     regex_whitespace = re.compile(r'[ \t]+$', flags=re.MULTILINE)
     
-    # f_res = open(result_file, 'w', encoding='utf-8')
-    # f_res_noctx = open(result_file_noctx, 'w', encoding='utf-8')
-    
+    open(result_file, 'w', encoding='utf-8').close()
+    open(result_file_noctx, 'w', encoding='utf-8').close()
+
     function_sources = {node: all_blocks.get(node) for node in subgraph.nodes}
 
-    with open(result_file, 'w', encoding='utf-8') as f_res:
-        with open(result_file_noctx, 'w', encoding='utf-8') as f_res_noctx:
+    with open(result_file, 'a', encoding='utf-8') as f_res:
+        with open(result_file_noctx, 'a', encoding='utf-8') as f_res_noctx:
             with open(the_output, 'a', encoding='utf-8') as log_file:
                 # Gather all nodes in the subgraph that have outgoing edges
                 potential_src_nodes = {node for node in subgraph.nodes if subgraph.out_degree(node) > 0}
