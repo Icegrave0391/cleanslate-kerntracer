@@ -1,0 +1,10 @@
+__rdgsbase_inactive
+__wrgsbase_inactive
+__x64_sys_arch_prctl
+__xstate_request_perm
+do_arch_prctl_64
+do_arch_prctl_common
+fpu_xstate_prctl
+wrmsrl
+x86_fsbase_read_task
+x86_gsbase_read_task

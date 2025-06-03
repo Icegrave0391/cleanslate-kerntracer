@@ -151,10 +151,6 @@ def parse_args():
     return parser.parse_args()
     
 def main():
-    # if len(sys.argv) != 2:
-    #     usage()
-    # prog = sys.argv[1]
-    
     args = parse_args()
     prog = args.p
     input_fname = args.i
