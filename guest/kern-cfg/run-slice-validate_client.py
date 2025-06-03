@@ -204,7 +204,34 @@ def LLM_validate(
        
     # f_res.close()
     # f_res_noctx.close()
-    print(f"Validation results saved to {result_file} and {result_file_noctx}.")     
+    # Count statistics for f_res and f_res_noctx
+    def count_yes_percentage(file_path):
+        total_lines = 0
+        yes_count = 0
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                total_lines += 1
+                if "[YES]" in line:
+                    yes_count += 1
+        return (yes_count / total_lines * 100) if total_lines > 0 else 0
+
+    yes_percentage_ctx = count_yes_percentage(result_file)
+    yes_percentage_noctx = count_yes_percentage(result_file_noctx)
+    
+    with open(result_file, 'r+', encoding='utf-8') as f:
+        content = f.read()
+        f.seek(0, 0)
+        f.write(f"Percentage of [YES]: {yes_percentage_ctx:.2f}%\n" + content)
+
+    with open(result_file_noctx, 'r+', encoding='utf-8') as f:
+        content = f.read()
+        f.seek(0, 0)
+        f.write(f"Percentage of [YES]: {yes_percentage_noctx:.2f}%\n" + content)
+
+    # print(f"Percentage of [YES] in {result_file}: {yes_percentage_ctx:.2f}%")
+    # print(f"Percentage of [YES] in {result_file_noctx}: {yes_percentage_noctx:.2f}%")
+    print(f"Validation results saved to {result_file} and {result_file_noctx}.")
+    
     return subgraph
 
 

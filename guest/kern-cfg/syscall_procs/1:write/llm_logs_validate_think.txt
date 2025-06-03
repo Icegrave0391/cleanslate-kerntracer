@@ -2,90 +2,113 @@ PROMPT (ctx: True):
 Please first read the above functions' source code.
 You are a Linux security expert analyzing kernel call-graph edges.
 Historical dynamic function call-graph (from prior executions):
-- bio_init
+- sd_init_command
+  - mempool_alloc
+- bio_alloc_bioset
+  - mempool_alloc
 
-Caller: bio_init
+Caller: mempool_alloc
 Source code:
-void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
-	      unsigned short max_vecs, blk_opf_t opf)
+void *mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
 {
-	bio->bi_next = NULL;
-	bio->bi_bdev = bdev;
-	bio->bi_opf = opf;
-	bio->bi_flags = 0;
-	bio->bi_ioprio = 0;
-	bio->bi_status = 0;
-	bio->bi_iter.bi_sector = 0;
-	bio->bi_iter.bi_size = 0;
-	bio->bi_iter.bi_idx = 0;
-	bio->bi_iter.bi_bvec_done = 0;
-	bio->bi_end_io = NULL;
-	bio->bi_private = NULL;
-#ifdef CONFIG_BLK_CGROUP
-	bio->bi_blkg = NULL;
-	bio->bi_issue.value = 0;
-	if (bdev)
-		bio_associate_blkg(bio);
-#ifdef CONFIG_BLK_CGROUP_IOCOST
-	bio->bi_iocost_cost = 0;
-#endif
-#endif
-#ifdef CONFIG_BLK_INLINE_ENCRYPTION
-	bio->bi_crypt_context = NULL;
-#endif
-#ifdef CONFIG_BLK_DEV_INTEGRITY
-	bio->bi_integrity = NULL;
-#endif
-	bio->bi_vcnt = 0;
+	void *element;
+	unsigned long flags;
+	wait_queue_entry_t wait;
+	gfp_t gfp_temp;
 
-	atomic_set(&bio->__bi_remaining, 1);
-	atomic_set(&bio->__bi_cnt, 1);
-	bio->bi_cookie = BLK_QC_T_NONE;
+	VM_WARN_ON_ONCE(gfp_mask & __GFP_ZERO);
+	might_alloc(gfp_mask);
 
-	bio->bi_max_vecs = max_vecs;
-	bio->bi_io_vec = table;
-	bio->bi_pool = NULL;
+	gfp_mask |= __GFP_NOMEMALLOC;	/* don't allocate emergency reserves */
+	gfp_mask |= __GFP_NORETRY;	/* don't loop in __alloc_pages */
+	gfp_mask |= __GFP_NOWARN;	/* failures are OK */
+
+	gfp_temp = gfp_mask & ~(__GFP_DIRECT_RECLAIM|__GFP_IO);
+
+repeat_alloc:
+
+	element = pool->alloc(gfp_temp, pool->pool_data);
+	if (likely(element != NULL))
+		return element;
+
+	spin_lock_irqsave(&pool->lock, flags);
+	if (likely(pool->curr_nr)) {
+		element = remove_element(pool);
+		spin_unlock_irqrestore(&pool->lock, flags);
+		/* paired with rmb in mempool_free(), read comment there */
+		smp_wmb();
+		/*
+		 */
+		kmemleak_update_trace(element);
+		return element;
+	}
+
+	/*
+	 */
+	if (gfp_temp != gfp_mask) {
+		spin_unlock_irqrestore(&pool->lock, flags);
+		gfp_temp = gfp_mask;
+		goto repeat_alloc;
+	}
+
+	/* We must not sleep if !__GFP_DIRECT_RECLAIM */
+	if (!(gfp_mask & __GFP_DIRECT_RECLAIM)) {
+		spin_unlock_irqrestore(&pool->lock, flags);
+		return NULL;
+	}
+
+	/* Let's wait for someone else to return an element to @pool */
+	init_wait(&wait);
+	prepare_to_wait(&pool->wait, &wait, TASK_UNINTERRUPTIBLE);
+
+	spin_unlock_irqrestore(&pool->lock, flags);
+
+	/*
+	 */
+	io_schedule_timeout(5*HZ);
+
+	finish_wait(&pool->wait, &wait);
+	goto repeat_alloc;
 }
 
 
-Callee candidate: bio_associate_blkg
+Callee candidate: finish_wait
 Source code:
-void bio_associate_blkg(struct bio *bio)
+void finish_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry)
 {
-	struct cgroup_subsys_state *css;
+	unsigned long flags;
 
-	rcu_read_lock();
-
-	if (bio->bi_blkg)
-		css = bio_blkcg_css(bio);
-	else
-		css = blkcg_css();
-
-	bio_associate_blkg_from_css(bio, css);
-
-	rcu_read_unlock();
+	__set_current_state(TASK_RUNNING);
+	/*
+	 */
+	if (!list_empty_careful(&wq_entry->entry)) {
+		spin_lock_irqsave(&wq_head->lock, flags);
+		list_del_init(&wq_entry->entry);
+		spin_unlock_irqrestore(&wq_head->lock, flags);
+	}
 }
 
 
 
-From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of bio_init will reach bio_associate_blkg? Provide a concise justification, then a literal answer: '{Your justification}
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of mempool_alloc will reach finish_wait? Provide a concise justification, then a literal answer: '{Your justification}
 FINAL ANSWER -> YES/NO'
 
 RESPONSE:
-The execution of `bio_init` reaches `bio_associate_blkg` only if `CONFIG_BLK_CGROUP` is enabled and the `bdev` argument is non-null. The code explicitly includes the call to `bio_associate_blkg(bio)` under these conditions, making it semantically and functionally valid within the context of block cgroup support.
+The `mempool_alloc` function enters a waiting state on an empty pool when `__GFP_DIRECT_RECLAIM` is set. It uses `prepare_to_wait` to add the current task to the wait queue and later calls `finish_wait` to clean up the wait state after a timeout. This path is explicitly triggered when allocations block, which aligns with the historical call sites (e.g., `bio_alloc_bioset` and `sd_init_command`) handling I/O operations that may require waiting for memory pool availability. The code unconditionally calls `finish_wait` after `io_schedule_timeout`, ensuring this edge is traversed under the correct conditions.
+
 FINAL ANSWER -> YES
 
 PROMPT (ctx: False):
 You are a Linux security expert analyzing kernel call-graph edges.
-Caller: bio_init
+Caller: mempool_alloc
 
-Callee candidate: bio_associate_blkg
+Callee candidate: finish_wait
 
-From a security-enforcement standpoint, please predict is it semantically and functionally reasonable to expect that execution of bio_init will reach bio_associate_blkg? Provide a concise justification, then a literal answer: '{Your justification}
+From a security-enforcement standpoint, please predict is it semantically and functionally reasonable to expect that execution of mempool_alloc will reach finish_wait? Provide a concise justification, then a literal answer: '{Your justification}
 FINAL ANSWER -> YES/NO'\nothink
 
 RESPONSE:
-bio_init is a function responsible for initializing a bio structure, which is used in the Linux block layer for I/O operations. bio_associate_blkg, on the other hand, is used to associate a bio with a block I/O cgroup (blkg), primarily for cgroup-based I/O control and accounting. For bio_associate_blkg to be called from bio_init, bio_init would need to be involved in setting up bio structures for cgroup-aware I/O paths. However, bio_init is a generic initialization function and does not inherently deal with cgroup associations. Therefore, it is not semantically or functionally expected that bio_init directly calls or reaches bio_associate_blkg during normal execution.
+Mempool_alloc is a function used to allocate memory from a memory pool, typically in contexts requiring efficient and fast memory allocation, such as in device drivers. Finish_wait is used to complete a wait operation, typically in synchronization or blocking contexts. While both functions may appear in the same general subsystem (e.g., block or network layers), there is no direct or semantically clear path where mempool_alloc would naturally lead to finish_wait. The allocation of memory does not inherently involve waiting or signaling for completion. Thus, it is not semantically or functionally reasonable to expect that execution of mempool_alloc would reach finish_wait.
 
 FINAL ANSWER -> NO
 
@@ -93,86 +116,470 @@ PROMPT (ctx: True):
 Please first read the above functions' source code.
 You are a Linux security expert analyzing kernel call-graph edges.
 Historical dynamic function call-graph (from prior executions):
-- __release_sock
-  - tcp_v4_do_rcv
-    - tcp_rcv_established
-      - __tcp_ack_snd_check
-        - tcp_send_delayed_ack
 - __netif_receive_skb_list_core
   - ip_list_rcv
     - ip_sublist_rcv
       - tcp_v4_rcv
         - tcp_child_process
           - tcp_rcv_state_process
-            - __tcp_ack_snd_check
-              - tcp_send_delayed_ack
+            - tcp_data_queue
         - tcp_v4_do_rcv
           - tcp_rcv_established
+- __release_sock
+  - tcp_v4_do_rcv
+    - tcp_rcv_established
+      - tcp_data_queue
 
-Caller: tcp_send_delayed_ack
+Caller: tcp_data_queue
 Source code:
-void tcp_send_delayed_ack(struct sock *sk)
+static void tcp_data_queue(struct sock *sk, struct sk_buff *skb)
 {
-	struct inet_connection_sock *icsk = inet_csk(sk);
-	int ato = icsk->icsk_ack.ato;
-	unsigned long timeout;
+	struct tcp_sock *tp = tcp_sk(sk);
+	enum skb_drop_reason reason;
+	bool fragstolen;
+	int eaten;
 
-	if (ato > TCP_DELACK_MIN) {
-		const struct tcp_sock *tp = tcp_sk(sk);
-		int max_ato = HZ / 2;
+	/* If a subflow has been reset, the packet should not continue
+	 */
+	if (sk_is_mptcp(sk) && !mptcp_incoming_options(sk, skb)) {
+		__kfree_skb(skb);
+		return;
+	}
 
-		if (inet_csk_in_pingpong_mode(sk) ||
-		    (icsk->icsk_ack.pending & ICSK_ACK_PUSHED))
-			max_ato = TCP_DELACK_MAX;
+	if (TCP_SKB_CB(skb)->seq == TCP_SKB_CB(skb)->end_seq) {
+		__kfree_skb(skb);
+		return;
+	}
+	skb_dst_drop(skb);
+	__skb_pull(skb, tcp_hdr(skb)->doff * 4);
 
-		/* Slow path, intersegment interval is "high". */
+	reason = SKB_DROP_REASON_NOT_SPECIFIED;
+	tp->rx_opt.dsack = 0;
 
-		/* If some rtt estimate is known, use it to bound delayed ack.
+	/*  Queue data for delivery to the user.
+	 */
+	if (TCP_SKB_CB(skb)->seq == tp->rcv_nxt) {
+		if (tcp_receive_window(tp) == 0) {
+			reason = SKB_DROP_REASON_TCP_ZEROWINDOW;
+			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPZEROWINDOWDROP);
+			goto out_of_window;
+		}
+
+		/* Ok. In sequence. In window. */
+queue_and_out:
+		if (skb_queue_len(&sk->sk_receive_queue) == 0)
+			sk_forced_mem_schedule(sk, skb->truesize);
+		else if (tcp_try_rmem_schedule(sk, skb, skb->truesize)) {
+			reason = SKB_DROP_REASON_PROTO_MEM;
+			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPRCVQDROP);
+			sk->sk_data_ready(sk);
+			goto drop;
+		}
+
+		eaten = tcp_queue_rcv(sk, skb, &fragstolen);
+		if (skb->len)
+			tcp_event_data_recv(sk, skb);
+		if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
+			tcp_fin(sk);
+
+		if (!RB_EMPTY_ROOT(&tp->out_of_order_queue)) {
+			tcp_ofo_queue(sk);
+
+			/* RFC5681. 4.2. SHOULD send immediate ACK, when
+			 */
+			if (RB_EMPTY_ROOT(&tp->out_of_order_queue))
+				inet_csk(sk)->icsk_ack.pending |= ICSK_ACK_NOW;
+		}
+
+		if (tp->rx_opt.num_sacks)
+			tcp_sack_remove(tp);
+
+		tcp_fast_path_check(sk);
+
+		if (eaten > 0)
+			kfree_skb_partial(skb, fragstolen);
+		if (!sock_flag(sk, SOCK_DEAD))
+			tcp_data_ready(sk);
+		return;
+	}
+
+	if (!after(TCP_SKB_CB(skb)->end_seq, tp->rcv_nxt)) {
+		tcp_rcv_spurious_retrans(sk, skb);
+		/* A retransmit, 2nd most common case.  Force an immediate ack. */
+		reason = SKB_DROP_REASON_TCP_OLD_DATA;
+		NET_INC_STATS(sock_net(sk), LINUX_MIB_DELAYEDACKLOST);
+		tcp_dsack_set(sk, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq);
+
+out_of_window:
+		tcp_enter_quickack_mode(sk, TCP_MAX_QUICKACKS);
+		inet_csk_schedule_ack(sk);
+drop:
+		tcp_drop_reason(sk, skb, reason);
+		return;
+	}
+
+	/* Out of window. F.e. zero window probe. */
+	if (!before(TCP_SKB_CB(skb)->seq,
+		    tp->rcv_nxt + tcp_receive_window(tp))) {
+		reason = SKB_DROP_REASON_TCP_OVERWINDOW;
+		goto out_of_window;
+	}
+
+	if (before(TCP_SKB_CB(skb)->seq, tp->rcv_nxt)) {
+		/* Partial packet, seq < rcv_next < end_seq */
+		tcp_dsack_set(sk, TCP_SKB_CB(skb)->seq, tp->rcv_nxt);
+
+		/* If window is closed, drop tail of packet. But after
 		 */
-		if (tp->srtt_us) {
-			int rtt = max_t(int, usecs_to_jiffies(tp->srtt_us >> 3),
-					TCP_DELACK_MIN);
-
-			if (rtt < max_ato)
-				max_ato = rtt;
+		if (!tcp_receive_window(tp)) {
+			reason = SKB_DROP_REASON_TCP_ZEROWINDOW;
+			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPZEROWINDOWDROP);
+			goto out_of_window;
 		}
-
-		ato = min(ato, max_ato);
+		goto queue_and_out;
 	}
 
-	ato = min_t(u32, ato, inet_csk(sk)->icsk_delack_max);
-
-	/* Stay within the limit we were given */
-	timeout = jiffies + ato;
-
-	/* Use new timeout only if there wasn't a older one earlier. */
-	if (icsk->icsk_ack.pending & ICSK_ACK_TIMER) {
-		/* If delack timer is about to expire, send ACK now. */
-		if (time_before_eq(icsk->icsk_ack.timeout, jiffies + (ato >> 2))) {
-			tcp_send_ack(sk);
-			return;
-		}
-
-		if (!time_before(timeout, icsk->icsk_ack.timeout))
-			timeout = icsk->icsk_ack.timeout;
-	}
-	icsk->icsk_ack.pending |= ICSK_ACK_SCHED | ICSK_ACK_TIMER;
-	icsk->icsk_ack.timeout = timeout;
-	sk_reset_timer(sk, &icsk->icsk_delack_timer, timeout);
+	tcp_data_queue_ofo(sk, skb);
 }
 
 
-Callee candidate: __usecs_to_jiffies
+Callee candidate: sk_forced_mem_schedule
 Source code:
-unsigned long __usecs_to_jiffies(const unsigned int u)
+void sk_forced_mem_schedule(struct sock *sk, int size)
 {
-	if (u > jiffies_to_usecs(MAX_JIFFY_OFFSET))
-		return MAX_JIFFY_OFFSET;
-	return _usecs_to_jiffies(u);
+	int delta, amt;
+
+	delta = size - sk->sk_forward_alloc;
+	if (delta <= 0)
+		return;
+	amt = sk_mem_pages(delta);
+	sk->sk_forward_alloc += amt << PAGE_SHIFT;
+	sk_memory_allocated_add(sk, amt);
+
+	if (mem_cgroup_sockets_enabled && sk->sk_memcg)
+		mem_cgroup_charge_skmem(sk->sk_memcg, amt,
+					gfp_memcg_charge() | __GFP_NOFAIL);
 }
 
 
 
-From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of tcp_send_delayed_ack will reach __usecs_to_jiffies? Provide a concise justification, then a literal answer: '{Your justification}
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of tcp_data_queue will reach sk_forced_mem_schedule? Provide a concise justification, then a literal answer: '{Your justification}
 FINAL ANSWER -> YES/NO'
+
+RESPONSE:
+In the `tcp_data_queue` function, the call to `sk_forced_mem_schedule` occurs when the receive queue (`sk->sk_receive_queue`) is empty. This condition is explicitly checked with `if (skb_queue_len(...) == 0)`. Since the receive queue can legitimately be empty during normal TCP operation (e.g., when the first data packet arrives for a connection), the code path to `sk_forced_mem_schedule` is valid and reachable under these circumstances. The historical call graph confirms `tcp_data_queue` is executed in contexts where memory allocation for the socket is necessary, aligning with this logic.
+
+FINAL ANSWER -> YES
+
+PROMPT (ctx: False):
+You are a Linux security expert analyzing kernel call-graph edges.
+Caller: tcp_data_queue
+
+Callee candidate: sk_forced_mem_schedule
+
+From a security-enforcement standpoint, please predict is it semantically and functionally reasonable to expect that execution of tcp_data_queue will reach sk_forced_mem_schedule? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+In the Linux networking stack, `tcp_data_queue` is responsible for queueing incoming TCP data segments into the socket's receive buffer. `sk_forced_mem_schedule` is a function used to check if a socket can allocate memory under memory pressure, typically in the context of enforcing socket memory limits.
+
+For `tcp_data_queue` to reach `sk_forced_mem_schedule`, there must be a scenario where memory allocation for the incoming data requires checking and enforcing memory constraints. This is indeed a functional requirement when the socket's memory usage is approaching limits, and the system must enforce memory policies to prevent excessive allocation.
+
+FINAL ANSWER -> YES
+
+PROMPT (ctx: True):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- raw_local_deliver
+
+Caller: raw_local_deliver
+Source code:
+int raw_local_deliver(struct sk_buff *skb, int protocol)
+{
+	int hash = protocol & (RAW_HTABLE_SIZE - 1);
+
+	return raw_v4_input(skb, ip_hdr(skb), hash);
+}
+
+
+Callee candidate: skb_clone
+Source code:
+struct sk_buff *skb_clone(struct sk_buff *skb, gfp_t gfp_mask)
+{
+	struct sk_buff_fclones *fclones = container_of(skb,
+						       struct sk_buff_fclones,
+						       skb1);
+	struct sk_buff *n;
+
+	if (skb_orphan_frags(skb, gfp_mask))
+		return NULL;
+
+	if (skb->fclone == SKB_FCLONE_ORIG &&
+	    refcount_read(&fclones->fclone_ref) == 1) {
+		n = &fclones->skb2;
+		refcount_set(&fclones->fclone_ref, 2);
+		n->fclone = SKB_FCLONE_CLONE;
+	} else {
+		if (skb_pfmemalloc(skb))
+			gfp_mask |= __GFP_MEMALLOC;
+
+		n = kmem_cache_alloc(skbuff_head_cache, gfp_mask);
+		if (!n)
+			return NULL;
+
+		n->fclone = SKB_FCLONE_UNAVAILABLE;
+	}
+
+	return __skb_clone(n, skb);
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of raw_local_deliver will reach skb_clone? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'
+
+RESPONSE:
+{The function `raw_local_deliver` directly calls `raw_v4_input` but does not explicitly invoke `skb_clone`. The determination hinges on whether `raw_v4_input` or its transitive callees use `skb_clone`. However, the provided code for `raw_v4_input` is absent, and based on typical raw socket processing in the Linux kernel, `raw_v4_input` often delivers packets directly to sockets without requiring a clone. Since `raw_local_deliver` itself does not involve operations that necessitate cloning (e.g., modifying the skb or branching processing paths), it is semantically and functionally unreasonable to expect `skb_clone` to be reached in this context.}
+FINAL ANSWER -> NO
+
+PROMPT (ctx: False):
+You are a Linux security expert analyzing kernel call-graph edges.
+Caller: raw_local_deliver
+
+Callee candidate: skb_clone
+
+From a security-enforcement standpoint, please predict is it semantically and functionally reasonable to expect that execution of raw_local_deliver will reach skb_clone? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+raw_local_deliver is part of the Linux networking stack and is responsible for delivering raw sockets local messages. skb_clone is used to create a copy of a socket buffer (skb), which is often needed when multiple consumers need to process the same network packet. While both functions operate in the networking stack, raw_local_deliver typically does not require cloning skbs for local delivery to raw sockets, as it usually passes the skb directly without modification or duplication.
+
+FINAL ANSWER -> NO
+
+PROMPT (ctx: True):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- tcp_retransmit_skb
+  - __tcp_retransmit_skb
+    - __skb_unclone_keeptruesize
+    - tcp_trim_head
+- __netif_receive_skb_list_core
+  - ip_list_rcv
+    - ip_sublist_rcv
+      - tcp_v4_rcv
+        - tcp_child_process
+          - tcp_rcv_state_process
+            - tcp_ack
+              - tcp_trim_head
+                - __skb_unclone_keeptruesize
+        - tcp_v4_do_rcv
+          - tcp_rcv_established
+- __release_sock
+  - tcp_v4_do_rcv
+    - tcp_rcv_established
+      - tcp_ack
+        - tcp_trim_head
+          - __skb_unclone_keeptruesize
+
+Caller: __skb_unclone_keeptruesize
+Source code:
+int __skb_unclone_keeptruesize(struct sk_buff *skb, gfp_t pri)
+{
+	unsigned int saved_end_offset, saved_truesize;
+	struct skb_shared_info *shinfo;
+	int res;
+
+	saved_end_offset = skb_end_offset(skb);
+	saved_truesize = skb->truesize;
+
+	res = pskb_expand_head(skb, 0, 0, pri);
+	if (res)
+		return res;
+
+	skb->truesize = saved_truesize;
+
+	if (likely(skb_end_offset(skb) == saved_end_offset))
+		return 0;
+
+	shinfo = skb_shinfo(skb);
+
+	/* We are about to change back skb->end,
+	 */
+	memmove(skb->head + saved_end_offset,
+		shinfo,
+		offsetof(struct skb_shared_info, frags[shinfo->nr_frags]));
+
+	skb_set_end_offset(skb, saved_end_offset);
+
+	return 0;
+}
+
+
+Callee candidate: pskb_expand_head
+Source code:
+int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
+		     gfp_t gfp_mask)
+{
+	int i, osize = skb_end_offset(skb);
+	int size = osize + nhead + ntail;
+	long off;
+	u8 *data;
+
+	BUG_ON(nhead < 0);
+
+	BUG_ON(skb_shared(skb));
+
+	skb_zcopy_downgrade_managed(skb);
+
+	size = SKB_DATA_ALIGN(size);
+
+	if (skb_pfmemalloc(skb))
+		gfp_mask |= __GFP_MEMALLOC;
+	data = kmalloc_reserve(size + SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+			       gfp_mask, NUMA_NO_NODE, NULL);
+	if (!data)
+		goto nodata;
+	size = SKB_WITH_OVERHEAD(ksize(data));
+
+	/* Copy only real data... and, alas, header. This should be
+	 */
+	memcpy(data + nhead, skb->head, skb_tail_pointer(skb) - skb->head);
+
+	memcpy((struct skb_shared_info *)(data + size),
+	       skb_shinfo(skb),
+	       offsetof(struct skb_shared_info, frags[skb_shinfo(skb)->nr_frags]));
+
+	/*
+	 */
+	if (skb_cloned(skb)) {
+		if (skb_orphan_frags(skb, gfp_mask))
+			goto nofrags;
+		if (skb_zcopy(skb))
+			refcount_inc(&skb_uarg(skb)->refcnt);
+		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++)
+			skb_frag_ref(skb, i);
+
+		if (skb_has_frag_list(skb))
+			skb_clone_fraglist(skb);
+
+		skb_release_data(skb);
+	} else {
+		skb_free_head(skb);
+	}
+	off = (data + nhead) - skb->head;
+
+	skb->head     = data;
+	skb->head_frag = 0;
+	skb->data    += off;
+
+	skb_set_end_offset(skb, size);
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+	off           = nhead;
+#endif
+	skb->tail	      += off;
+	skb_headers_offset_update(skb, nhead);
+	skb->cloned   = 0;
+	skb->hdr_len  = 0;
+	skb->nohdr    = 0;
+	atomic_set(&skb_shinfo(skb)->dataref, 1);
+
+	skb_metadata_clear(skb);
+
+	/* It is not generally safe to change skb->truesize.
+	 */
+	if (!skb->sk || skb->destructor == sock_edemux)
+		skb->truesize += size - osize;
+
+	return 0;
+
+nofrags:
+	kfree(data);
+nodata:
+	return -ENOMEM;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of __skb_unclone_keeptruesize will reach pskb_expand_head? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'
+
+RESPONSE:
+{The function __skb_unclone_keeptruesize explicitly calls pskb_expand_head(skb, 0, 0, pri) as its first major operation. The code flow shows no conditions preventing this call. Historical execution paths (e.g., from tcp_retransmit_skb and __release_sock) confirm this call is reachable.}
+FINAL ANSWER -> YES
+
+PROMPT (ctx: False):
+You are a Linux security expert analyzing kernel call-graph edges.
+Caller: __skb_unclone_keeptruesize
+
+Callee candidate: pskb_expand_head
+
+From a security-enforcement standpoint, please predict is it semantically and functionally reasonable to expect that execution of __skb_unclone_keeptruesize will reach pskb_expand_head? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+**Justification:**
+The function `__skb_unclone_keeptruesize` is used to unclone a socket buffer (`skb`) while preserving the original `truesize`. Uncloning may require expanding the `skb`'s headroom if the current structure is shared or not suitable for modification. `pskb_expand_head` is the standard function used to expand the headroom of a socket buffer, which can be necessary during uncloning operations. Therefore, it is semantically and functionally reasonable for `__skb_unclone_keeptruesize` to invoke `pskb_expand_head` to adjust the `skb` as needed.
+
+**FINAL ANSWER -> YES**
+
+PROMPT (ctx: True):
+Please first read the above functions' source code.
+You are a Linux security expert analyzing kernel call-graph edges.
+Historical dynamic function call-graph (from prior executions):
+- generic_write_check_limits
+  - send_sig
+- __x64_sys_write
+  - ksys_write
+    - vfs_write
+      - ext4_file_write_iter
+        - ext4_buffered_write_iter
+          - generic_write_checks
+            - generic_write_checks_count
+              - send_sig
+      - pipe_write
+
+Caller: send_sig
+Source code:
+None
+
+Callee candidate: do_send_sig_info
+Source code:
+int do_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p,
+			enum pid_type type)
+{
+	unsigned long flags;
+	int ret = -ESRCH;
+
+	if (lock_task_sighand(p, &flags)) {
+		ret = send_signal_locked(sig, info, p, type);
+		unlock_task_sighand(p, &flags);
+	}
+
+	return ret;
+}
+
+
+
+From a security-enforcement standpoint, and given the historical execution contexts, please predict is it semantically and functionally reasonable to expect that execution of send_sig will reach do_send_sig_info? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'
+
+RESPONSE:
+{The send_sig function is part of the Linux kernel's signal handling mechanism. From the provided code, send_sig is called in generic_write_check_limits when a process exceeds its file size limit (SIGXFSZ). The do_send_sig_info function is a lower-level kernel function that handles the actual delivery of signals to processes. Given that send_sig is historically linked to signal delivery and do_send_sig_info is a core component of the kernel's signal handling pipeline, it is functionally reasonable to expect that send_sig would invoke do_send_sig_info to deliver the signal. This aligns with the typical kernel signal delivery flow where higher-level functions like send_sig delegate to lower-level implementations like do_send_sig_info.}
+FINAL ANSWER -> YES
+
+PROMPT (ctx: False):
+You are a Linux security expert analyzing kernel call-graph edges.
+Caller: send_sig
+
+Callee candidate: do_send_sig_info
+
+From a security-enforcement standpoint, please predict is it semantically and functionally reasonable to expect that execution of send_sig will reach do_send_sig_info? Provide a concise justification, then a literal answer: '{Your justification}
+FINAL ANSWER -> YES/NO'\nothink
+
+RESPONSE:
+send_sig is a function traditionally used to queue signals to a process, while do_send_sig_info is a more generalized and flexible function that handles signal delivery with detailed information (e.g., from kernel or user space). In modern Linux kernel versions, send_sig is often implemented to internally call do_send_sig_info, making the latter the core mechanism. Thus, from both a semantic and functional standpoint, it is reasonable to expect that send_sig execution will reach do_send_sig_info.
+
+FINAL ANSWER -> YES
 

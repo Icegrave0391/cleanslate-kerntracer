@@ -1,5 +1,0 @@
-[YES] seq_put_decimal_ull -> seq_put_decimal_ull_width
-[YES] vm_commit_limit -> hugetlb_total_pages
-[YES] ext4_writepages -> mpage_prepare_extent_to_map
-[YES] ext4_ext_correct_indexes -> __ext4_handle_dirty_metadata
-[YES] __x64_sys_read -> ksys_read

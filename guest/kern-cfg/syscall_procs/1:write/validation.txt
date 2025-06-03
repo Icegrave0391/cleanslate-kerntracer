@@ -1,1 +1,6 @@
-[YES] bio_init -> bio_associate_blkg
+Percentage of [YES]: 80.00%
+[YES] mempool_alloc -> finish_wait
+[YES] tcp_data_queue -> sk_forced_mem_schedule
+[NO] raw_local_deliver -> skb_clone
+[YES] __skb_unclone_keeptruesize -> pskb_expand_head
+[YES] send_sig -> do_send_sig_info
