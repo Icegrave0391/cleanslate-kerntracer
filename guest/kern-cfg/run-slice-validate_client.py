@@ -13,7 +13,10 @@ from tqdm import tqdm
 from ollama import chat
 from collections import defaultdict, deque
 import argparse
+import random
 
+
+# python run-slice-validate_client.py --port 11432 --syscalls 0:read 1:write 3:close 257:openat 9:mmap 11:munmap 12:brk 41:socket 59:execve 262:newfstatat
 
 kernel_cg_path = "./callgraph.graphml"
 kernel_cg_acyc_path = "./pruned_callgraph_filtered.graphml"
@@ -42,8 +45,7 @@ def dump_subgraph_statistics(subgraph, file_name):
     print(f"Subgraph statistics saved to {file_name}")
 
 
-
-def LLM_hybrid_expand_profile(
+def LLM_validate(
     subgraph: nx.DiGraph,
     k_cg: nx.DiGraph,
     all_blocks: dict[str, str],
@@ -53,31 +55,35 @@ def LLM_hybrid_expand_profile(
     role: str = "user",
     num_ctx: int = 14336,
     syscall_info: str = "3:close",
-    nothink: bool = True) -> nx.DiGraph:
+    nothink: bool = True,
+    vali_thres=50) -> nx.DiGraph:
     """
     Proof-of-concept: iteratively expand `subgraph` by querying LLM for
     semantically valid static edges, up to N hops per dynamic start node.
     """
     
     mode = "nothink" if nothink else "think"
+    nothink_prompt = "\\nothink" if nothink else ""
+    
     
     out_dir = f"{proc_directory}/{syscall_info}"
-    profile_info_output = f"{out_dir}/profiled_info.txt"
+    # profile_info_output = f"{out_dir}/profiled_info.txt"
     
-    the_output = f"{out_dir}/llm_logs_{mode}.txt"
+    the_output = f"{out_dir}/llm_logs_validate_{mode}.txt"
     
-    with open(profile_info_output, 'w', encoding='utf-8') as f:
-        f.write(f"Profiled functions: {len(subgraph.nodes)} nodes and {len(subgraph.edges)} edges.\n")
-        # write down all functions
-        f.write("Profiled (filtered) functions:\n")
-        for node in subgraph.nodes:
-            f.write(f"{node}\n")
+    result_file = f"{out_dir}/validation.txt"
+    result_file_noctx = f"{out_dir}/validation_noctx.txt"
+    
+    
+    # with open(profile_info_output, 'w', encoding='utf-8') as f:
+    #     f.write(f"Profiled functions: {len(subgraph.nodes)} nodes and {len(subgraph.edges)} edges.\n")
+    #     # write down all functions
+    #     f.write("Profiled (filtered) functions:\n")
+    #     for node in subgraph.nodes:
+    #         f.write(f"{node}\n")
     
     # Clear existing log file once
     open(the_output, 'w', encoding='utf-8').close()
-    
-    queried = set()
-    queried_nodes = set(subgraph.nodes) # these mfc nodes are already exist in the subgraph (profiled functions)
     
     # Precompute set of nodes in full call graph for fast lookup
     k_cg_nodes = set(k_cg.nodes)
@@ -86,122 +92,118 @@ def LLM_hybrid_expand_profile(
     regex_think = re.compile(r'<think>.*?</think>', flags=re.DOTALL)
     regex_whitespace = re.compile(r'[ \t]+$', flags=re.MULTILINE)
     
-    # Open log file once to reduce repeated I/O overhead
+    f_res = open(result_file, 'w', encoding='utf-8')
+    f_res_noctx = open(result_file_noctx, 'w', encoding='utf-8')
+    
+    function_sources = {node: all_blocks.get(node) for node in subgraph.nodes}
+    
     with open(the_output, 'a', encoding='utf-8') as log_file:
-        # Topologically sort dynamic subgraph and process bottom-up
-        dynamic_order = list(nx.topological_sort(subgraph))[::-1]
-    
-        start_counter = 0
-        counter = 0
-        for D in dynamic_order:
-            
-            print(
-                f"[Expanding {syscall_info}] Process ({start_counter}/{len(dynamic_order)}). "
-                f"Root {D}, 1-hop neighbors ({len(list(k_cg.neighbors(D)))}) [{list(k_cg.neighbors(D))}]"
+        
+        # Gather all nodes in the subgraph that have outgoing edges
+        potential_src_nodes = {node for node in subgraph.nodes if subgraph.out_degree(node) > 0}
+        if len(potential_src_nodes) < 50:
+            thres = len(potential_src_nodes) // 2
+        else:
+            thres = vali_thres
+        
+        # Randomly select pairs of nodes and destinations
+        selected_pairs = random.sample(
+            [
+            (node, random.choice(list(subgraph.neighbors(node))))
+            for node in potential_src_nodes
+            ],
+            min(thres, len(potential_src_nodes))
+        )
+        
+        def __query_llm(prompt, src, dst, with_ctx: bool):
+                print(f"[{syscall_info}; ctx: {with_ctx}] Querying LLM for validation. {src} -> {dst}...")
+                s_time = time.time()
+                llm_chat = client.chat if client else chat
+                response = llm_chat(
+                    model=model,
+                    messages=[{'role': role, 'content': prompt}],
+                    options={'num_ctx': num_ctx}
                 )
-            start_counter += 1
-            
-            frontier = [D]
-            
-            for depth in range(N):
-                # during iteractions, frontier will be updated -> next_frontier
-                if not frontier:
-                    break
-                
-                next_frontier = []
-                
-                # Pre-gather sources for current subgraph
-                function_sources = {node: all_blocks.get(node) for node in subgraph.nodes}
-        
-                for src in frontier:
-                    if src not in k_cg_nodes:
-                        continue
-                    
-                    # use backward slicing to find historical traces that reach `src`
-                    back_slice_grh = backward_slice(subgraph, src)
-                    markdown_output = graph_to_markdown_tree(back_slice_grh)
-                    
-                    # if src == "free_unref_page_list":
-                    #     import IPython; IPython.embed()
-                    #     exit(0)
-                        
-                    for _, dst in k_cg.out_edges(src):
-                        if subgraph.has_edge(src, dst) or (src, dst) in queried:
-                            continue
-                        if dst in queried_nodes:
-                            continue
-                        
-                        queried.add((src, dst))
-                        queried_nodes.add(dst)   # be mfc rigorous now first. also optimize performance. 
-                        
-                        # Build prompt text
-                        historical_srccode = (
-                            f"Here are some Linux kernel function's source code:\n"
-                        )
-                        # Chuqi: use backward slicing
-                        for node in back_slice_grh.nodes:
-                            code = function_sources.get(node, "")
-                            if code:
-                                historical_srccode += f"-- {node}:\n{code}\n"
-        
-                        prompt_text = (
-                            f"Please first read the above functions' source code.\n"
-                            f"You are a Linux security expert analyzing kernel call-graph edges.\n"
-                            f"Historical dynamic function call-graph (from prior executions):\n{markdown_output}\n\n"
-                            f"Caller: {src}\nSource code:\n{function_sources.get(src)}\n\n"
-                            f"Callee candidate: {dst}\nSource code:\n{all_blocks.get(dst)}\n\n"
-                        )
-        
-                        question_text = (
-                            f"\nFrom a security-enforcement standpoint, and given the historical execution contexts, "
-                            f"please predict is it semantically and functionally reasonable to expect that "
-                            f"execution of {src} will reach {dst}? Provide a concise justification, "
-                            f"then a literal answer: '{{Your justification}}\nFINAL ANSWER -> YES/NO'\\nothink"
-                        )
-        
-                        final_prompt = historical_srccode + prompt_text + question_text
-        
-                        # Log prompt (excluding long source context)
-                        log_file.write(f"PROMPT (depth {depth}):\n{prompt_text + question_text}\n\n")
-        
-                        # Query LLM
-                        # log the query and time to the console
-                        print(f"[Expanding {syscall_info}] Querying LLM for edge {src} -> {dst} at depth {depth}...")
-                        s_time = time.time()
-                        llm_chat = client.chat if client else chat
-                        response = llm_chat(
-                            model=model,
-                            messages=[{'role': role, 'content': final_prompt}],
-                            options={'num_ctx': num_ctx}
-                        )
-                        #log the query time
-                        e_time = time.time()
-                        query_yes = "NO"
+                #log the query time
+                e_time = time.time()
+                query_yes = "NO"
 
-                        resp = regex_think.sub('', response.message.content).strip()
-                        resp = regex_whitespace.sub('', resp)
+                resp = regex_think.sub('', response.message.content).strip()
+                resp = regex_whitespace.sub('', resp)
+
+                # Log response
+                log_file.write(f"RESPONSE:\n{resp}\n\n")
+                if 'FINAL ANSWER -> YES' in resp.upper():
+                    query_yes = "YES"
+                    if with_ctx:
+                        f_res.write(f"[YES] {src} -> {dst}\n")
+                    else:
+                        f_res_noctx.write(f"[YES] {src} -> {dst}\n")
+                else:
+                    if with_ctx:                    
+                        f_res.write(f"[NO] {src} -> {dst}\n")
+                    else:
+                        f_res_noctx.write(f"[NO] {src} -> {dst}\n")
+                print(f"RES: {query_yes} ({src}->{dst})")
         
-                        # Log response
-                        log_file.write(f"RESPONSE:\n{resp}\n\n")
-                        if 'FINAL ANSWER -> YES' in resp.upper():
-                            query_yes = "YES"
-                            subgraph.add_node(dst)
-                            subgraph.add_edge(src, dst, inferred=True)
-                            next_frontier.append(dst)
-                            log_file.write(f"Added edge: {src} -> {dst}\n")
+        for src, dst in selected_pairs:
+            # use backward slicing to find historical traces that reach `src`
+            back_slice_grh = backward_slice(subgraph, src)
+            markdown_output = graph_to_markdown_tree(back_slice_grh)
+                
         
-                        print(f"=> Query time: {e_time - s_time:.2f} seconds. res: {query_yes}\n")
-        
-                frontier = next_frontier
+            # Build prompt text
+            historical_srccode = (
+                f"Here are some Linux kernel function's source code:\n"
+            )
+            # use backward slicing
+            for node in back_slice_grh.nodes:
+                code = function_sources.get(node, "")
+                if code:
+                    historical_srccode += f"-- {node}:\n{code}\n"
+
+            # prompt with ctx
+            prompt_text = (
+                f"Please first read the above functions' source code.\n"
+                f"You are a Linux security expert analyzing kernel call-graph edges.\n"
+                f"Historical dynamic function call-graph (from prior executions):\n{markdown_output}\n\n"
+                f"Caller: {src}\nSource code:\n{function_sources.get(src)}\n\n"
+                f"Callee candidate: {dst}\nSource code:\n{all_blocks.get(dst)}\n\n"
+            )
+
+            question_text = (
+                f"\nFrom a security-enforcement standpoint, and given the historical execution contexts, "
+                f"please predict is it semantically and functionally reasonable to expect that "
+                f"execution of {src} will reach {dst}? "
+                # f"Don't be too restrictive. Your justification can be a bit loose and optimistic. "
+                f"Provide a concise justification, "
+                f"then a literal answer: '{{Your justification}}\nFINAL ANSWER -> YES/NO'{nothink_prompt}"
+            )
+
+            final_prompt = historical_srccode + prompt_text + question_text
+            # Log prompt (excluding long source context)
+            log_file.write(f"PROMPT (ctx: True):\n{prompt_text + question_text}\n\n")
+            __query_llm(final_prompt, src, dst, with_ctx=True)
             
-            counter += 1
-            if counter % 10 == 0:
-                print(f"[Expanding {syscall_info}] {counter}/{len(dynamic_order)} nodes processed.")
-    
-    # Dump statistics of final subgraph
-    dump_subgraph_statistics(subgraph, os.path.join(out_dir, f"result_{mode}.txt"))
-    # Dump the expanded subgraph to a file
-    nx.write_graphml(subgraph, os.path.join(out_dir, f"expanded_subgraph_{mode}.graphml"))
+            # prompt without ctx
+            final_prompt_text = (
+                f"You are a Linux security expert analyzing kernel call-graph edges.\n"
+                f"Caller: {src}\n\n"
+                f"Callee candidate: {dst}\n\n"
+                f"From a security-enforcement standpoint, "
+                f"please predict is it semantically and functionally reasonable to expect that "
+                f"execution of {src} will reach {dst}? "
+                # f"Don't be too restrictive. Your justification can be a bit loose and optimistic. "
+                f"Provide a concise justification, "
+                f"then a literal answer: '{{Your justification}}\nFINAL ANSWER -> YES/NO'\\nothink"
+            )
+            # Log prompt
+            log_file.write(f"PROMPT (ctx: False):\n{final_prompt_text}\n\n")
+            __query_llm(final_prompt_text, src, dst, with_ctx=False)
+       
+    f_res.close()
+    f_res_noctx.close()
+    print(f"Validation results saved to {result_file} and {result_file_noctx}.")     
     return subgraph
 
 
@@ -302,10 +304,10 @@ if __name__ == "__main__":
         else:
             print(f"Entry function for syscall {syscall_name} not found in profiled functions.")
         
-        pure_static_subgraph = gen_subgraph(k_cg_acyc, sys_entry_function=entry_name, function_set=None)
-        profiled_static_subgraph = gen_subgraph(k_cg_acyc, sys_entry_function=entry_name, function_set=profiled_functions, hops=2)    
-        dump_subgraph_statistics(pure_static_subgraph, os.path.join(out_dir, proc_pure_static_file))
-        dump_subgraph_statistics(profiled_static_subgraph, os.path.join(out_dir, proc_profile_static_file))
+        # pure_static_subgraph = gen_subgraph(k_cg_acyc, sys_entry_function=entry_name, function_set=None)
+        # profiled_static_subgraph = gen_subgraph(k_cg_acyc, sys_entry_function=entry_name, function_set=profiled_functions, hops=2)    
+        # dump_subgraph_statistics(pure_static_subgraph, os.path.join(out_dir, proc_pure_static_file))
+        # dump_subgraph_statistics(profiled_static_subgraph, os.path.join(out_dir, proc_profile_static_file))
         
         # Start LLM!
         dyn_graph = gen_subgraph(k_cg_acyc, sys_entry_function=None, function_set=profiled_functions)
@@ -316,7 +318,7 @@ if __name__ == "__main__":
         
         # profile the time taken
         start_time = time.time()
-        LLM_hybrid_expand_profile(
+        LLM_validate(
             subgraph=dyn_graph,
             k_cg=k_cg_acyc,
             all_blocks=all_blocks,
@@ -330,6 +332,4 @@ if __name__ == "__main__":
         )
         end_time = time.time()
         elapsed_time = end_time - start_time
-        # write time taken to a output file 
-        with open(os.path.join(out_dir, f"time_taken_{thinkmode}.txt"), "w") as f:
-            f.write(f"Time taken for LLM expansion of {syscall_info}: {elapsed_time:.2f} seconds\n")
+        print(f"Validation for syscall {syscall_info} completed in {elapsed_time:.2f} seconds.")
