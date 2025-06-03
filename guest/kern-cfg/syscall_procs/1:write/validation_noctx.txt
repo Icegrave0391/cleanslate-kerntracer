@@ -1,0 +1,1 @@
+[NO] bio_init -> bio_associate_blkg

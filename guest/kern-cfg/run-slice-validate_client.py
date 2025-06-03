@@ -116,7 +116,7 @@ def LLM_validate(
                     min(thres, len(potential_src_nodes))
                 )
                 
-                def __query_llm(prompt, src, dst, with_ctx: bool):
+                def __query_llm(prompt, src, dst, f_res, f_res_noctx, with_ctx: bool):
                     print(f"[{syscall_info}; ctx: {with_ctx}] Querying LLM for validation. {src} -> {dst}...")
                     s_time = time.time()
                     llm_chat = client.chat if client else chat
@@ -184,7 +184,7 @@ def LLM_validate(
                     final_prompt = historical_srccode + prompt_text + question_text
                     # Log prompt (excluding long source context)
                     log_file.write(f"PROMPT (ctx: True):\n{prompt_text + question_text}\n\n")
-                    __query_llm(final_prompt, src, dst, with_ctx=True)
+                    __query_llm(final_prompt, src, dst, f_res, f_res_noctx, with_ctx=True)
                     
                     # prompt without ctx
                     final_prompt_text = (
@@ -200,7 +200,7 @@ def LLM_validate(
                     )
                     # Log prompt
                     log_file.write(f"PROMPT (ctx: False):\n{final_prompt_text}\n\n")
-                    __query_llm(final_prompt_text, src, dst, with_ctx=False)
+                    __query_llm(final_prompt_text, src, dst, f_res, f_res_noctx, with_ctx=False)
        
     # f_res.close()
     # f_res_noctx.close()
