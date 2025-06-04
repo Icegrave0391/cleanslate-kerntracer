@@ -1,4 +1,4 @@
-Percentage of [YES]: 73.33%
+Percentage of [YES]: 80%
 [YES] unlink_file_vma -> down_write
 [YES] flush_tlb_mm_range -> flush_tlb_func
 [YES] unmap_region -> free_pgtables
@@ -9,7 +9,7 @@ Percentage of [YES]: 73.33%
 [YES] mark_page_accessed -> folio_mark_accessed
 [YES] free_pages_and_swap_cache -> release_pages
 [NO] tlb_flush_mmu -> free_pages_and_swap_cache
-[NO] anon_vma_clone -> anon_vma_interval_tree_insert
+[YES] anon_vma_clone -> anon_vma_interval_tree_insert
 [NO] kmem_cache_alloc -> should_failslab
 [YES] autoremove_wake_function -> default_wake_function
 [YES] kmem_cache_alloc_bulk -> should_failslab

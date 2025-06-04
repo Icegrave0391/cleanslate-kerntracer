@@ -63,6 +63,7 @@ def __do_filter_functions(k_func_syms):
         re.compile("lock"),
         re.compile("rcu"),
         re.compile("kcompactd"),
+        re.compile("kthread"),
         ]
     return [sym for sym in k_func_syms if any(p.search(sym) for p in patterns)]
 

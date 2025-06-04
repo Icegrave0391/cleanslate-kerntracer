@@ -1,4 +1,4 @@
-Percentage of [YES]: 78.00%
+Percentage of [YES]: 82.00%
 [YES] tcp_cleanup_congestion_control -> module_put
 [YES] tcp_v4_rcv -> inet_twsk_deschedule_put
 [NO] tcp_cwnd_restart -> cubictcp_cwnd_event
@@ -34,7 +34,7 @@ Percentage of [YES]: 78.00%
 [NO] filemap_unaccount_folio -> inode_to_bdi
 [YES] xfrm_lookup_route -> dst_release
 [NO] __blk_mq_try_issue_directly -> blk_mq_put_tag
-[NO] save_fpregs_to_fpstate -> xfd_validate_state
+[YES] save_fpregs_to_fpstate -> xfd_validate_state
 [NO] __inet_lookup_listener -> inet_ehashfn
 [YES] pick_next_task_fair -> pick_next_entity
 [YES] raw_local_deliver -> skb_clone
@@ -44,7 +44,7 @@ Percentage of [YES]: 78.00%
 [YES] ip_sublist_rcv -> tcp_v4_rcv
 [YES] netlbl_req_setattr -> cipso_v4_req_delattr
 [YES] __sk_dst_check -> ipv4_dst_check
-[NO] kmem_cache_alloc -> should_failslab
+[YES] kmem_cache_alloc -> should_failslab
 [NO] vring_interrupt -> virtqueue_disable_cb
 [YES] __skb_gro_checksum_complete -> skb_checksum
 [YES] move_folios_to_lru -> folio_mapping

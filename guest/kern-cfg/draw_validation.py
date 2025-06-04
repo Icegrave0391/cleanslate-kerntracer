@@ -48,7 +48,6 @@ if __name__ == "__main__":
     vals_noctx = []
 
     for sysid_name in target_syscalls:
-        # Extract syscall name (part after ':')
         name = sysid_name.split(":", 1)[1]
         names.append(name)
 
@@ -56,39 +55,70 @@ if __name__ == "__main__":
         val_file = os.path.join(dir_path, "validation.txt")
         noctx_file = os.path.join(dir_path, "validation_noctx.txt")
 
-        # Read percentages
         pct_val = read_percentage(val_file)
         pct_noctx = read_percentage(noctx_file)
 
         vals.append(pct_val)
         vals_noctx.append(pct_noctx)
 
-    # Convert to numpy arrays for plotting
     vals = np.array(vals)
     vals_noctx = np.array(vals_noctx)
-    x = np.arange(len(names))
 
+    # ========= 这里开始修改 =========
+    width = 0.3      # 每根柱子的宽度
+    interval = 0.05  # 同组内两根柱子的间隙
+    extra_gap = 0.5  # 额外留给“组与组之间”的空白
 
-    # Compute and print mean accuracies
+    # 组宽度 = 2 根柱子 + 组内间隙 + 额外空白
+    group_width = width * 2 + interval + extra_gap
+    x = np.arange(len(names)) * group_width
+    # ========= 修改结束 =========
+
+    # 计算并打印平均值
     mean_vals = vals.mean()
     mean_noctx = vals_noctx.mean()
     print(f"Mean accuracy (LLM-RAG): {mean_vals:.2f}%")
     print(f"Mean accuracy (LLM-nonRAG): {mean_noctx:.2f}%")
 
-    width = 0.25  # width of the bars
-
     fig, ax = plt.subplots(figsize=(9, 4))
-    bars1 = ax.bar(x - width/2, vals, width, label='LLM-RAG',color='#4C72B0')
-    bars2 = ax.bar(x + width/2, vals_noctx, width, label='LLM-nonRAG',color='#55A868')
 
-    # Add labels, title, and legend
+    bars1_x = x - width/2 - interval/2
+    bars2_x = x + width/2 + interval/2
+
+    color_rag = '#a53860'
+    color_nonrag = '#ffa5ab'
+
+    bars1 = ax.bar(
+        bars1_x,
+        vals,
+        width,
+        label='LLM-RAG',
+        color=color_rag,
+        edgecolor='black',
+        linewidth=0.5,
+        zorder=2
+    )
+    bars2 = ax.bar(
+        bars2_x,
+        vals_noctx,
+        width,
+        label='LLM-nonRAG',
+        color=color_nonrag,
+        edgecolor='black',
+        linewidth=0.5,
+        zorder=2
+    )
+
     ax.set_xticks(x)
     ax.set_xticklabels(names, rotation=30, ha='right')
 
     ax.set_ylabel('Prediction accuracy (%)')
-    ax.set_yticks([0, 25, 50, 75, 100])
-    ax.legend(ncols=2)
+    ax.set_yticks([0, 50, 70, 80, 90])
+    ax.set_ylim(0, 100)
+
+    ax.legend(ncols=2, loc='lower right')
+    ax.grid(axis='y', linestyle='dotted', linewidth=0.75, zorder=1)
 
     plt.tight_layout()
-    # plt.show()
     plt.savefig("llm_validation.pdf", bbox_inches='tight')
+    # plt.show()

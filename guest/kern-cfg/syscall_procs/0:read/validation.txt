@@ -1,4 +1,4 @@
-Percentage of [YES]: 86.00%
+Percentage of [YES]: 90.00%
 [YES] sd_init_command -> mempool_alloc
 [YES] clear_page_dirty_for_io -> folio_clear_dirty_for_io
 [YES] ptrace_may_access -> __ptrace_may_access
@@ -12,7 +12,7 @@ Percentage of [YES]: 86.00%
 [YES] pte_alloc_one -> mod_node_page_state
 [YES] __kmem_cache_alloc_node -> should_failslab
 [YES] fixup_exception -> search_exception_tables
-[NO] kmem_cache_alloc_node -> should_failslab
+[YES] kmem_cache_alloc_node -> should_failslab
 [YES] nf_hook_slow -> selinux_ip_postroute
 [YES] do_task_stat -> seq_putc
 [YES] virtscsi_queuecommand -> virtscsi_add_cmd
@@ -20,7 +20,7 @@ Percentage of [YES]: 86.00%
 [YES] ksys_read -> __fdget_pos
 [YES] neigh_resolve_output -> eth_header
 [YES] bio_alloc_bioset -> mempool_alloc
-[NO] kmem_cache_alloc -> should_failslab
+[YES] kmem_cache_alloc -> should_failslab
 [YES] sock_rfree -> __sk_mem_reduce_allocated
 [YES] __tcp_retransmit_skb -> tcp_rate_skb_sent
 [YES] __iomap_dio_rw -> kmalloc_trace
