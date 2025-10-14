@@ -5,6 +5,8 @@ cp ./kvm/vmx/* ./linux-5.19/arch/x86/kvm/vmx/
 cp ./kvm/*.c   ./linux-5.19/arch/x86/kvm/
 cp ./kvm/*.h   ./linux-5.19/arch/x86/kvm/
 
+cp ./include-asm/*.h ./linux-5.19/arch/x86/include/asm/
+
 pushd linux-5.19
 make modules -j`nproc`
 

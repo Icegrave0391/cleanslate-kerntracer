@@ -85,6 +85,7 @@ static int vmx_init_pt_trace_buffer(int vcpu_id)
 
 	pages_required = (topa_full_size + PAGE_SIZE - 1) / PAGE_SIZE;
 	order = get_order(TOPA_BUFFER_SIZE);
+	// pages_required = 1 << order;
 
 	for (i = 0; i < PER_CORE_COUNT; i++) {
 		pages = dma_alloc_from_contiguous(NULL, pages_required, order, false);
