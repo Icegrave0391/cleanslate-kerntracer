@@ -1233,11 +1233,7 @@ int dump_guest_arch_lbr(struct kvm_vcpu *vcpu, struct dl_lbr_entry *entries, int
 		u64 from_ip = 0, to_ip = 0;
 		
 		/* Read FROM, TO, and INFO MSRs */
-		// if (rdmsrl(MSR_ARCH_LBR_FROM_0 + i, from_ip) != 0 ||
-		// 	rdmsrl(MSR_ARCH_LBR_TO_0 + i, to_ip) != 0) {
-		// 	deeplog_log_error("KVM: Failed to read LBR entry %d for vCPU %d\n", i, vcpu->vcpu_id);
-		// 	break;
-		// }
+		// Chuqi: no need to use kvm_get_msr, since we already passthrough them.
 		rdmsrl(MSR_ARCH_LBR_FROM_0 + i, from_ip);
 		rdmsrl(MSR_ARCH_LBR_TO_0 + i, to_ip);
 		
