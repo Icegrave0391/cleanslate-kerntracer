@@ -1178,3 +1178,114 @@ void micro_vmcall_PT_config(struct kvm_vcpu *vcpu)
 	}
 }
 EXPORT_SYMBOL(micro_vmcall_PT_config);
+
+/* ==============================================
+	LBR functions
+   ============================================== */
+
+/* Get host Architectural LBR depth */
+static int host_lbr_depth = 0;
+int get_host_arch_lbr_depth(void)
+{
+	u32 eax, ebx, ecx, edx;
+	u32 bitmap;
+
+	if (host_lbr_depth != 0) {
+		return host_lbr_depth;
+	}
+	
+	/* Check if Architectural LBR is supported via CPUID.1CH */
+	cpuid(0x1c, &eax, &ebx, &ecx, &edx);
+	
+	/* Depth is in bits 7:0 of EAX */
+	bitmap = eax & 0xff;
+	for (int i = 7; i >= 0; --i) {
+        if (bitmap & (1u << i)) {
+            host_lbr_depth = (i + 1) * 8; // 8,16,...,64
+            break;
+        }
+    }
+	return host_lbr_depth;
+}
+EXPORT_SYMBOL(get_host_arch_lbr_depth);
+
+/* Dump all LBR entries from guest */
+int dump_guest_arch_lbr(struct kvm_vcpu *vcpu, struct dl_lbr_entry *entries, int max_entries)
+{
+	u64 lbr_depth = 0;
+	int i, count = 0;
+
+	/* Get current LBR depth */
+	if (kvm_get_msr(vcpu, MSR_ARCH_LBR_DEPTH, &lbr_depth) != 0) {
+		pr_err("KVM: Failed to read LBR depth for vCPU %d\n", vcpu->vcpu_id);
+		return -EIO;
+	}
+	
+	/* Limit to available entries */
+	if (lbr_depth > max_entries) {
+		lbr_depth = max_entries;
+	}
+	
+	pr_debug("KVM: Dumping %llu LBR entries for vCPU %d\n", lbr_depth, vcpu->vcpu_id);
+	
+	/* Read all LBR entries */
+	for (i = 0; i < lbr_depth; i++) {
+		u64 from_ip = 0, to_ip = 0;
+		
+		/* Read FROM, TO, and INFO MSRs */
+		// if (rdmsrl(MSR_ARCH_LBR_FROM_0 + i, from_ip) != 0 ||
+		// 	rdmsrl(MSR_ARCH_LBR_TO_0 + i, to_ip) != 0) {
+		// 	deeplog_log_error("KVM: Failed to read LBR entry %d for vCPU %d\n", i, vcpu->vcpu_id);
+		// 	break;
+		// }
+		rdmsrl(MSR_ARCH_LBR_FROM_0 + i, from_ip);
+		rdmsrl(MSR_ARCH_LBR_TO_0 + i, to_ip);
+		
+		/* Skip empty entries */
+		if (from_ip == 0 && to_ip == 0) {
+			continue;
+		}
+		
+		/* Store entry */
+		if (count < max_entries) {
+			entries[count].from_ip = from_ip;
+			entries[count].to_ip = to_ip;
+			count++;
+		}
+	}
+	
+	return count;
+}
+EXPORT_SYMBOL(dump_guest_arch_lbr);
+
+/* Print LBR entries to kernel log */
+void print_guest_arch_lbr(struct kvm_vcpu *vcpu)
+{
+	unsigned long rdtscp = dl_rdtscp();
+	struct dl_lbr_entry entries[MAX_ARCH_LBR_DEPTH];
+	int count, i;
+	
+	count = dump_guest_arch_lbr(vcpu, entries, ARRAY_SIZE(entries));
+	
+	if (count <= 0) {
+		deeplog_log_info("No LBR entries found for vCPU %d\n", vcpu->vcpu_id);
+		return;
+	}
+	
+	deeplog_log_info("KVM: === Arch LBR Dump for vCPU %d (%d entries) ===\n", 
+			vcpu->vcpu_id, count);
+
+	deeplog_log_info("RDTSCP: 0x%016lx\n", rdtscp);
+	for (i = 0; i < count; i++) {
+		deeplog_log_info("[%2d] 0x%016llx -> 0x%016llx\n", 
+				i, entries[i].from_ip, entries[i].to_ip);
+	}
+	
+	deeplog_log_info("=== End Arch LBR Dump ===\n");
+}
+EXPORT_SYMBOL(print_guest_arch_lbr);
+
+void vmcall_test_dump_lbr(struct kvm_vcpu *vcpu) {
+	print_guest_arch_lbr(vcpu);
+}
+EXPORT_SYMBOL(vmcall_test_dump_lbr);

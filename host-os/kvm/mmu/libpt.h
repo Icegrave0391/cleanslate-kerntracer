@@ -23,6 +23,8 @@
 #include <asm/cpufeature.h>
 
 #include "common.h"
+#include "lbr.h"
+
 // #include "metadata.h"
 // #define pt_avail() test_cpu_cap(&boot_cpu_data, X86_FEATURE_INTEL_PT)
 // #define pt_enabled() (native_read_msr(MSR_IA32_RTIT_CTL) & RTIT_CTL_TRACEEN)

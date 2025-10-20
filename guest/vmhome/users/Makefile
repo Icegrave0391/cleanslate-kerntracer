@@ -20,8 +20,9 @@ EXEC8 := statistics
 EXEC9 := init_obj_contexts
 EXEC10 := pin_memory
 EXEC11 := activate_eptp_contexts
+EXEC12 := lbr_test
 
-all: $(EXEC) $(EXEC1) $(EXEC2) $(EXEC3) $(EXEC4) $(EXEC5) $(EXEC6) $(EXEC7) $(EXEC8) $(EXEC9) $(EXEC10) $(EXEC11)
+all: $(EXEC) $(EXEC1) $(EXEC2) $(EXEC3) $(EXEC4) $(EXEC5) $(EXEC6) $(EXEC7) $(EXEC8) $(EXEC9) $(EXEC10) $(EXEC11) $(EXEC12)
 
 $(EXEC): ud2_test.c ud2_page.S
 	$(CC) $(CFLAGS_1) -o $@ $^
@@ -59,6 +60,9 @@ $(EXEC10): pin_memory.c
 $(EXEC11): activate_eptp_contexts.c
 	$(CC) $(CFLAGS) -o $@ $^
 
+$(EXEC12): lbr_test.c
+	$(CC) $(CFLAGS) -o $@ $^
+
 obj-m += cf_logging_enable.o
 KVERN := $(shell uname -r)
 
@@ -85,5 +89,6 @@ clean:
 	rm -rf *.o $(EXEC9)
 	rm -rf *.o $(EXEC10)
 	rm -rf *.o $(EXEC11)
+	rm -rf *.o $(EXEC12)
 	rm -rf *.out
 	make CC=$(CC) -C /lib/modules/$(KVERN)/build M=$(PWD) clean

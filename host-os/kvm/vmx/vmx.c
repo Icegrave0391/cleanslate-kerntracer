@@ -7622,6 +7622,50 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
 	guest_state_exit_irqoff();
 }
 
+#ifdef CONFIG_DEEPLOG
+// Chuqi: we always enable guest arch LBR whenever the guest VCPU runs
+void kvm_enable_guest_arch_lbr(struct kvm_vcpu *vcpu) 
+{
+	int i;
+	u64 lbr_ctl;
+	// u64 guest_depth = 0; //debug
+	// u64 guest_ctl = 0;   //debug
+
+	if (!vmx_arch_lbr_supported())
+		return;
+
+	/* Chuqi: debug get lbr depth (should always be 16) */
+	// kvm_get_msr(vcpu, MSR_ARCH_LBR_DEPTH, &guest_depth);
+	// deeplog_log_info("KVM: Current guest LBR depth for vCPU %d: %llu\n", 
+	// 		vcpu->vcpu_id, guest_depth);
+	// kvm_get_msr(vcpu, MSR_ARCH_LBR_CTL, &guest_ctl);
+	// deeplog_log_info("KVM: Current guest LBR ctl for vCPU %d: %llu\n", 
+	// 		vcpu->vcpu_id, guest_ctl);
+
+	/* enable LBR from->to passthrough */
+	for (i = 0; i < 16; i++) {
+		vmx_set_intercept_for_msr(vcpu, MSR_ARCH_LBR_FROM_0 + i, MSR_TYPE_RW, false);
+		vmx_set_intercept_for_msr(vcpu, MSR_ARCH_LBR_TO_0 + i, MSR_TYPE_RW, false);
+		// if (lbr->info)
+		// 	vmx_set_intercept_for_msr(vcpu, MSR_ARCH_LBR_INFO_0 + i, MSR_TYPE_RW, set);
+	}
+
+	wrmsrl(MSR_ARCH_LBR_DEPTH, 16);
+	
+	/* Configure LBR control for ring-0 only tracing */
+	lbr_ctl = 0;
+	lbr_ctl |= ARCH_LBR_CTL_ENABLE;        /* Enable LBR */
+	lbr_ctl |= ARCH_LBR_CTL_KERNEL;   	   /* ring-0 only */
+	
+	// lbr_ctl |= ARCH_LBR_ALL_BRANCHES;   /* mode: all */
+	lbr_ctl |= ARCH_LBR_CALLSTACK_CALL_BRANCHES;  /* mode: callstack */
+	
+	/* Write LBR control to guest */
+	vmcs_write64(GUEST_IA32_LBR_CTL, lbr_ctl);
+}
+
+#endif
+
 static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
 {
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
@@ -7706,6 +7750,10 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
 	atomic_switch_perf_msrs(vmx);
 	if (intel_pmu_lbr_is_enabled(vcpu))
 		vmx_passthrough_lbr_msrs(vcpu);
+
+#ifdef CONFIG_DEEPLOG
+	kvm_enable_guest_arch_lbr(vcpu);
+#endif
 
 	if (enable_preemption_timer)
 		vmx_update_hv_timer(vcpu);
@@ -9052,6 +9100,15 @@ static int __init vmx_init(void)
 		vmx_init_pt();
 	else
 		deeplog_log_error("pt_init failed: PT mode is NOT host-guest.\n");
+
+	if (vmx_arch_lbr_supported()) {
+		get_host_arch_lbr_depth();
+		deeplog_log_info("Host Architecture LBR is supported on this CPU.\n");
+		deeplog_log_info("Host Architecture LBR depth: %d\n", get_host_arch_lbr_depth());
+	}
+	else {
+		deeplog_log_error("Host Architecture LBR is not supported on this CPU.\n");
+	}
 #else
 	printk(KERN_WARNING "vmx_init: DeepLog is not enabled. Please enable via kconfig: CONFIG_DEEPLOG.\n");
 #endif

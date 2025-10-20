@@ -12,6 +12,8 @@
 #define KVM_DEEPLOG_OBJ_PROFILING    0x2000c
 #define KVM_DEEPLOG_PIN_MEMORY    0x40002
 #define KVM_DEEPLOG_WALK_MEMORY    0x40003
+#define KVM_DEEPLOG_WALK_MEMORY    0x40003
+#define KVM_DEEPLOG_DUMPLBR         0x40005
 
 typedef unsigned long long  u64;
 
@@ -82,4 +84,9 @@ static inline void Pin_guest_memory(void)
 static inline void Walk_guest_memory_done(void)
 {
     kvm_hypercall3(KVM_DEEPLOG_WALK_MEMORY, 0, 0, 0);
+}
+
+static inline void Dump_guest_lbr(void)
+{
+    kvm_hypercall3(KVM_DEEPLOG_DUMPLBR, 0, 0, 0);
 }

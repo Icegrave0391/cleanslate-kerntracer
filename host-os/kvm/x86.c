@@ -3613,6 +3613,21 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 			kvm_update_cpuid_runtime(vcpu);
 		}
 		break;
+	/*
+	 * Chuqi: always 16
+	 */
+	case MSR_ARCH_LBR_DEPTH:
+		if (!msr_info->host_initiated &&
+		    !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+			return 1;
+		wrmsrl(MSR_ARCH_LBR_DEPTH, 16);
+		break;
+	// Chuqi: simply set to the host
+	case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
+	case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
+	case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
+		wrmsrl(msr_info->index, msr_info->data);
+		break;
 	case MSR_SMI_COUNT:
 		if (!msr_info->host_initiated)
 			return 1;
@@ -3877,7 +3892,18 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		msr_info->data = 0;
 		break;
 	case MSR_ARCH_LBR_CTL:
+		if (!msr_info->host_initiated &&
+		    !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+			return 1;
+		// Chuqi: just fake a value 0 to the guest, as Appare
+		// does not allow the guest to modify its LBR settings.
+		msr_info->data = 0x0;
+		break;
 	case MSR_ARCH_LBR_DEPTH:
+		// Chuqi: we always fix the depth visible to guest.
+		// msr_info->data = get_host_arch_lbr_depth();
+		msr_info->data = 16;
+		break;
 	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
 			return kvm_pmu_get_msr(vcpu, msr_info);
@@ -9431,6 +9457,7 @@ extern int deeplog_syscall_count[VCPU_MAX];
 #define KVM_DEEPLOG_WALK_MEMORY	0x40003
 
 #define KVM_DEEPLOG_OMNILOG		0x40004
+#define KVM_DEEPLOG_DUMPLBR		0x40005
 #define ENABLE_OMNILOG
 
 #define KVM_DEEPLOG_INIT_DEEPLOG_CONTEXTS	0x19999
@@ -9633,6 +9660,10 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
 		vmcall_walk_through_all_guest_memory_done(vcpu);
 		break;
 
+	case KVM_DEEPLOG_DUMPLBR:
+		deeplog_log_info("DUMP LBR ENTRIES\n");
+		vmcall_test_dump_lbr(vcpu);
+		break;
 	/**
 	 * OmniLog
 	 */

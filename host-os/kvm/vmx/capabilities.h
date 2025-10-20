@@ -406,6 +406,15 @@ static inline bool vmx_pt_mode_is_host_guest(void)
 	return pt_mode == PT_MODE_HOST_GUEST;
 }
 
+// Chuqi: detect whether host supports arch LBR
+static inline bool vmx_arch_lbr_supported(void)
+{
+	if (!boot_cpu_has(X86_FEATURE_ARCH_LBR))
+		return false;
+
+	return true;
+}
+
 static inline u64 vmx_get_perf_capabilities(void)
 {
 	u64 perf_cap = 0;

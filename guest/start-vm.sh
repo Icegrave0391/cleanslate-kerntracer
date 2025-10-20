@@ -28,9 +28,8 @@ stty intr ^]
 QEMU="../local-qemu/qemu-8.1.0/build/qemu-system-x86_64"
 MEMORY=8192M
 
-# taskset -c 0,1,2,3
 # Enable LBR support with proper CPU features
-$QEMU -s -cpu host,intel-pt=on,pmu=on,+arch-lbr \
+taskset -c 0,1,2,3,4,5,6,7 $QEMU -s -cpu host,intel-pt=on,pmu=on,+arch-lbr \
 	  -enable-kvm \
 	  -smp 8,maxcpus=8 \
 	  -m $MEMORY -mem-prealloc \
